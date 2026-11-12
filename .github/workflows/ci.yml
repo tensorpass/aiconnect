@@ -2,9 +2,10 @@
 # rated high or critical, lint, types, the build and the unit tests. The build comes before the unit tests,
 # since the loader's size test bundles the stylesheet that the build of @tensorpass/aiconnect-react writes.
 # The wallet's end to end tests run in the wallet's repository, against the demo of this one. The job reads
-# the repository and
-# writes nothing to it. Each action is pinned to the commit of a release, since a tag can be moved to other
-# code after a review.
+# the repository and writes nothing to it. Each action is pinned to the commit of a release, since a tag can
+# be moved to other code after a review.
+# The job runs on the VPS runner of this repository (runs-on: [self-hosted, vps]), in a fresh container with no
+# root: ci/runner of vps-automation.
 name: CI
 
 on:
@@ -17,7 +18,8 @@ permissions:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, vps]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
