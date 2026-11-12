@@ -10,6 +10,8 @@ The docs at https://tensorpass.app/docs live with the website, which is not in t
 
 AI Wallet, the extension, is proprietary software in its own repository. A change to the SDK that the wallet depends on is tested against the wallet by the maintainers.
 
+The connectors, the AI providers the wallet holds, are part of the wallet's code, so this repository has none. To propose a provider, use the form at https://tensorpass.app/connectors/propose: the team reads the provider's documentation, answers within one working day and writes the connector.
+
 ## Set up
 
 You need Node.js 26 or later and npm. The repository is one npm workspace.
