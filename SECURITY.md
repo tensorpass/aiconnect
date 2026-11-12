@@ -2,7 +2,7 @@
 
 ## Report a vulnerability
 
-Write to hello@tensorpass.app with the word "security" in the subject. Please do not open a public issue or a public pull request for a vulnerability, since both are visible to everyone before a fix exists.
+Write to security@tensorpass.app. Please do not open a public issue or a public pull request for a vulnerability, since both are visible to everyone before a fix exists.
 
 A useful report holds:
 
