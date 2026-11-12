@@ -1,0 +1,58 @@
+# WordPress with the AI Connect plugin, for its end to end test (scripts/e2e.sh) at http://localhost:5046.
+# The plugin folder is mounted read only, so the site runs the working copy.
+name: aiconnect-wordpress
+
+services:
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 2s
+      retries: 30
+
+  wordpress:
+    image: wordpress:6.8-php8.3-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '5046:80'
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - site:/var/www/html
+      - ./aiconnect:/var/www/html/wp-content/plugins/aiconnect:ro
+    # Ready once the image has copied WordPress into the volume and written wp-config.php.
+    healthcheck:
+      test: ['CMD-SHELL', 'test -f /var/www/html/wp-config.php']
+      interval: 2s
+      retries: 30
+
+  cli:
+    image: wordpress:cli-php8.3
+    profiles: ['cli']
+    user: '33:33'
+    depends_on:
+      - wordpress
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - site:/var/www/html
+      - ./aiconnect:/var/www/html/wp-content/plugins/aiconnect:ro
+
+volumes:
+  db:
+  site:

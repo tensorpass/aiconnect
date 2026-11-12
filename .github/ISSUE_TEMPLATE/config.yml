@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/tensorpass/aiwallet-sdk/blob/main/SECURITY.md
+    about: Vulnerabilities are reported in private, by email.
+  - name: Read the docs
+    url: https://tensorpass.app/docs
+    about: Quickstarts, guides, the SDK reference and the wallet protocol.

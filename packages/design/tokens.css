@@ -1,0 +1,79 @@
+/* The design tokens of AI Connect's site side: the connect window and the interface modules a site
+   shows read these --aic-* names, in the AI Wallet's world (near white ground, white surfaces, ink
+   type, cyan for the live connection). A site overrides any of them on :root (or an ancestor of the
+   window or module) to match its own design system.
+
+   The light palette applies by default. An element with data-aic-theme="dark" takes the dark one,
+   and data-aic-theme="auto" follows the system setting. */
+
+:root {
+  --aic-font: inherit;
+  --aic-mono: 'Reddit Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --aic-ink: #0b0d12;
+  --aic-muted: #5e636d;
+  --aic-surface: #ffffff;
+  --aic-ground: #f6f7f9;
+  --aic-border: #e6e8ec;
+  --aic-accent: #0b0d12;
+  --aic-accent-ink: #ffffff;
+  --aic-cyan: #0ab9f7;
+  --aic-cyan-soft: #7fddfb;
+  --aic-cyan-faint: #cff4fc;
+  --aic-halo: #e3f8fd;
+  --aic-chip: #ffffff;
+  --aic-chip-ink: #0b0d12;
+  --aic-stripe: #15161a;
+  --aic-danger: #c4321f;
+  --aic-focus: #046b92;
+  --aic-field-edge: #7c818b;
+  --aic-backdrop: rgba(11, 13, 18, 0.42);
+  --aic-shadow: 0 24px 64px rgba(11, 13, 18, 0.2);
+  --aic-radius: 24px;
+  --aic-width: 380px;
+  --aic-panel-width: 420px;
+  --aic-popup-width: 400px;
+  --aic-popup-height: 640px;
+  --aic-inline-height: 560px;
+  --aic-page-width: 760px;
+  --aic-layer: 990;
+}
+
+[data-aic-theme='dark'] {
+  --aic-ink: #f3f4f6;
+  --aic-muted: #9aa0aa;
+  --aic-surface: #17181d;
+  --aic-ground: #0e0f13;
+  --aic-border: #2a2c33;
+  --aic-accent: #f3f4f6;
+  --aic-accent-ink: #0e0f13;
+  --aic-cyan-faint: #0f3a49;
+  --aic-focus: #0ab9f7;
+  --aic-field-edge: #747986;
+  --aic-halo: #0c2a35;
+  --aic-stripe: #050506;
+  --aic-danger: #ff8a7a;
+  --aic-backdrop: rgba(0, 0, 0, 0.6);
+  --aic-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-aic-theme='auto'] {
+    --aic-ink: #f3f4f6;
+    --aic-muted: #9aa0aa;
+    --aic-surface: #17181d;
+    --aic-ground: #0e0f13;
+    --aic-border: #2a2c33;
+    --aic-accent: #f3f4f6;
+    --aic-accent-ink: #0e0f13;
+    --aic-cyan-faint: #0f3a49;
+    --aic-focus: #0ab9f7;
+    --aic-field-edge: #747986;
+    --aic-halo: #0c2a35;
+    --aic-stripe: #050506;
+    --aic-danger: #ff8a7a;
+    --aic-backdrop: rgba(0, 0, 0, 0.6);
+    --aic-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+  }
+}

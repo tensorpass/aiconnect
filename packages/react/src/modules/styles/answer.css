@@ -1,0 +1,101 @@
+/* The answer as the visitor's model writes it: its paragraphs, headings, lists, code and links, each
+   paragraph in the direction of its own words, and the cyan caret it writes behind it. */
+
+.aic-answer {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  color: var(--aic-m-ink-2);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+/* Each paragraph takes the direction of its own first words, so an English answer reads left to
+   right inside a Hebrew module and the reverse. */
+.aic-answer :is(p, li),
+.aic-question {
+  unicode-bidi: plaintext;
+}
+
+.aic-answer p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.aic-answer .aic-answer-heading {
+  margin-block-start: 4px;
+  color: var(--aic-ink);
+  font-weight: 800;
+}
+
+.aic-answer :is(strong, b) {
+  color: var(--aic-ink);
+  font-weight: 700;
+}
+
+.aic-answer :is(ul, ol) {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-inline-start: 22px;
+}
+
+.aic-answer ul {
+  list-style: disc;
+}
+
+.aic-answer ol {
+  list-style: decimal;
+}
+
+.aic-answer li {
+  margin: 0;
+  padding-inline-start: 2px;
+}
+
+.aic-answer li::marker {
+  color: var(--aic-muted);
+}
+
+.aic-answer code {
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--aic-m-fill);
+  color: var(--aic-ink);
+  font-family: var(--aic-mono);
+  font-size: 0.86em;
+  font-weight: 600;
+}
+
+.aic-answer a {
+  color: var(--aic-ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--aic-border);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.aic-answer a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* The caret the answer writes behind it, held still while the words arrive. */
+.aic-caret {
+  display: inline-block;
+  width: 8px;
+  height: 1.05em;
+  margin-inline-start: 3px;
+  vertical-align: -0.17em;
+  border-radius: 2px;
+  background: var(--aic-cyan);
+}
+
+/* The site's safe answer, shown in place of a question or an answer the guards stopped. */
+.aic-answer[data-blocked] {
+  color: var(--aic-muted);
+  font-style: italic;
+}

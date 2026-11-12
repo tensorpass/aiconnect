@@ -1,0 +1,33 @@
+{
+  "name": "@tensorpass/aiconnect-design",
+  "version": "0.1.0",
+  "description": "The design tokens, the TensorPass mark, the providers' marks, key card colours and room colours shared by the AI Connect connect window, the AI Wallet extension and the website.",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "license": "Apache-2.0",
+  "scripts": {
+    "brand": "node scripts/exportBrand.ts"
+  },
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./card-tints": "./src/cardTints.ts",
+    "./room-color": "./src/roomColor.ts",
+    "./brand-mark": "./src/brandMark.ts",
+    "./provider-marks": "./src/providerMarks.ts"
+  },
+  "files": [
+    "tokens.css",
+    "src/cardTints.ts",
+    "src/roomColor.ts",
+    "src/brandMark.ts",
+    "src/providerMarks.ts",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "devDependencies": {
+    "@fontsource/reddit-sans": "^5.3.0",
+    "opentype.js": "^2.0.0"
+  }
+}

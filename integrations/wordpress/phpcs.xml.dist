@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+  The plugin's PHP follows the WordPress coding standards. Two rules are relaxed to the repository's own: a
+  function or class carries a comment where the comment says something its name does not, and the editor
+  script's dependency file keeps the name WordPress tooling gives it, edit.asset.php.
+-->
+<ruleset name="AI Connect for WordPress">
+  <file>aiconnect</file>
+  <arg name="extensions" value="php"/>
+  <arg value="s"/>
+
+  <config name="minimum_wp_version" value="6.5"/>
+  <config name="testVersion" value="8.1-"/>
+
+  <rule ref="WordPress">
+    <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+    <exclude name="Squiz.Commenting.ClassComment.Missing"/>
+  </rule>
+
+  <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+    <exclude-pattern>*/blocks/*/*.asset.php</exclude-pattern>
+  </rule>
+
+  <rule ref="WordPress.WP.I18n">
+    <properties>
+      <property name="text_domain" type="array">
+        <element value="aiconnect"/>
+      </property>
+    </properties>
+  </rule>
+
+  <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+    <properties>
+      <property name="prefixes" type="array">
+        <element value="aiconnect"/>
+      </property>
+    </properties>
+  </rule>
+</ruleset>

@@ -1,0 +1,29 @@
+name: Feature request
+description: A change to the SDK, a module or an integration, or a new connector.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you are trying to do
+      description: The site or the product you work on and what stops you today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you propose
+      description: The behaviour you would like, with the code a site would write when you can show it.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you tried
+      description: The other ways you considered and why they fall short.
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I can send the pull request for this.

@@ -1,0 +1,14 @@
+node_modules
+dist
+*.tsbuildinfo
+.tmp/
+.env
+.env*.local
+
+# Playwright runs
+test-results/
+playwright-report/
+
+
+# Session handoffs and the task roadmap, kept across sessions and outside .tmp
+/.continuations/

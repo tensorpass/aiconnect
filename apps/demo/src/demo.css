@@ -1,0 +1,73 @@
+body {
+  margin: 0;
+  background: #faf9f6;
+  color: #1f1d18;
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.turn {
+  margin: 16px 0;
+}
+
+.question {
+  font-weight: 600;
+}
+
+.tool {
+  overflow-x: auto;
+  padding: 8px;
+  background: #efece5;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.error {
+  color: #b3261e;
+}
+
+form {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  font: inherit;
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 16px 0;
+  padding: 4px;
+  border-radius: 999px;
+  background: #efece5;
+}
+
+.segmented button {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.segmented button[aria-checked='true'] {
+  background: #1f1d18;
+  color: #fff;
+}
+
+.segmented button:focus-visible {
+  outline: 2px solid #1f1d18;
+  outline-offset: 2px;
+}

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "strict": true,
+    "noUncheckedIndexedAccess": false,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "declaration": true,
+    "composite": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx"
+  }
+}

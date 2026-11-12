@@ -1,0 +1,224 @@
+/* The forms a chat takes on the page: inline in the page's flow, docked in a side panel at the
+   page's edge, in a popup over a floating button, and in a full page AI mode. The buttons that open
+   them are in launchers.css. The panel and the popup sit at the end of the reading direction, on the
+   right in left to right languages and on the left in right to left ones, and take the whole screen
+   on a phone. */
+
+@keyframes aic-slide-in {
+  from { opacity: 0; transform: translateX(var(--aic-m-slide)); }
+}
+
+@keyframes aic-pop-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+}
+
+@keyframes aic-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+}
+
+.aic-inline,
+.aic-panel,
+.aic-popup,
+.aic-page-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The panel, the popup and the full page take the focus as a whole to hold the keyboard. They are
+   containers, so they draw no focus ring, whatever focus rule the site sets for its own controls. */
+:is(.aic-panel, .aic-popup, .aic-page):focus {
+  outline: none;
+}
+
+.aic-inline {
+  width: 100%;
+  height: var(--aic-inline-height);
+  overflow: hidden;
+  border: 1px solid var(--aic-border);
+  border-radius: var(--aic-radius);
+  background: var(--aic-surface);
+  box-shadow: var(--aic-m-raise);
+}
+
+.aic-panel {
+  --aic-m-slide: 28px;
+  position: fixed;
+  inset-block: 0;
+  right: 0;
+  z-index: var(--aic-layer);
+  width: min(var(--aic-panel-width), 100vw);
+  padding-block-start: env(safe-area-inset-top);
+  border-inline-start: 1px solid var(--aic-border);
+  background: var(--aic-surface);
+  box-shadow: var(--aic-shadow);
+  animation: aic-slide-in 280ms var(--aic-m-ease);
+}
+
+.aic-panel[dir='rtl'] {
+  --aic-m-slide: -28px;
+  right: auto;
+  left: 0;
+}
+
+.aic-popup {
+  position: fixed;
+  right: 20px;
+  bottom: calc(max(20px, env(safe-area-inset-bottom)) + 74px);
+  z-index: var(--aic-layer);
+  width: min(var(--aic-popup-width), calc(100vw - 32px));
+  height: min(var(--aic-popup-height), calc(100dvh - 120px));
+  overflow: hidden;
+  border: 1px solid var(--aic-border);
+  border-radius: var(--aic-radius);
+  background: var(--aic-surface);
+  box-shadow: var(--aic-shadow);
+  transform-origin: bottom right;
+  animation: aic-pop-in 240ms var(--aic-m-ease);
+}
+
+.aic-popup[dir='rtl'] {
+  right: auto;
+  left: 20px;
+  transform-origin: bottom left;
+}
+
+/* The full page AI mode: one column on the page's ground, the conversation in the middle. */
+.aic-page {
+  position: fixed;
+  inset: 0;
+  z-index: var(--aic-layer);
+  display: flex;
+  justify-content: center;
+  background: var(--aic-ground);
+  animation: aic-fade-up 260ms var(--aic-m-ease);
+}
+
+.aic-page-column {
+  width: min(var(--aic-page-width), 100%);
+  height: 100%;
+  padding-block: env(safe-area-inset-top) env(safe-area-inset-bottom);
+}
+
+.aic-page .aic-head {
+  min-height: 76px;
+  padding-inline: 24px 18px;
+  border-block-end: 0;
+}
+
+.aic-page .aic-head-title {
+  font-size: 20px;
+}
+
+.aic-page .aic-round {
+  background: var(--aic-surface);
+  box-shadow: 0 0 0 1px var(--aic-border);
+}
+
+.aic-page .aic-log {
+  padding: 8px 24px 16px;
+}
+
+.aic-page .aic-empty {
+  align-content: center;
+  justify-items: center;
+  min-height: 100%;
+  padding-block: 16px 40px;
+  text-align: center;
+}
+
+.aic-page .aic-empty-ring {
+  display: block;
+  width: min(300px, 100%);
+}
+
+.aic-page .aic-empty-ring .aic-ring {
+  height: 132px;
+}
+
+.aic-page .aic-empty-ring .aic-disc {
+  width: 92px;
+  height: 92px;
+}
+
+.aic-page .aic-empty-ring .aic-disc svg {
+  width: 40px;
+  height: 40px;
+}
+
+.aic-page .aic-empty:has(.aic-note) .aic-empty-ring {
+  display: none;
+}
+
+.aic-page .aic-intro {
+  max-width: 18ch;
+  font-size: clamp(34px, 3.4vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.aic-page .aic-empty .aic-note {
+  max-width: 460px;
+  background: var(--aic-surface);
+  box-shadow: var(--aic-m-raise);
+}
+
+.aic-page .aic-suggestions {
+  width: min(520px, 100%);
+}
+
+.aic-page .aic-question,
+.aic-page .aic-tool {
+  background: var(--aic-surface);
+  box-shadow: 0 0 0 1px var(--aic-border);
+}
+
+.aic-page .aic-answer {
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.aic-page .aic-composer {
+  padding: 8px 24px 24px;
+}
+
+.aic-page .aic-field {
+  min-height: 60px;
+  padding-block: 9px;
+  padding-inline: 20px 9px;
+  border-radius: 18px;
+}
+
+.aic-page .aic-field-input {
+  font-size: 17px;
+}
+
+@media (max-width: 640px) {
+  .aic-panel,
+  .aic-popup {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .aic-popup:not([hidden]) ~ .aic-fab {
+    display: none;
+  }
+
+  .aic-head,
+  .aic-page .aic-head {
+    padding-inline: 16px 10px;
+  }
+
+  .aic-log,
+  .aic-page .aic-log {
+    padding-inline: 16px;
+  }
+
+  .aic-composer,
+  .aic-page .aic-composer {
+    padding: 8px 12px max(12px, env(safe-area-inset-bottom));
+  }
+}

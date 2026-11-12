@@ -1,0 +1,4 @@
+# The Web Components script, copied from packages/elements/dist by scripts/package.sh, and the plugin's zip.
+aiconnect/assets/
+dist/
+test-results/

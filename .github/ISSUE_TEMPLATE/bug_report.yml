@@ -1,0 +1,55 @@
+name: Bug report
+description: Something in the SDK, the demo or an integration does not work as the docs say.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A vulnerability does not belong here: report it in private, as SECURITY.md says.
+  - type: dropdown
+    id: part
+    attributes:
+      label: Part
+      description: Where the bug shows.
+      options:
+        - "@tensorpass/aiconnect"
+        - "@tensorpass/aiconnect-react"
+        - "@tensorpass/aiconnect-elements"
+        - "@tensorpass/aiconnect-design"
+        - The demo (apps/demo)
+        - The WordPress plugin
+        - The docs
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: The package version, or the commit of this repository you built from.
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what you got. Paste the error and the browser console when there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The smallest page or script that shows it.
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and system
+      description: The browser with its version, the operating system, and the AI Wallet version when the wallet is involved.
+  - type: input
+    id: account
+    attributes:
+      label: Account that answered
+      description: The kind of account when a provider is involved, such as "Mistral API key". Never paste a key or a token.

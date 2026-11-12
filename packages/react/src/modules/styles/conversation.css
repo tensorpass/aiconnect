@@ -1,0 +1,320 @@
+/* The chat every form shares: the header with the account that answers, and the conversation with
+   the visitor's question, the tools as they run, the thinking line, a stopped answer, the site's
+   result cards and the error of the last answer. The answer's own text is in answer.css. */
+
+.aic-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 68px;
+  margin: 0;
+  padding-block: 12px;
+  padding-inline: 20px 14px;
+  border-block-end: 1px solid var(--aic-border);
+}
+
+.aic-head-text {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+}
+
+.aic-head-title {
+  margin: 0;
+  overflow: hidden;
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.aic-account {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--aic-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* A key card in the wallet's image: a small card with the sheen from its top corner, crossed by
+   its ink stripe. */
+.aic-keycard {
+  position: relative;
+  flex: none;
+  width: 24px;
+  height: 16px;
+  overflow: hidden;
+  border-radius: 4px;
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--aic-surface) 70%, transparent), transparent 55%),
+    color-mix(in srgb, var(--aic-ink) 13%, var(--aic-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--aic-ink) 10%, transparent);
+}
+
+.aic-keycard::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 52%;
+  height: 3.5px;
+  background: var(--aic-stripe);
+}
+
+.aic-account-arcs {
+  flex: none;
+  margin-inline-start: -2px;
+}
+
+.aic-account-arcs path {
+  stroke: var(--aic-cyan-soft);
+}
+
+/* The account's name keeps its room; the model gives way first on a narrow module. */
+.aic-account-name {
+  flex: none;
+  white-space: nowrap;
+}
+
+.aic-account-name b {
+  color: var(--aic-ink);
+  font-weight: 700;
+}
+
+/* Model and tool names are literal strings, read left to right in every language. */
+.aic-account-model,
+.aic-tool-name {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.aic-account-model {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--aic-m-fill);
+  color: var(--aic-muted);
+  font-family: var(--aic-mono);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.aic-log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px 20px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--aic-border) transparent;
+}
+
+.aic-turns {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aic-turn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.aic-question {
+  justify-self: end;
+  max-width: 86%;
+  margin: 0;
+  padding: 10px 15px;
+  border-radius: 18px;
+  border-end-end-radius: 6px;
+  background: var(--aic-m-fill);
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.aic-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aic-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  margin: 0;
+  padding-block: 6px;
+  padding-inline: 7px 12px;
+  border-radius: 12px;
+  background: var(--aic-surface);
+  box-shadow: 0 0 0 1px var(--aic-border);
+  color: var(--aic-muted);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.3;
+  animation: aic-rise-in 220ms var(--aic-m-ease);
+}
+
+.aic-tool-light {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--aic-halo);
+  color: var(--aic-cyan);
+}
+
+.aic-tool[data-status='running'] .aic-tool-light::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--aic-cyan);
+  animation: aic-pulse 1.1s ease-in-out infinite;
+}
+
+.aic-tool[data-status='failed'] .aic-tool-light {
+  background: color-mix(in srgb, var(--aic-danger) 14%, var(--aic-surface));
+}
+
+.aic-tool[data-status='failed'] .aic-tool-light::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--aic-danger);
+}
+
+.aic-tool-name {
+  flex: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: var(--aic-ink);
+  font-family: var(--aic-mono);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.aic-tool-label {
+  flex: none;
+  color: var(--aic-ink);
+  font-weight: 700;
+}
+
+.aic-tool-args {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.aic-tool-failed {
+  flex: none;
+  color: var(--aic-danger);
+  font-weight: 700;
+}
+
+.aic-thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--aic-muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.aic-stopped {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--aic-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.aic-stopped i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.aic-results {
+  width: 100%;
+  margin-block-start: 2px;
+}
+
+.aic-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--aic-danger) 9%, var(--aic-surface));
+  color: var(--aic-danger);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.aic-error p {
+  flex: 1 1 200px;
+  margin: 0;
+}
+
+.aic-error .aic-text-button {
+  color: inherit;
+}
+
+@keyframes aic-rise-in {
+  from { opacity: 0; transform: translateY(4px); }
+}

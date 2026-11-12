@@ -1,0 +1,162 @@
+/* The ground every interface module stands on: its own type and colour from the --aic-* tokens,
+   the two shades it derives from them (the fill of the visitor's question, the ink of the answer)
+   so a site's palette carries into both, and the controls the forms share. Every element a module
+   draws sets its own spacing, so the host page's element styles do not reach it. */
+
+@keyframes aic-arc {
+  0%,
+  100% { stroke: var(--aic-cyan-faint); }
+  40% { stroke: var(--aic-cyan); }
+}
+
+@keyframes aic-pulse {
+  50% { opacity: 0.35; transform: scale(0.7); }
+}
+
+.aic-module {
+  --aic-m-fill: var(--aic-fill, color-mix(in srgb, var(--aic-ink) 7%, var(--aic-surface)));
+  --aic-m-ink-2: var(--aic-ink-2, color-mix(in srgb, var(--aic-ink) 84%, var(--aic-surface)));
+  --aic-m-raise: 0 1px 2px rgba(11, 13, 18, 0.06), 0 8px 24px -16px rgba(11, 13, 18, 0.18);
+  --aic-m-lift: 0 1px 2px rgba(11, 13, 18, 0.08), 0 10px 22px -12px rgba(11, 13, 18, 0.26);
+  --aic-m-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  font-family: var(--aic-font);
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.aic-module {
+  color: var(--aic-ink);
+}
+
+.aic-module *,
+.aic-module *::before,
+.aic-module *::after {
+  box-sizing: border-box;
+}
+
+.aic-module[hidden] {
+  display: none;
+}
+
+.aic-module ::selection {
+  background: var(--aic-cyan-faint);
+  color: var(--aic-ink);
+}
+
+.aic-module button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.aic-module :is(button, a):focus-visible {
+  outline: 2px solid var(--aic-focus);
+  outline-offset: 3px;
+}
+
+.aic-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.aic-round {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--aic-ground);
+  color: var(--aic-muted);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.aic-round:hover {
+  background: var(--aic-m-fill);
+  color: var(--aic-ink);
+}
+
+.aic-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: 8px 0 0;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--aic-accent);
+  color: var(--aic-accent-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 200ms var(--aic-m-ease);
+}
+
+.aic-button:hover {
+  transform: translateY(-1px);
+}
+
+.aic-text-button {
+  margin: 0;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: underline;
+  text-decoration-color: var(--aic-border);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.aic-text-button:hover {
+  text-decoration-color: currentColor;
+}
+
+/* The wallet's arcs, lit one after the other while the visitor's AI answers. */
+.aic-live-arcs path,
+.aic-module [data-live] .aic-account-arcs path {
+  animation: aic-arc 1.8s ease-out infinite;
+}
+
+.aic-live-arcs .aic-w2,
+.aic-module [data-live] .aic-account-arcs .aic-w2 {
+  animation-delay: 0.18s;
+}
+
+.aic-live-arcs .aic-w3,
+.aic-module [data-live] .aic-account-arcs .aic-w3 {
+  animation-delay: 0.36s;
+}
+
+[dir='rtl'] .aic-arrow {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aic-module *,
+  .aic-module *::before,
+  .aic-module *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,145 @@
+/* The search bar that answers: the site's search field with the wallet's live answer under it, in
+   a card that holds the tools it ran, the answer, the site's own result cards and the account that
+   answers. Suggested questions sit under an empty bar as chips. The bar is as tall as a page's
+   large buttons, so it lines up with the buttons beside it. */
+
+.aic-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.aic-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  margin: 0;
+  padding-block: 6px;
+  padding-inline: 18px 7px;
+  border: 1px solid var(--aic-field-edge);
+  border-radius: 16px;
+  background: var(--aic-surface);
+  box-shadow: var(--aic-m-raise);
+  color: var(--aic-muted);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.aic-search-bar:focus-within {
+  border-color: var(--aic-focus);
+  box-shadow: 0 0 0 1px var(--aic-focus), 0 0 0 4px var(--aic-cyan-faint);
+}
+
+.aic-search-bar > svg {
+  flex: none;
+}
+
+.aic-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.3;
+  caret-color: var(--aic-cyan);
+  appearance: none;
+}
+
+.aic-search-input::-webkit-search-cancel-button,
+.aic-search-input::-webkit-search-decoration {
+  appearance: none;
+}
+
+/* The bar's own clear button, in place of the browser's. */
+.aic-search-clear {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--aic-muted);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.aic-search-clear:hover {
+  background: var(--aic-m-fill);
+  color: var(--aic-ink);
+}
+
+.aic-search .aic-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.aic-search .aic-suggestion {
+  width: auto;
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--aic-m-fill);
+  box-shadow: none;
+  color: var(--aic-m-ink-2);
+  font-size: 14px;
+}
+
+.aic-search .aic-suggestion:hover {
+  box-shadow: 0 0 0 1px var(--aic-border);
+  transform: none;
+}
+
+.aic-search .aic-suggestion .aic-arrow {
+  display: none;
+}
+
+.aic-search-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  gap: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--aic-border);
+  border-radius: 18px;
+  background: var(--aic-surface);
+  box-shadow: var(--aic-m-raise);
+  animation: aic-rise-in 240ms var(--aic-m-ease);
+}
+
+.aic-search-result .aic-error {
+  margin: 0;
+  width: 100%;
+}
+
+/* The connection step sits in the card itself, with no ground of its own. */
+.aic-search-result .aic-note[data-compact] {
+  padding: 0;
+  background: none;
+}
+
+.aic-search-foot {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 2px 0 0;
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--aic-border);
+}
+
+.aic-search-foot .aic-account {
+  flex: 1;
+}

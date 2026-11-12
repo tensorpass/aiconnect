@@ -1,0 +1,122 @@
+<!doctype html>
+<!--
+  The bookshop as a plain HTML page, the way a WordPress page or any site without React adds AI
+  Connect: one script tag defines <aiconnect-chat> and <aiconnect-search>, and each element reads
+  the shop's tools from its MCP server at /api/mcp. Every form is on this page. `?lang=fr` or
+  `?lang=he` sets the language of every element, and `?theme=dark` the dark theme.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bookshop with AI Connect elements</title>
+    <script src="/aiconnect-elements.js" defer></script>
+    <style>
+      body {
+        margin: 0;
+        background: var(--aic-ground);
+        color: var(--aic-ink);
+        font-family: system-ui, sans-serif;
+      }
+
+      header,
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 20px 24px;
+      }
+
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+
+      header b {
+        flex: 1;
+        font-size: 21px;
+        font-weight: 800;
+      }
+
+      main {
+        display: grid;
+        gap: 28px;
+        padding-bottom: 120px;
+      }
+
+      h1 {
+        margin: 12px 0 0;
+        font-size: clamp(34px, 3.4vw, 48px);
+        line-height: 1.04;
+        letter-spacing: -0.03em;
+      }
+
+      main p {
+        max-width: 56ch;
+        margin: 0;
+        color: var(--aic-muted);
+        font-size: 18px;
+        line-height: 1.5;
+      }
+
+      aiconnect-search {
+        max-width: 720px;
+      }
+
+      h2 {
+        margin: 12px 0 0;
+        font-size: 20px;
+      }
+
+      @media (max-width: 640px) {
+        header,
+        main {
+          padding-inline: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <b>Bookshop</b>
+      <aiconnect-chat variant="panel" mcp="/api/mcp" launcher-label="Ask the shop"
+        system="You recommend books from this site's catalog. Always search the catalog before recommending. Answer in the visitor's language."
+        suggestions='["A calm book for tonight", "Something funny and hopeful"]'
+        tool-labels='{"search_books": "Searching the catalog"}'></aiconnect-chat>
+      <aiconnect-chat variant="page" mcp="/api/mcp"
+        system="You recommend books from this site's catalog. Always search the catalog before recommending. Answer in the visitor's language."
+        intro="What do you feel like reading?"
+        suggestions='["A calm book for tonight", "An adventure under 320 pages"]'></aiconnect-chat>
+    </header>
+    <main>
+      <h1>Books for every mood</h1>
+      <p>This page has no build step. One script tag adds every AI Connect module, and each one answers on the visitor's own AI.</p>
+      <aiconnect-search mcp="/api/mcp"
+        system="You answer questions about this bookshop's catalog. Always search the catalog first. Answer in the visitor's language, in two sentences."
+        suggestions='["A calm book for tonight", "Something funny"]'></aiconnect-search>
+      <h2>Ask in the page</h2>
+      <aiconnect-chat variant="inline" mcp="/api/mcp" heading="Bookshop assistant"
+        system="You recommend books from this site's catalog. Always search the catalog before recommending. Answer in the visitor's language."
+        tool-labels='{"search_books": "Searching the catalog"}'></aiconnect-chat>
+    </main>
+    <aiconnect-chat variant="popup" mcp="/api/mcp"
+      system="You recommend books from this site's catalog. Always search the catalog before recommending. Answer in the visitor's language."
+      suggestions='["A calm book for tonight"]'></aiconnect-chat>
+    <script>
+      // The page's language and theme from its address, set on the page and on every element.
+      const params = new URLSearchParams(location.search);
+      const locale = params.get('lang');
+      if (locale) {
+        document.documentElement.lang = locale;
+        document.documentElement.dir = locale === 'he' ? 'rtl' : 'ltr';
+        document.querySelectorAll('aiconnect-chat, aiconnect-search').forEach((element) => {
+          element.setAttribute('locale', locale);
+        });
+      }
+      if (params.get('theme') === 'dark') {
+        document.documentElement.dataset.aicTheme = 'dark';
+      }
+    </script>
+  </body>
+</html>

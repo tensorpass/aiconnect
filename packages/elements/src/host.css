@@ -1,0 +1,24 @@
+/* How each element sits in the page. The inline chat and the search bar take the width of their
+   place; the side panel and the full page take the size of their button, which the site places;
+   the popup takes no room, since its button and its window float over the page. */
+
+:host {
+  display: block;
+}
+
+:host([variant='panel']),
+:host([variant='page']) {
+  display: inline-block;
+}
+
+:host([variant='popup']) {
+  display: contents;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+.aic-mount {
+  display: contents;
+}

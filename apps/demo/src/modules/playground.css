@@ -1,0 +1,216 @@
+/* The bookshop's page in the modules playground, drawn from the same --aic-* tokens as the
+   modules so the light and dark themes and the reading direction carry across the whole page. The
+   playground's own bar is an ink band, set apart from the shop it controls. */
+
+.shop {
+  --aic-font: 'Reddit Sans', 'Noto Sans Hebrew', 'Noto Sans Arabic', system-ui, sans-serif;
+  --aic-mono: 'Reddit Mono', ui-monospace, monospace;
+  min-height: 100vh;
+  background: var(--aic-ground);
+  color: var(--aic-ink);
+  font-family: var(--aic-font);
+}
+
+.playground-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 10px 24px;
+  background: var(--aic-stripe);
+  color: #c9ccd3;
+  font-size: 14px;
+}
+
+.playground-bar .segmented {
+  margin: 0;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.playground-bar .segmented button {
+  color: #c9ccd3;
+  font-weight: 600;
+}
+
+.playground-bar .segmented button[aria-checked='true'] {
+  background: #ffffff;
+  color: #0b0d12;
+}
+
+.playground-bar .segmented button:focus-visible,
+.playground-link:focus-visible {
+  outline: 2px solid var(--aic-focus);
+  outline-offset: 2px;
+}
+
+.playground-link {
+  margin-inline-start: auto;
+  color: #ffffff;
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
+
+.shop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+
+.shop-name {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.shop .shop-main {
+  display: grid;
+  gap: 44px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px 24px 120px;
+}
+
+.shop-hero h1 {
+  max-width: 16ch;
+  margin: 0;
+  font-size: clamp(34px, 3.4vw, 48px);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.shop-hero > p {
+  max-width: 56ch;
+  margin: 16px 0 0;
+  color: var(--aic-muted);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.shop-hero .aic-search {
+  max-width: 720px;
+  margin-top: 30px;
+}
+
+.shop-main[data-form='inline'] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.shop-main[data-form='inline'] .shop-hero {
+  grid-column: 1 / -1;
+}
+
+.shelf h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.shelf ul,
+.book-results {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shelf ul {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  max-width: 920px;
+}
+
+.book {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+}
+
+.book-cover {
+  display: flex;
+  align-items: flex-end;
+  aspect-ratio: 2 / 3;
+  padding: 14px;
+  border-radius: 6px 10px 10px 6px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.15;
+  box-shadow: inset 7px 0 0 rgba(0, 0, 0, 0.2), 0 14px 26px -16px rgba(11, 13, 18, 0.55);
+}
+
+[dir='rtl'] .book-cover {
+  border-radius: 10px 6px 6px 10px;
+  box-shadow: inset -7px 0 0 rgba(0, 0, 0, 0.2), 0 14px 26px -16px rgba(11, 13, 18, 0.55);
+}
+
+.book-text {
+  display: grid;
+  gap: 2px;
+}
+
+.book-text b {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.book-text span {
+  color: var(--aic-muted);
+  font-size: 14px;
+}
+
+.book-text .book-pages {
+  font-size: 13px;
+}
+
+/* The books an answer names, as the shop's compact cards under the answer. */
+.book-results {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.book-results .book {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--aic-surface);
+  box-shadow: 0 0 0 1px var(--aic-border);
+}
+
+.book-results .book-cover {
+  flex: none;
+  width: 36px;
+  padding: 0;
+  font-size: 0;
+  box-shadow: inset 4px 0 0 rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 860px) {
+  .shop-main[data-form='inline'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .playground-bar,
+  .shop-head,
+  .shop .shop-main {
+    padding-inline: 16px;
+  }
+
+  .shelf ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}

@@ -1,0 +1,271 @@
+/* Where the visitor asks: the empty conversation with its heading and suggested questions, the
+   connection step a module shows until the visitor's AI is connected, and the question box with
+   its send and Stop buttons. */
+
+.aic-empty {
+  display: grid;
+  gap: 16px;
+  padding-block: 4px 18px;
+}
+
+/* The wallet's ring over the heading, shown by the full page mode while no connection step shows
+   its own. */
+.aic-empty-ring {
+  display: none;
+}
+
+.aic-intro {
+  margin: 0;
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.aic-suggestions {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aic-suggestions li {
+  margin: 0;
+}
+
+.aic-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 50px;
+  margin: 0;
+  padding-block: 12px;
+  padding-inline: 16px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--aic-surface);
+  box-shadow: 0 0 0 1px var(--aic-border), var(--aic-m-raise);
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: start;
+  cursor: pointer;
+  transition: box-shadow 200ms var(--aic-m-ease), transform 200ms var(--aic-m-ease);
+}
+
+.aic-suggestion .aic-arrow {
+  flex: none;
+  color: var(--aic-muted);
+  transition: color 200ms ease;
+}
+
+.aic-suggestion:hover {
+  box-shadow: 0 0 0 1px var(--aic-border), var(--aic-m-lift);
+  transform: translateY(-1px);
+}
+
+.aic-suggestion:hover .aic-arrow {
+  color: var(--aic-ink);
+}
+
+/* The connection step: the wallet's ring over the connect window's words and its button. */
+.aic-note {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+  padding: 2px 18px 20px;
+  border-radius: 20px;
+  background: var(--aic-ground);
+  text-align: center;
+}
+
+.aic-note .aic-ring {
+  height: 100px;
+}
+
+.aic-note .aic-disc {
+  width: 66px;
+  height: 66px;
+  box-shadow: 0 0 0 6px var(--aic-halo), 0 14px 26px -14px rgba(10, 185, 247, 0.55);
+}
+
+.aic-note .aic-disc svg {
+  width: 28px;
+  height: 28px;
+}
+
+.aic-note-copy {
+  display: grid;
+  gap: 4px;
+  max-width: 36ch;
+}
+
+.aic-note-title {
+  margin: 0;
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.aic-note-text {
+  margin: 0;
+  color: var(--aic-muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* The compact step keeps its button beside the words, and moves it under them when the module is too
+   narrow for both. */
+.aic-note[data-compact] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  text-align: start;
+}
+
+.aic-note[data-compact] .aic-note-copy {
+  flex: 1 1 15rem;
+}
+
+.aic-note[data-compact] .aic-ring {
+  display: none;
+}
+
+.aic-note[data-compact] .aic-button {
+  margin: 0;
+}
+
+/* The question box: the field grows with the text, and its button sends or stops. */
+.aic-composer {
+  display: block;
+  flex: none;
+  margin: 0;
+  padding: 8px 14px 14px;
+}
+
+.aic-field {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-height: 52px;
+  margin: 0;
+  padding-block: 6px;
+  padding-inline: 16px 6px;
+  border: 1px solid var(--aic-field-edge);
+  border-radius: 16px;
+  background: var(--aic-surface);
+  box-shadow: var(--aic-m-raise);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.aic-field:focus-within {
+  border-color: var(--aic-focus);
+  box-shadow: 0 0 0 1px var(--aic-focus), 0 0 0 4px var(--aic-cyan-faint);
+}
+
+.aic-field-input {
+  flex: 1;
+  align-self: center;
+  min-width: 0;
+  max-height: 168px;
+  margin: 0;
+  padding: 8px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  caret-color: var(--aic-cyan);
+  resize: none;
+  overflow-y: auto;
+}
+
+/* The question box and the search bar draw the focus on their own edge, so the field inside draws
+   none, whatever focus rule the site sets for its own controls. */
+:is(.aic-field-input, .aic-search-input):focus {
+  outline: none;
+}
+
+.aic-field-input::placeholder,
+.aic-search-input::placeholder {
+  color: var(--aic-muted);
+  opacity: 1;
+}
+
+.aic-send {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--aic-accent);
+  color: var(--aic-accent-ink);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 200ms var(--aic-m-ease);
+}
+
+.aic-send:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.aic-send:disabled {
+  background: var(--aic-m-fill);
+  color: var(--aic-muted);
+  cursor: default;
+}
+
+.aic-stop {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: 13px 15px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--aic-accent);
+  color: var(--aic-accent-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.aic-stop i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2.5px;
+  background: currentColor;
+}

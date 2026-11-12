@@ -1,0 +1,150 @@
+/* The buttons that open a chat over the page: the popup's floating button at the page's corner, and
+   the button a side panel or the full page puts where the site renders it. They stand outside the
+   module's own ground, so they carry the shades and the type they need. The Web Components' loader
+   draws the same buttons from this file before the chat's script arrives, so both look alike. */
+
+@keyframes aic-ripple {
+  from { opacity: 0.55; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.55); }
+}
+
+.aic-launcher,
+.aic-fab {
+  --aic-m-fill: var(--aic-fill, color-mix(in srgb, var(--aic-ink) 7%, var(--aic-surface)));
+  --aic-m-lift: 0 1px 2px rgba(11, 13, 18, 0.08), 0 10px 22px -12px rgba(11, 13, 18, 0.26);
+  --aic-m-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  font-family: var(--aic-font);
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.aic-launcher:focus-visible,
+.aic-fab:focus-visible {
+  outline: 2px solid var(--aic-focus);
+  outline-offset: 3px;
+}
+
+/* The floating button: the wallet's wave mark, crossed into a close mark while the popup is open,
+   and the wallet's ripples while the visitor's AI answers. */
+.aic-fab {
+  position: fixed;
+  right: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: var(--aic-layer);
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--aic-accent);
+  color: var(--aic-accent-ink);
+  box-shadow: 0 2px 6px rgba(11, 13, 18, 0.16), 0 14px 28px -14px rgba(11, 13, 18, 0.7);
+  cursor: pointer;
+  transition: transform 240ms var(--aic-m-ease);
+}
+
+.aic-fab[dir='rtl'] {
+  right: auto;
+  left: 20px;
+}
+
+.aic-fab:hover {
+  transform: translateY(-2px);
+}
+
+.aic-fab:active {
+  transform: scale(0.96);
+}
+
+.aic-fab > * {
+  grid-area: 1 / 1;
+  transition: opacity 200ms ease, transform 280ms var(--aic-m-ease);
+}
+
+.aic-fab-close {
+  display: grid;
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.6);
+}
+
+.aic-fab[data-open] .aic-fab-wave {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
+}
+
+.aic-fab[data-open] .aic-fab-close {
+  opacity: 1;
+  transform: none;
+}
+
+.aic-fab[data-live]::before,
+.aic-fab[data-live]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--aic-cyan);
+  border-radius: 50%;
+  animation: aic-ripple 2.4s ease-out infinite;
+  pointer-events: none;
+}
+
+.aic-fab[data-live]::after {
+  animation-delay: 1.2s;
+}
+
+/* The button a panel or the full page puts where the site renders it. */
+.aic-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: 12px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--aic-surface);
+  box-shadow: 0 0 0 1px var(--aic-border), 0 1px 2px rgba(11, 13, 18, 0.06);
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: box-shadow 200ms var(--aic-m-ease), transform 200ms var(--aic-m-ease);
+}
+
+.aic-launcher:hover {
+  box-shadow: 0 0 0 1px var(--aic-border), var(--aic-m-lift);
+  transform: translateY(-1px);
+}
+
+.aic-launcher[aria-expanded='true'] {
+  background: var(--aic-m-fill);
+  box-shadow: 0 0 0 1px var(--aic-border);
+  transform: none;
+}
+
+.aic-launcher-mark {
+  flex: none;
+  color: var(--aic-cyan);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aic-fab,
+  .aic-fab *,
+  .aic-launcher {
+    animation: none !important;
+    transition: none !important;
+  }
+}

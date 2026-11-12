@@ -1,0 +1,34 @@
+{
+  "name": "@tensorpass/aiconnect-elements",
+  "version": "0.1.0",
+  "description": "The AI Connect interface modules as Web Components, defined by one script a page loads with a script tag, and a loader under 10 KB that loads it when a visitor reaches for a chat.",
+  "type": "module",
+  "sideEffects": true,
+  "license": "Apache-2.0",
+  "exports": {
+    "./aiconnect-elements.js": "./dist/aiconnect-elements.js",
+    "./aiconnect-loader.js": "./dist/aiconnect-loader.js"
+  },
+  "unpkg": "dist/aiconnect-elements.js",
+  "jsdelivr": "dist/aiconnect-elements.js",
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && node build.mjs"
+  },
+  "dependencies": {
+    "@tensorpass/aiconnect": "0.1.0",
+    "@tensorpass/aiconnect-design": "0.1.0",
+    "@tensorpass/aiconnect-react": "0.1.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "^0.28.2"
+  }
+}

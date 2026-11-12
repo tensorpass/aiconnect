@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "aiconnect/chat",
+  "title": "AI Connect Chat",
+  "category": "widgets",
+  "icon": "format-chat",
+  "description": "An AI chat that answers on the visitor's own AI account, from this site's posts and pages.",
+  "keywords": ["ai", "chat", "assistant"],
+  "textdomain": "aiconnect",
+  "attributes": {
+    "variant": { "type": "string", "enum": ["inline", "panel", "popup", "page"], "default": "popup" },
+    "heading": { "type": "string", "default": "" },
+    "launcherLabel": { "type": "string", "default": "" },
+    "placeholder": { "type": "string", "default": "" },
+    "system": { "type": "string", "default": "" }
+  },
+  "supports": { "html": false, "multiple": false },
+  "editorScript": "file:./edit.js"
+}
