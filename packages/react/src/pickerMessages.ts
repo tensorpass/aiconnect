@@ -27,6 +27,9 @@ export interface PickerMessages {
   waitingText: string;
   installTitle: string;
   installText: string;
+  // The install button when the visitor's browser is known, with the browser's name in Latin script;
+  // `installButton` names it for any other browser.
+  addToBrowser: (browser: string) => string;
   installButton: string;
   // By the reason the wallet gave; `failed` covers every other failure.
   refusals: Record<WalletRefusal | 'failed', RefusalStep>;
@@ -53,6 +56,7 @@ const en: PickerMessages = {
   installTitle: 'Add AI Wallet to your browser',
   installText: 'The AI Wallet extension keeps your AI accounts and connects them to the sites you approve. '
     + 'Reload this page once it is installed.',
+  addToBrowser: (browser) => `Add to ${browser}`,
   installButton: 'Install AI Wallet',
   refusals: {
     declined: {
@@ -95,6 +99,7 @@ const fr: PickerMessages = {
   installTitle: 'Ajoutez AI Wallet à votre navigateur',
   installText: 'L\'extension AI Wallet garde vos comptes d\'IA et les connecte aux sites que vous approuvez. '
     + 'Rechargez cette page une fois l\'extension installée.',
+  addToBrowser: (browser) => `Ajouter à ${browser}`,
   installButton: 'Installer AI Wallet',
   refusals: {
     declined: {
@@ -137,6 +142,7 @@ const he: PickerMessages = {
   installTitle: 'הוסיפו את AI Wallet לדפדפן',
   installText: 'התוסף AI Wallet שומר את חשבונות הבינה המלאכותית שלכם ומחבר אותם לאתרים שאתם מאשרים. '
     + 'טענו מחדש את הדף אחרי ההתקנה.',
+  addToBrowser: (browser) => `הוספה לדפדפן ${browser}`,
   installButton: 'התקנת AI Wallet',
   refusals: {
     declined: {
@@ -179,6 +185,7 @@ const ar: PickerMessages = {
   installTitle: 'أضف AI Wallet إلى متصفحك',
   installText: 'تحتفظ إضافة AI Wallet بحسابات الذكاء الاصطناعي الخاصة بك وتربطها بالمواقع التي توافق عليها. '
     + 'أعد تحميل هذه الصفحة بعد تثبيتها.',
+  addToBrowser: (browser) => `إضافة إلى ${browser}`,
   installButton: 'تثبيت AI Wallet',
   refusals: {
     declined: {
@@ -220,6 +227,7 @@ const zh: PickerMessages = {
   waitingText: '它的窗口已打开。此页面会自动继续。',
   installTitle: '将 AI Wallet 添加到你的浏览器',
   installText: 'AI Wallet 扩展保管你的 AI 账户，并把它们连接到你批准的网站。安装完成后请重新加载此页面。',
+  addToBrowser: (browser) => `添加至 ${browser}`,
   installButton: '安装 AI Wallet',
   refusals: {
     declined: {

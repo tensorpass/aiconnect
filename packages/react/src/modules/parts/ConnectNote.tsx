@@ -3,10 +3,10 @@
 // Its button runs the step itself, as the connect window's button does: the install link opens the
 // wallet's page, and connect asks the wallet, whose window opens at once.
 
-import type { ConnectionState } from '@tensorpass/aiconnect';
+import type { ConnectionState, VisitorBrowser } from '@tensorpass/aiconnect';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { ConnectRing } from '../../ConnectRing.tsx';
-import { refusalStep } from '../../messages.ts';
+import { installLabel, refusalStep } from '../../messages.ts';
 import { useActionAttribute } from './moduleAnalytics.ts';
 import type { ModuleMessages, PickerMessages } from '../../messages.ts';
 
@@ -24,10 +24,11 @@ interface StepCopy {
   moduleMessages: ModuleMessages;
   // Whether the visitor already asked a question that waits for the connection.
   pending: boolean;
+  browser: VisitorBrowser;
 }
 
 function connectionStep(state: ConnectionState, copy: StepCopy): Step | null {
-  const { messages, moduleMessages, pending } = copy;
+  const { messages, moduleMessages, pending, browser } = copy;
   switch (state.status) {
     case 'connected':
       return null;
@@ -38,7 +39,7 @@ function connectionStep(state: ConnectionState, copy: StepCopy): Step | null {
       return {
         title: messages.installTitle,
         text: moduleMessages.installText,
-        action: { kind: 'install', label: messages.installButton },
+        action: { kind: 'install', label: installLabel(messages, browser) },
       };
     case 'connecting':
       return { title: messages.waitingTitle, text: messages.waitingText, live: true };
@@ -71,8 +72,8 @@ function StepButton({ action }: { action: StepAction }) {
 }
 
 export function ConnectNote({ pending, compact = false }: { pending: boolean; compact?: boolean }) {
-  const { state, messages, moduleMessages } = useAiConnect();
-  const step = connectionStep(state, { messages, moduleMessages, pending });
+  const { client, state, messages, moduleMessages } = useAiConnect();
+  const step = connectionStep(state, { messages, moduleMessages, pending, browser: client.browser });
   if (!step) {
     return null;
   }

@@ -2,7 +2,8 @@
 // connection that did not go through and the words of an answer that failed. The copy of each
 // language lives in pickerMessages.ts and moduleMessages.ts.
 
-import type { WalletRefusal } from '@tensorpass/aiconnect';
+import { BROWSER_NAMES } from '@tensorpass/aiconnect';
+import type { VisitorBrowser, WalletRefusal } from '@tensorpass/aiconnect';
 import type { ModuleMessages } from './moduleMessages.ts';
 import type { PickerMessages, RefusalStep } from './pickerMessages.ts';
 
@@ -10,6 +11,12 @@ export { builtInModuleMessages } from './moduleMessages.ts';
 export type { ModuleMessages } from './moduleMessages.ts';
 export { builtInMessages } from './pickerMessages.ts';
 export type { Locale, PickerMessages, RefusalStep } from './pickerMessages.ts';
+
+// The words of the install button: "Add to" the visitor's browser, or the general words for a browser the
+// wallet does not name.
+export function installLabel(messages: PickerMessages, browser: VisitorBrowser): string {
+  return browser === 'other' ? messages.installButton : messages.addToBrowser(BROWSER_NAMES[browser]);
+}
 
 // The step a connection in error shows: the words for the reason the wallet gave, or the wallet's
 // own message under the general title.

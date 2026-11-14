@@ -8,6 +8,8 @@ export { AiConnect } from './client.ts';
 export type { ConnectionState, SdkOptions } from './client.ts';
 export * from './guards/index.ts';
 export { McpToolSource } from './mcpToolSource.ts';
+export { BROWSER_NAMES, browserOf, visitorBrowser, walletInstallUrl } from './visitorBrowser.ts';
+export type { BrowserSignals, VisitorBrowser } from './visitorBrowser.ts';
 export { finalAnswer, runConversation } from './toolLoop.ts';
 export type { ConversationHooks, ConversationOptions } from './toolLoop.ts';
 export type * from './types.ts';

@@ -8,6 +8,8 @@
 import type { ChatRequest, ChatResponse, ProviderSession, WalletLink } from './types.ts';
 import { findWallet, WalletRequestError } from './walletProvider.ts';
 import type { ChatEvent, WalletChatParams, WalletProvider, WalletRefusal } from './walletProvider.ts';
+import { visitorBrowser, walletInstallUrl } from './visitorBrowser.ts';
+import type { VisitorBrowser } from './visitorBrowser.ts';
 import { createWalletFetch } from './wireProtocols/walletFetch.ts';
 import type { WalletFetch } from './wireProtocols/walletFetch.ts';
 
@@ -31,10 +33,6 @@ export interface SdkOptions {
 type Listener = (state: ConnectionState) => void;
 
 const SDK_API_KEY = 'aiwallet';
-
-// The AI Wallet page, where a visitor without the wallet gets it. It becomes the Chrome Web Store
-// listing once the wallet is published there.
-const WALLET_INSTALL_URL = 'https://tensorpass.app/wallet';
 
 // The states a request waits through before it knows whether the site is connected.
 const SETTLING = new Set<ConnectionState['status']>(['checking', 'connecting']);
@@ -84,8 +82,16 @@ function walletSession(wallet: WalletProvider, link: Extract<WalletLink, { conne
 }
 
 export class AiConnect {
-  // Where a visitor without the wallet installs it, for the connect window's link.
-  readonly installUrl: string = WALLET_INSTALL_URL;
+  // The visitor's browser, which names the install button.
+  get browser(): VisitorBrowser {
+    return visitorBrowser();
+  }
+
+  // Where a visitor without the wallet adds it to this browser, for the connect window's link.
+  get installUrl(): string {
+    return walletInstallUrl(this.browser);
+  }
+
   // A `fetch` for the AI SDKs: it answers their requests through the wallet, in their own protocol.
   readonly fetch: WalletFetch = createWalletFetch(() => this.connectedSession());
   readonly sdkOptions: SdkOptions = { apiKey: SDK_API_KEY, fetch: this.fetch, dangerouslyAllowBrowser: true };

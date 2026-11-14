@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 import { AboutView } from './AboutView.tsx';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { ConnectRing } from './ConnectRing.tsx';
-import { refusalStep } from './messages.ts';
+import { installLabel, refusalStep } from './messages.ts';
 
 function useEscapeToClose(onClose: () => void) {
   useEffect(() => {
@@ -45,7 +45,7 @@ function WalletStep() {
       return (
         <Step live={false} title={messages.installTitle} text={messages.installText}>
           <a className="aic-primary" href={client.installUrl} target="_blank" rel="noreferrer">
-            {messages.installButton}
+            {installLabel(messages, client.browser)}
           </a>
         </Step>
       );
