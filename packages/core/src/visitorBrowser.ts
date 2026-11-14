@@ -46,7 +46,9 @@ export function browserOf({ userAgent, brands, brave, mobile }: BrowserSignals):
   if (chromium) {
     return chromium.browser;
   }
-  if (brands.includes('Google Chrome') || (brands.length === 0 && /\bChrome\//.test(userAgent))) {
+  // Chromium itself, and the browsers built on it that name no brand of their own, install from the
+  // Chrome Web Store as Chrome does.
+  if (brands.includes('Google Chrome') || brands.includes('Chromium') || /\bChrome\//.test(userAgent)) {
     return /\b(Vivaldi|YaBrowser|SamsungBrowser)\//.test(userAgent) ? 'other' : 'chrome';
   }
   if (/\bFirefox\//.test(userAgent)) {

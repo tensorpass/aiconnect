@@ -14,6 +14,7 @@ test('each desktop browser is named by its brands, Brave\'s own flag or its user
   const cases: [BrowserSignals, string][] = [
     [signals(CHROME, { brands: ['Chromium', 'Google Chrome', 'Not A Brand'] }), 'chrome'],
     [signals(CHROME), 'chrome'],
+    [signals(CHROME.replace('Chrome/', 'HeadlessChrome/'), { brands: ['Chromium', 'Not A Brand'] }), 'chrome'],
     [signals(`${CHROME} Edg/142.0.0.0`), 'edge'],
     [signals(CHROME, { brands: ['Chromium', 'Microsoft Edge'] }), 'edge'],
     [signals(`${CHROME} OPR/124.0.0.0`), 'opera'],
