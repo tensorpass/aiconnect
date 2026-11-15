@@ -59,7 +59,7 @@ async function createWallet(context: BrowserContext): Promise<void> {
   await wallet.getByRole('button', { name: /^Mistral/ }).click();
   await wallet.getByLabel('Mistral API key').fill('e2e-mistral-key');
   await wallet.getByRole('button', { name: 'Connect' }).click();
-  await expect(wallet.getByRole('heading', { name: 'Mistral is ready' })).toBeVisible();
+  await expect(wallet.getByRole('heading', { name: 'Mistral is connected' })).toBeVisible();
   await wallet.close();
 }
 
@@ -137,10 +137,9 @@ test('a visitor with AI Wallet asks the chat and their model answers from the po
 
   const chat = site.locator('aiconnect-chat[variant="inline"]');
   await chat.getByRole('textbox', { name: 'Ask a question' }).fill(QUESTION);
-  await chat.getByRole('button', { name: 'Send' }).click();
+  // A question asked before the connection opens the wallet's window at once.
   const approval = context.waitForEvent('page', { predicate: (page) => page.url().includes('/wallet.html#') });
-  const picker = site.getByRole('dialog', { name: 'Connect your AI' });
-  await picker.getByRole('button', { name: 'Connect AI Wallet' }).click();
+  await chat.getByRole('button', { name: 'Send' }).click();
   await (await approval).getByRole('button', { name: 'Approve' }).click();
 
   await expect(chat.locator('.aic-answer').last()).toHaveText(ANSWER);
