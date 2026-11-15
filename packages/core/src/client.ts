@@ -3,23 +3,28 @@
 // the site then chats through the wallet, which answers with the account the visitor picked for
 // this site. The site never sees a credential. A site the visitor approved connects on its own on
 // later visits, and its state follows the account the visitor picks for it in the wallet.
+// In a browser without the wallet, the visitor can sign in on the page to OpenRouter, or to TensorPass's
+// plan when the site gave its site key (see webAccounts/webAccountSource.ts). The credential of such an
+// account lives in the site's own storage, where the site's scripts can read it.
 // `fetch` lets the AI SDK a site already uses answer through the same connection.
 
+import type { ConnectionState } from './connectionState.ts';
 import type { ChatRequest, ChatResponse, ProviderSession, WalletLink } from './types.ts';
 import { findWallet, WalletRequestError } from './walletProvider.ts';
 import type { ChatEvent, WalletChatParams, WalletProvider, WalletRefusal } from './walletProvider.ts';
 import { visitorBrowser, walletInstallUrl } from './visitorBrowser.ts';
 import type { VisitorBrowser } from './visitorBrowser.ts';
+import { WebAccountSource } from './webAccounts/webAccountSource.ts';
+import type { WebAccountOptions } from './webAccounts/webAccountSource.ts';
+import type { WebAccountId } from './webAccounts/webAccountStore.ts';
 import { createWalletFetch } from './wireProtocols/walletFetch.ts';
 import type { WalletFetch } from './wireProtocols/walletFetch.ts';
 
-export type ConnectionState =
-  | { status: 'checking' }
-  | { status: 'noWallet' }
-  | { status: 'disconnected' }
-  | { status: 'connecting' }
-  | { status: 'connected'; providerName: string; model?: string; session: ProviderSession }
-  | { status: 'error'; message: string; reason?: WalletRefusal };
+export type { ConnectionState, WebSignInFailure } from './connectionState.ts';
+
+// What a site sets on its client: its TensorPass site key, which offers the TensorPass plan's sign in to a
+// visitor without the wallet, and the models the web accounts answer with.
+export type AiConnectOptions = WebAccountOptions;
 
 // The options an OpenAI or Anthropic SDK client takes to answer through the wallet. The SDKs
 // require an API key; the wallet never reads it, and the browser guard they keep for real keys
@@ -35,10 +40,10 @@ type Listener = (state: ConnectionState) => void;
 const SDK_API_KEY = 'aiwallet';
 
 // The states a request waits through before it knows whether the site is connected.
-const SETTLING = new Set<ConnectionState['status']>(['checking', 'connecting']);
+const SETTLING = new Set<ConnectionState['status']>(['checking', 'connecting', 'signingIn']);
 
 const NOT_CONNECTED: Record<string, string> = {
-  noWallet: 'AI Wallet is not installed in this browser',
+  noWallet: 'AI Wallet is not installed in this browser, and no account is signed in on this site',
   disconnected: 'AI Wallet is not connected on this site',
 };
 
@@ -98,12 +103,39 @@ export class AiConnect {
   private readonly listeners = new Set<Listener>();
   private current: ConnectionState = { status: 'checking' };
   private wallet: Promise<WalletProvider | null> | null = null;
+  private readonly web: WebAccountSource;
+  // Set once the page knows the wallet is missing: the web accounts then make the state.
+  private walletMissing = false;
 
-  constructor() {
-    // A client built during a server render stays in the checking state.
-    if (typeof window !== 'undefined') {
+  constructor(options: AiConnectOptions = {}) {
+    this.web = new WebAccountSource({ options, onChange: () => this.webChanged() });
+    // A client built during a server render stays in the checking state, and so does a sign in's popup,
+    // which hands its answer to the page that opened it and closes.
+    if (typeof window !== 'undefined' && this.web.takeCallback() !== 'window') {
       this.reconnect();
     }
+  }
+
+  // The accounts a visitor without the wallet can sign in to on this site: TensorPass with a site key,
+  // then OpenRouter.
+  get webAccounts(): WebAccountId[] {
+    return this.web.ids;
+  }
+
+  // Signs the visitor in to a web account in a popup, or in the page where the browser blocks popups. Call
+  // it from the visitor's click. The state goes through `signingIn` to `connected`, or back to `noWallet`
+  // with the reason the sign in failed.
+  signIn(account: WebAccountId): Promise<void> {
+    return this.web.signIn(account);
+  }
+
+  cancelSignIn(): void {
+    this.web.cancel();
+  }
+
+  // Removes the web account's credential from the site's storage, and ends a TensorPass sign in.
+  signOut(): Promise<void> {
+    return this.web.signOut();
   }
 
   get state(): ConnectionState {
@@ -119,7 +151,7 @@ export class AiConnect {
   async connect(): Promise<void> {
     const wallet = await this.findWallet();
     if (!wallet) {
-      this.setState({ status: 'noWallet' });
+      this.walletGone();
       return;
     }
     this.setState({ status: 'connecting' });
@@ -130,10 +162,19 @@ export class AiConnect {
     }
   }
 
+  // Disconnects the wallet from this site, or signs the visitor out of the web account that answers.
   async disconnect(): Promise<void> {
+    if (this.current.status === 'connected' && this.current.account) {
+      await this.signOut();
+      return;
+    }
     const wallet = await this.findWallet();
     await wallet?.request('disconnect');
-    this.setState(wallet ? { status: 'disconnected' } : { status: 'noWallet' });
+    if (wallet) {
+      this.setState({ status: 'disconnected' });
+    } else {
+      this.walletGone();
+    }
   }
 
   // The session of the connected site, once the status check or the visitor's approval is over.
@@ -174,11 +215,22 @@ export class AiConnect {
   private async reconnect(): Promise<void> {
     const wallet = await this.findWallet();
     if (!wallet) {
-      this.setState({ status: 'noWallet' });
+      this.walletGone();
       return;
     }
     const link = await wallet.request('status').catch((): WalletLink => ({ connected: false }));
     this.apply(wallet, link as WalletLink);
+  }
+
+  private walletGone(): void {
+    this.walletMissing = true;
+    this.setState(this.web.state());
+  }
+
+  private webChanged(): void {
+    if (this.walletMissing) {
+      this.setState(this.web.state());
+    }
   }
 
   private apply(wallet: WalletProvider, link: WalletLink): void {
