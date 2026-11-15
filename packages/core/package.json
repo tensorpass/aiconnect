@@ -15,13 +15,16 @@
       "default": "./dist/guards/index.js"
     }
   },
+  "bin": {
+    "aiconnect": "./dist/cli/main.js"
+  },
   "files": [
     "dist",
     "LICENSE",
     "NOTICE"
   ],
   "scripts": {
-    "build": "rm -rf dist tsconfig.tsbuildinfo && tsc -b"
+    "build": "rm -rf dist tsconfig.tsbuildinfo tsconfig.cli.tsbuildinfo && tsc -b tsconfig.json tsconfig.cli.json"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "^2.4.0"

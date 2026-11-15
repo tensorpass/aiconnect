@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
-    "typecheck": "tsc -b packages/core packages/react && tsc -p packages/elements && tsc -p apps/demo",
+    "typecheck": "tsc -b packages/core packages/core/tsconfig.cli.json packages/react && tsc -p packages/elements && tsc -p apps/demo",
     "test": "node --test \"packages/*/src/**/*.test.ts\" \"apps/*/src/**/*.test.ts\"",
     "e2e": "npm run e2e -w @tensorpass/demo",
     "lint": "eslint .",
