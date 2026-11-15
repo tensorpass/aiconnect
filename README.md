@@ -163,6 +163,26 @@ Host `packages/elements/dist/aiconnect-elements.js` with your site's files. The 
 
 A page built with plain JavaScript and a bundler can use `AiConnect` and `runConversation` without React. The [JavaScript quickstart](https://tensorpass.app/docs/quickstart/javascript) shows how to build the connect button and the chat yourself.
 
+## Visitors without AI Wallet: web accounts
+
+In a browser without the extension, on a computer or a phone, the connect window and the modules keep the install step and add two sign ins under it. The visitor signs in to OpenRouter, offered on every site and paid from the visitor's OpenRouter credits, or to the TensorPass plan, offered when the site passes its site key. The chat then runs the same conversation loop, tools and guards as with the wallet, so `useAiChat`, the modules and `AiConnect.fetch` need no other change.
+
+```ts
+const client = new AiConnect({ siteKey: process.env.NEXT_PUBLIC_TENSORPASS_SITE_KEY });
+```
+
+A site key is public: it names the site on TensorPass's sign in page and works on `https://<domain>` and on `http://localhost` for development, with no proof of the domain. The command line creates one after you approve it in your browser, and prints where it goes for your project:
+
+```bash
+npx @tensorpass/aiconnect site-key shop.example
+```
+
+The Web Components take it as `data-site-key` on their script tag or `site-key` on the element, and the WordPress plugin as its Site key setting. Coding agents get the key from TensorPass's account MCP server at https://plan.tensorpass.app/mcp.
+
+Each sign in opens in a popup from the visitor's click, with PKCE and a checked state, and comes back to the page's own address. Where the browser blocks the popup, the page itself goes to the sign in and returns. The credential, an OpenRouter key or a TensorPass token of 15 minutes with its refresh token, is kept in the site's `localStorage` for its origin, and `client.signOut()` removes it. Every script of the site's pages can read it there, which the wallet's accounts are kept from. A TensorPass token only answers chats, from the site's origin. Plan accounts such as ChatGPT, Claude, Gemini and Grok stay in the extension: on 15 November 2026 each of them refused a web page at its sign in or its chat.
+
+`client.webAccounts` lists the accounts the site offers, `client.signIn(account)` starts a sign in from a click, and the connection state goes through `signingIn` to `connected`, with `account` naming the web account, or back to `noWallet` with `signInFailure`. The [web accounts page](https://tensorpass.app/docs/providers/web-accounts) covers the details.
+
 ## Use the AI SDK you already have
 
 A site that already calls a model through an AI SDK keeps its code and passes one option. `AiConnect.fetch` passes the SDK's request to the visitor's wallet and returns the answer in the format the SDK expects, as a stream or in one piece. The SDK's requests stay in the browser and go to the wallet. The API key the SDK requires is set to the placeholder `aiwallet`, which the wallet ignores.
@@ -303,6 +323,8 @@ A site has no method to read the visitor's credentials, the list of accounts in 
 
 The wallet keeps the accounts in a vault encrypted on the visitor's computer, unlocked with a password, and asks the visitor before each new site uses them.
 
+A web account, which a visitor without the wallet signs in to on the page, works another way: its credential is kept in the site's `localStorage`, where the site's scripts can read it, and the page calls OpenRouter or TensorPass's gateway itself. A TensorPass token from a site lasts 15 minutes, answers chats only and only from that site's origin, and the visitor removes the site's access from their TensorPass account page.
+
 The modules and `useAiChat` run guards on each conversation, and they need no setup. Each conversation draws a random salt that marks the start and the end of your instructions and of each tool result. Text planted in your data therefore reaches the model as data. A question that tries to replace your instructions stops before it reaches the model. An answer stops at its first unsafe piece, and your safe answer replaces it. Unsafe pieces include a repeat of your instructions, a link outside the hosts you allow and a name you keep internal. The [security model](https://tensorpass.app/docs/security) and the [guards page](https://tensorpass.app/docs/modules/guards) describe each check.
 
 ## The wallet protocol
@@ -317,7 +339,7 @@ The wallet protocol defines the `window.aiwallet` object a wallet places in each
 | Where the provider key lives | On your server | In the visitor's encrypted wallet |
 | Rate limits | One key shared by every visitor | Each visitor's own limits |
 | Model choice | Your code picks it | The visitor picks it in the wallet |
-| Visitors who can use the feature | Every visitor | Visitors with AI Wallet and an AI account |
+| Visitors who can use the feature | Every visitor | Visitors with AI Wallet and an AI account, or with an OpenRouter account or a TensorPass plan they sign in to on the page |
 | Your tools | Called from your server | Served over MCP, called from the page |
 
 ## Frequently asked questions
@@ -336,7 +358,7 @@ AI Wallet supports ChatGPT, Claude, Gemini, Grok, Muse, GLM, Qwen, MiniMax, Kimi
 
 ### What does a visitor without AI Wallet see?
 
-The modules show an install step with a button named after the visitor's browser, such as "Add to Chrome", which opens the AI Wallet page. A question typed before the install stays on screen.
+The modules show an install step with a button named after the visitor's browser, such as "Add to Chrome", which opens the AI Wallet page, and under it the sign ins of the web accounts: TensorPass when the site passes its site key, and OpenRouter. A question typed before the install or the sign in stays on screen and goes out once the visitor is connected.
 
 ### What if a visitor has no AI account at all?
 
@@ -370,6 +392,7 @@ The packages are not published on npm yet. Until they are, build this repository
 
 * [Introduction](https://tensorpass.app/docs)
 * Quickstarts: [React](https://tensorpass.app/docs/quickstart/react), [Next.js](https://tensorpass.app/docs/quickstart/nextjs), [JavaScript](https://tensorpass.app/docs/quickstart/javascript), [Vue](https://tensorpass.app/docs/quickstart/vue), [Svelte](https://tensorpass.app/docs/quickstart/svelte), [WordPress](https://tensorpass.app/docs/quickstart/wordpress), [Shopify](https://tensorpass.app/docs/quickstart/shopify)
+* [Web accounts for visitors without AI Wallet](https://tensorpass.app/docs/providers/web-accounts)
 * [Use the AI SDK you already have](https://tensorpass.app/docs/guides/existing-sdks)
 * [Expose your tools over MCP](https://tensorpass.app/docs/guides/mcp-tools)
 * [Interface modules](https://tensorpass.app/docs/modules) and [Guards](https://tensorpass.app/docs/modules/guards)
