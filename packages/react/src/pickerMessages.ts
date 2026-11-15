@@ -11,6 +11,20 @@ export interface RefusalStep {
   action: string;
 }
 
+// The step on an iPhone without the wallet, which comes with the AI Wallet app. Safari gets the app; another
+// browser opens the page again in Safari or in the app's own browser, or in the app alone before iOS 17.
+export interface PhoneMessages {
+  appTitle: string;
+  appText: string;
+  appButton: string;
+  switchTitle: string;
+  switchText: string;
+  appOnlyTitle: string;
+  appOnlyText: string;
+  safariButton: string;
+  appBrowserButton: string;
+}
+
 export interface PickerMessages {
   dir: 'ltr' | 'rtl';
   title: string;
@@ -37,6 +51,7 @@ export interface PickerMessages {
   // every website yet: Safari runs it only on the sites the visitor allowed, so this site cannot find it.
   // The wallet's popover then leads with the button that allows it on every website.
   safariAlreadyAdded: string;
+  phone: PhoneMessages;
   // By the reason the wallet gave; `failed` covers every other failure.
   refusals: Record<WalletRefusal | 'failed', RefusalStep>;
 }
@@ -66,6 +81,18 @@ const en: PickerMessages = {
   installButton: 'Install AI Wallet',
   safariAlreadyAdded: 'Already added? Click AI Wallet in Safari\'s toolbar and choose Always Allow on Every '
     + 'Website.',
+  phone: {
+    appTitle: 'Use your AI on this iPhone',
+    appText: 'AI Wallet keeps your AI accounts on this iPhone and answers the sites you approve. '
+      + 'Install the app and allow it in Safari to use your AI here.',
+    appButton: 'Get the AI Wallet app',
+    switchTitle: 'Continue in Safari or in AI Wallet',
+    switchText: 'On an iPhone, AI Wallet answers sites in Safari and in its own app. Open this page in either one.',
+    appOnlyTitle: 'Continue in AI Wallet',
+    appOnlyText: 'On an iPhone, AI Wallet answers sites in its own app. Open this page there.',
+    safariButton: 'Open in Safari',
+    appBrowserButton: 'Open in AI Wallet',
+  },
   refusals: {
     declined: {
       title: 'You declined this site',
@@ -111,6 +138,19 @@ const fr: PickerMessages = {
   installButton: 'Installer AI Wallet',
   safariAlreadyAdded: 'Déjà ajouté ? Cliquez sur AI Wallet dans la barre d\'outils de Safari et choisissez Toujours '
     + 'autoriser sur tous les sites web.',
+  phone: {
+    appTitle: 'Utilisez votre IA sur cet iPhone',
+    appText: 'AI Wallet garde vos comptes d\'IA sur cet iPhone et répond aux sites que vous approuvez. '
+      + 'Installez l\'app et autorisez-la dans Safari pour utiliser votre IA ici.',
+    appButton: 'Obtenir l\'app AI Wallet',
+    switchTitle: 'Continuez dans Safari ou dans AI Wallet',
+    switchText: 'Sur iPhone, AI Wallet répond aux sites dans Safari et dans sa propre app. '
+      + 'Ouvrez cette page dans l\'un des deux.',
+    appOnlyTitle: 'Continuez dans AI Wallet',
+    appOnlyText: 'Sur iPhone, AI Wallet répond aux sites dans sa propre app. Ouvrez cette page dans l\'app.',
+    safariButton: 'Ouvrir dans Safari',
+    appBrowserButton: 'Ouvrir dans AI Wallet',
+  },
   refusals: {
     declined: {
       title: 'Vous avez refusé ce site',
@@ -155,6 +195,18 @@ const he: PickerMessages = {
   addToBrowser: (browser) => `הוספה לדפדפן ${browser}`,
   installButton: 'התקנת AI Wallet',
   safariAlreadyAdded: 'כבר הוספתם? לחצו על AI Wallet בסרגל הכלים של Safari ובחרו „תמיד לאשר בכל האתרים”.',
+  phone: {
+    appTitle: 'השתמשו בבינה המלאכותית שלכם באייפון הזה',
+    appText: 'AI Wallet שומר את חשבונות הבינה המלאכותית שלכם באייפון הזה ועונה לאתרים שאתם מאשרים. '
+      + 'התקינו את האפליקציה ואפשרו אותה ב Safari כדי להשתמש כאן בבינה המלאכותית שלכם.',
+    appButton: 'הורדת האפליקציה AI Wallet',
+    switchTitle: 'המשיכו ב Safari או ב AI Wallet',
+    switchText: 'באייפון, AI Wallet עונה לאתרים ב Safari ובאפליקציה שלו. פתחו את הדף באחד מהם.',
+    appOnlyTitle: 'המשיכו ב AI Wallet',
+    appOnlyText: 'באייפון, AI Wallet עונה לאתרים באפליקציה שלו. פתחו את הדף שם.',
+    safariButton: 'פתיחה ב Safari',
+    appBrowserButton: 'פתיחה ב AI Wallet',
+  },
   refusals: {
     declined: {
       title: 'דחיתם את האתר הזה',
@@ -200,6 +252,18 @@ const ar: PickerMessages = {
   installButton: 'تثبيت AI Wallet',
   safariAlreadyAdded: 'هل أضفته من قبل؟ انقر على AI Wallet في شريط أدوات Safari واختر «السماح دائمًا على كل '
     + 'مواقع الويب».',
+  phone: {
+    appTitle: 'استخدم الذكاء الاصطناعي الخاص بك على هذا الآيفون',
+    appText: 'يحتفظ AI Wallet بحسابات الذكاء الاصطناعي الخاصة بك على هذا الآيفون ويجيب على المواقع التي توافق عليها. '
+      + 'ثبّت التطبيق واسمح له في Safari لاستخدام الذكاء الاصطناعي الخاص بك هنا.',
+    appButton: 'احصل على تطبيق AI Wallet',
+    switchTitle: 'تابع في Safari أو في AI Wallet',
+    switchText: 'على الآيفون، يجيب AI Wallet على المواقع في Safari وفي تطبيقه الخاص. افتح هذه الصفحة في أحدهما.',
+    appOnlyTitle: 'تابع في AI Wallet',
+    appOnlyText: 'على الآيفون، يجيب AI Wallet على المواقع في تطبيقه الخاص. افتح هذه الصفحة فيه.',
+    safariButton: 'فتح في Safari',
+    appBrowserButton: 'فتح في AI Wallet',
+  },
   refusals: {
     declined: {
       title: 'لقد رفضت هذا الموقع',
@@ -244,6 +308,17 @@ const zh: PickerMessages = {
   addToBrowser: (browser) => `添加至 ${browser}`,
   installButton: '安装 AI Wallet',
   safariAlreadyAdded: '已经添加过？点按 Safari 工具栏中的 AI Wallet，然后选择“在所有网站上始终允许”。',
+  phone: {
+    appTitle: '在这台 iPhone 上使用你的 AI',
+    appText: 'AI Wallet 把你的 AI 账户保存在这台 iPhone 上，并回答你批准的网站。安装这个 App 并在 Safari 中允许它，即可在这里使用你的 AI。',
+    appButton: '获取 AI Wallet App',
+    switchTitle: '在 Safari 或 AI Wallet 中继续',
+    switchText: '在 iPhone 上，AI Wallet 可以在 Safari 和它自己的 App 中回答网站。请在其中之一打开此页面。',
+    appOnlyTitle: '在 AI Wallet 中继续',
+    appOnlyText: '在 iPhone 上，AI Wallet 在它自己的 App 中回答网站。请在那里打开此页面。',
+    safariButton: '在 Safari 中打开',
+    appBrowserButton: '在 AI Wallet 中打开',
+  },
   refusals: {
     declined: {
       title: '你拒绝了这个网站',

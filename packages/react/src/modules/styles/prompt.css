@@ -156,6 +156,24 @@
   margin: 0;
 }
 
+/* The links that get the wallet: one install link, or on an iPhone the page handed to Safari and to the app. */
+.aic-note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.aic-note-actions .aic-button {
+  margin: 0;
+}
+
+.aic-note[data-compact] .aic-note-actions {
+  justify-content: flex-start;
+  margin: 0;
+}
+
 /* The question box: the field grows with the text, and its button sends or stops. */
 .aic-composer {
   display: block;

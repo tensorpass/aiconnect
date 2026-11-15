@@ -18,6 +18,8 @@ import { WebAccountSource } from './webAccounts/webAccountSource.ts';
 import type { WebAccountOptions } from './webAccounts/webAccountSource.ts';
 import type { PlanAccess } from './webAccounts/tensorPassPlan.ts';
 import type { WebAccountId } from './webAccounts/webAccountStore.ts';
+import { visitorWalletRoute } from './walletRoute.ts';
+import type { WalletRoute } from './walletRoute.ts';
 import { createWalletFetch } from './wireProtocols/walletFetch.ts';
 import type { WalletFetch } from './wireProtocols/walletFetch.ts';
 
@@ -97,6 +99,12 @@ export class AiConnect {
   // the connect window's link.
   get installUrl(): string {
     return walletInstallUrl(this.browser);
+  }
+
+  // Where a visitor without the wallet gets it on this device: the browser's install page, or on an iPhone
+  // the AI Wallet app, reached from Safari or by handing the page over from another browser.
+  get walletRoute(): WalletRoute {
+    return visitorWalletRoute();
   }
 
   // A `fetch` for the AI SDKs: it answers their requests through the wallet, in their own protocol.

@@ -10,7 +10,7 @@ import type { PickerMessages, RefusalStep } from './pickerMessages.ts';
 export { builtInModuleMessages } from './moduleMessages.ts';
 export type { ModuleMessages } from './moduleMessages.ts';
 export { builtInMessages } from './pickerMessages.ts';
-export type { Locale, PickerMessages, RefusalStep } from './pickerMessages.ts';
+export type { Locale, PhoneMessages, PickerMessages, RefusalStep } from './pickerMessages.ts';
 
 // The visitor's browser by its name in Latin script, or `undefined` for a browser the wallet does not name.
 function browserName(browser: VisitorBrowser): string | undefined {

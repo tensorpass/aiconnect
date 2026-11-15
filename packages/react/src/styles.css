@@ -204,6 +204,14 @@
   cursor: pointer;
 }
 
+/* A second choice under the main button, such as opening the page in the app after opening it in Safari. */
+.aic-primary[data-secondary] {
+  margin-top: 0;
+  border: 1px solid var(--aic-field-edge);
+  background: transparent;
+  color: var(--aic-ink);
+}
+
 .aic-connect-button {
   display: inline-flex;
   align-items: center;

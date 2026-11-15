@@ -111,6 +111,13 @@
   transform: translateY(-1px);
 }
 
+/* A second choice beside the main button, such as opening the page in the app after opening it in Safari. */
+.aic-button[data-secondary] {
+  border: 1px solid var(--aic-field-edge);
+  background: transparent;
+  color: var(--aic-ink);
+}
+
 .aic-text-button {
   margin: 0;
   padding: 4px 2px;

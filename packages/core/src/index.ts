@@ -13,6 +13,8 @@ export {
   BROWSER_NAMES, browserOf, visitorBrowser, walletInstallUrl, walletStore, WALLET_STORES,
 } from './visitorBrowser.ts';
 export type { BrowserSignals, VisitorBrowser, WalletStore } from './visitorBrowser.ts';
+export { iosBrowserOf, safariLink, visitorWalletRoute, walletAppLink, walletRouteOf } from './walletRoute.ts';
+export type { WalletRoute } from './walletRoute.ts';
 export { finalAnswer, runConversation } from './toolLoop.ts';
 export type { ConversationHooks, ConversationOptions } from './toolLoop.ts';
 export type * from './types.ts';

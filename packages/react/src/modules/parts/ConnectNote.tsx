@@ -1,39 +1,41 @@
 // The connection step a module shows until the visitor's AI is connected, in the connect window's
-// words: connect the wallet, add it to the browser (with, in Safari, how to allow a wallet already added
-// on every website), approve the site, or try again after a refusal.
-// Its button runs the step itself, as the connect window's button does: the install link opens the
-// wallet's store listing, under the marks of the plans it answers with, and connect asks the wallet, whose
-// window opens at once.
+// words: connect the wallet, get it on this device (with, in Safari, how to allow a wallet already added on
+// every website), approve the site, or try again after a refusal.
+// Its buttons run the step themselves, as the connect window's do: the store link opens the wallet's listing
+// under the marks of the plans it answers with, a phone's links hand the page over, and connect asks the
+// wallet, whose window opens at once.
 
-import type { ConnectionState, VisitorBrowser } from '@tensorpass/aiconnect';
+import type { AiConnect, ConnectionState } from '@tensorpass/aiconnect';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { ConnectRing } from '../../ConnectRing.tsx';
 import { ProviderMarks } from '../../ProviderMarks.tsx';
-import { alreadyAddedLine, installLabel, installText, refusalStep } from '../../messages.ts';
+import { refusalStep } from '../../messages.ts';
+import { linkTarget, walletStep } from '../../walletStep.ts';
+import type { WalletLink } from '../../walletStep.ts';
 import { useActionAttribute } from './moduleAnalytics.ts';
 import type { ModuleMessages, PickerMessages } from '../../messages.ts';
-
-type StepAction = { kind: 'install' | 'connect'; label: string };
 
 interface Step {
   title: string;
   text: string;
   // A second line under the text, for the visitor the main text does not cover.
   aside?: string;
-  action?: StepAction;
+  // The links that get the wallet, or the label of the button that connects it.
+  links?: WalletLink[];
+  connect?: string;
   live?: boolean;
 }
 
 interface StepCopy {
+  client: AiConnect;
   messages: PickerMessages;
   moduleMessages: ModuleMessages;
   // Whether the visitor already asked a question that waits for the connection.
   pending: boolean;
-  browser: VisitorBrowser;
 }
 
 function connectionStep(state: ConnectionState, copy: StepCopy): Step | null {
-  const { messages, moduleMessages, pending, browser } = copy;
+  const { client, messages, moduleMessages, pending } = copy;
   switch (state.status) {
     case 'connected':
       return null;
@@ -41,46 +43,46 @@ function connectionStep(state: ConnectionState, copy: StepCopy): Step | null {
     case 'checking':
       return pending ? { title: messages.checking, text: '' } : null;
     case 'noWallet':
-      return {
-        title: messages.installTitle,
-        text: installText(messages, browser),
-        aside: alreadyAddedLine(messages, browser),
-        action: { kind: 'install', label: installLabel(messages, browser) },
-      };
+      return walletStep(client.walletRoute, messages);
     case 'connecting':
       return { title: messages.waitingTitle, text: messages.waitingText, live: true };
     case 'error': {
       const refusal = refusalStep(state, messages);
-      return { title: refusal.title, text: refusal.text, action: { kind: 'connect', label: refusal.action } };
+      return { title: refusal.title, text: refusal.text, connect: refusal.action };
     }
     default:
       return {
         title: messages.connectTitle,
         text: pending ? moduleMessages.pendingText : messages.connectText,
-        action: { kind: 'connect', label: moduleMessages.connect },
+        connect: moduleMessages.connect,
       };
   }
 }
 
-function StepButton({ action }: { action: StepAction }) {
-  const { client } = useAiConnect();
-  const tracking = useActionAttribute(action.kind);
-  if (action.kind === 'install') {
-    return (
-      <a className="aic-button" href={client.installUrl} target="_blank" rel="noreferrer" {...tracking}>
-        <ProviderMarks />
-        {action.label}
-      </a>
-    );
-  }
+function WalletLinks({ links }: { links: WalletLink[] }) {
+  const tracking = useActionAttribute('install');
   return (
-    <button type="button" className="aic-button" onClick={() => client.connect()} {...tracking}>{action.label}</button>
+    <div className="aic-note-actions">
+      {links.map((walletLink) => (
+        <a key={walletLink.href} className="aic-button" href={walletLink.href}
+          data-secondary={walletLink.secondary || undefined} {...linkTarget(walletLink)} {...tracking}>
+          {walletLink.marks ? <ProviderMarks /> : null}
+          {walletLink.label}
+        </a>
+      ))}
+    </div>
   );
+}
+
+function ConnectAction({ label }: { label: string }) {
+  const { client } = useAiConnect();
+  const tracking = useActionAttribute('connect');
+  return <button type="button" className="aic-button" onClick={() => client.connect()} {...tracking}>{label}</button>;
 }
 
 export function ConnectNote({ pending, compact = false }: { pending: boolean; compact?: boolean }) {
   const { client, state, messages, moduleMessages } = useAiConnect();
-  const step = connectionStep(state, { messages, moduleMessages, pending, browser: client.browser });
+  const step = connectionStep(state, { client, messages, moduleMessages, pending });
   if (!step) {
     return null;
   }
@@ -92,7 +94,8 @@ export function ConnectNote({ pending, compact = false }: { pending: boolean; co
         {step.text ? <p className="aic-note-text">{step.text}</p> : null}
         {step.aside ? <p className="aic-note-text">{step.aside}</p> : null}
       </div>
-      {step.action ? <StepButton action={step.action} /> : null}
+      {step.links ? <WalletLinks links={step.links} /> : null}
+      {step.connect ? <ConnectAction label={step.connect} /> : null}
     </div>
   );
 }

@@ -1,17 +1,18 @@
 // The connect window a site shows: one card over the page that connects the visitor's AI through
 // the AI Wallet. It says what happens, waits while the wallet asks the visitor, explains how to
-// install the wallet when it is missing (and, in Safari, how to allow a wallet already added on every
-// website), and lets the visitor try again after a refusal. The wallet's accounts stay in the extension.
-// A visitor without the wallet can sign in to a web account on the page instead (WebAccountStep.tsx), whose
-// credential the site keeps.
+// get the wallet on this device when it is missing (and, in Safari, how to allow a wallet already added on
+// every website), and lets the visitor try again after a refusal. The wallet's accounts stay in the wallet,
+// which the site cannot read. A visitor without the wallet can sign in to a web account on the page instead
+// (WebAccountStep.tsx), whose credential the site keeps.
 
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { AboutView } from './AboutView.tsx';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { ConnectRing } from './ConnectRing.tsx';
-import { alreadyAddedLine, installLabel, installText, refusalStep } from './messages.ts';
+import { refusalStep } from './messages.ts';
 import { ProviderMarks } from './ProviderMarks.tsx';
+import { linkTarget, walletStep } from './walletStep.ts';
 import { WebAccountConnected, WebSignIns, WebSigningIn } from './WebAccountStep.tsx';
 
 function useEscapeToClose(onClose: () => void) {
@@ -37,6 +38,23 @@ function Step({ live, title, text, children }: { live: boolean; title: string; t
   );
 }
 
+function InstallStep() {
+  const { client, messages } = useAiConnect();
+  const step = walletStep(client.walletRoute, messages);
+  return (
+    <Step live={false} title={step.title} text={step.text}>
+      {step.links.map((walletLink) => (
+        <a key={walletLink.href} className="aic-primary" href={walletLink.href}
+          data-secondary={walletLink.secondary || undefined} {...linkTarget(walletLink)}>
+          {walletLink.marks ? <ProviderMarks /> : null}
+          {walletLink.label}
+        </a>
+      ))}
+      {step.aside ? <p className="aic-hint">{step.aside}</p> : null}
+    </Step>
+  );
+}
+
 function WalletStep() {
   const { client, state, messages } = useAiConnect();
   const connect = () => client.connect();
@@ -45,18 +63,8 @@ function WalletStep() {
       return <Step live={false} title={messages.checking} text="" />;
     case 'connecting':
       return <Step live title={messages.waitingTitle} text={messages.waitingText} />;
-    case 'noWallet': {
-      const alreadyAdded = alreadyAddedLine(messages, client.browser);
-      return (
-        <Step live={false} title={messages.installTitle} text={installText(messages, client.browser)}>
-          <a className="aic-primary" href={client.installUrl} target="_blank" rel="noreferrer">
-            <ProviderMarks />
-            {installLabel(messages, client.browser)}
-          </a>
-          {alreadyAdded ? <p className="aic-hint">{alreadyAdded}</p> : null}
-        </Step>
-      );
-    }
+    case 'noWallet':
+      return <InstallStep />;
     case 'error': {
       const refusal = refusalStep(state, messages);
       return (
