@@ -119,7 +119,7 @@ test('a popup sign in comes back through the callback page and connects the acco
   assert.equal(`${callback.origin}${callback.pathname}`, `${ORIGIN}/books`);
   assert.equal(callback.searchParams.get('page'), '2');
   const state = authorize.searchParams.get('state')!;
-  assert.equal(callback.searchParams.get('aiconnect_state'), state);
+  assert.equal(callback.searchParams.has('aiconnect_state'), false);
 
   browser.deliver({ type: 'aiconnect:sign-in', state, code: 'forged' }, 'https://evil.example');
   browser.deliver({ type: 'aiconnect:sign-in', state: 'other', code: 'forged' }, ORIGIN);
@@ -139,8 +139,7 @@ test('a sign in the visitor declines goes back to the choice with the reason', a
   const browser = installBrowser({ href: `${ORIGIN}/` });
   const opener = source();
   await opener.web.signIn('openrouter');
-  const callback = new URL(new URL(browser.popups[0].location.href).searchParams.get('callback_url')!);
-  const state = callback.searchParams.get('aiconnect_state')!;
+  const state = new URL(browser.popups[0].location.href).searchParams.get('state')!;
   browser.deliver({ type: 'aiconnect:sign-in', state, error: 'access_denied' }, ORIGIN);
   const back = await until(opener.changes, 'noWallet');
   assert.equal(back.status === 'noWallet' && back.signInFailure?.reason, 'declined');
@@ -153,8 +152,7 @@ test('cancel closes the popup and ends the sign in; an answer after it is ignore
   opener.web.cancel();
   assert.equal(browser.popups[0].closed, true);
   assert.deepEqual(opener.web.state(), { status: 'noWallet' });
-  const state = new URL(new URL(browser.popups[0].location.href).searchParams.get('callback_url')!)
-    .searchParams.get('aiconnect_state');
+  const state = new URL(browser.popups[0].location.href).searchParams.get('state');
   browser.deliver({ type: 'aiconnect:sign-in', state, code: 'late' }, ORIGIN);
   await new Promise((resolve) => setTimeout(resolve, 5));
   assert.equal(opener.store.read(), null);
@@ -167,8 +165,9 @@ test('a blocked popup signs in through the page itself, which finishes the sign 
   const authorize = new URL(browser.assigned[0]);
   assert.equal(authorize.origin, 'https://openrouter.ai');
   const callback = authorize.searchParams.get('callback_url')!;
+  assert.equal(callback, `${ORIGIN}/books`);
 
-  location.href = `${callback}&code=code-2`;
+  location.href = `${callback}?code=code-2&state=${authorize.searchParams.get('state')}`;
   const returned = source(store);
   assert.equal(returned.web.takeCallback(), 'redirect');
   assert.equal(location.href, `${ORIGIN}/books`);
@@ -180,8 +179,48 @@ test('a blocked popup signs in through the page itself, which finishes the sign 
 });
 
 test('a page whose address carries a state this tab never started is no sign in', () => {
-  installBrowser({ href: `${ORIGIN}/?aiconnect_state=stranger&code=c` });
+  installBrowser({ href: `${ORIGIN}/?code=c&state=stranger` });
   const page = source();
   assert.equal(page.web.takeCallback(), null);
   assert.equal(page.store.read(), null);
+});
+
+test('a popup the provider isolated from its opener answers over the channel of its state', async () => {
+  const browser = installBrowser({ href: `${ORIGIN}/` });
+  const opener = source();
+  await opener.web.signIn('openrouter');
+  const authorize = new URL(browser.popups[0].location.href);
+  const state = authorize.searchParams.get('state')!;
+  // OpenRouter's page set a Cross-Origin-Opener-Policy, so the popup comes back without window.opener.
+  Object.assign(window, { opener: null });
+  location.href = `${authorize.searchParams.get('callback_url')}?code=code-3&state=${state}`;
+  assert.equal(source(new WebAccountStore(mapStorage())).web.takeCallback(), 'window');
+  await until(opener.changes, 'connected');
+  assert.equal(opener.store.read()?.account, 'openrouter');
+});
+
+test('a refusal OpenRouter sends back without the state still reaches the waiting page', async () => {
+  const browser = installBrowser({ href: `${ORIGIN}/` });
+  const opener = source();
+  await opener.web.signIn('openrouter');
+  location.href = `${ORIGIN}/?error=access_denied`;
+  assert.equal(source(new WebAccountStore(mapStorage())).web.takeCallback(), 'window');
+  const back = await until(opener.changes, 'noWallet');
+  assert.equal(back.status === 'noWallet' && back.signInFailure?.reason, 'declined');
+  assert.equal(browser.closedSelf, 1);
+});
+
+test('focus back with the popup gone leaves the waiting step, and a late answer still connects', async () => {
+  const browser = installBrowser({ href: `${ORIGIN}/` });
+  const opener = source();
+  await opener.web.signIn('openrouter');
+  const state = new URL(browser.popups[0].location.href).searchParams.get('state');
+  window.dispatchEvent(new Event('focus'));
+  assert.equal(opener.web.state().status, 'signingIn');
+  browser.popups[0].closed = true;
+  window.dispatchEvent(new Event('focus'));
+  assert.deepEqual(opener.web.state(), { status: 'noWallet' });
+  browser.deliver({ type: 'aiconnect:sign-in', state, code: 'late-but-real' }, ORIGIN);
+  await until(opener.changes, 'connected');
+  assert.equal(opener.store.read()?.account, 'openrouter');
 });

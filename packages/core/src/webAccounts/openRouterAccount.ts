@@ -1,7 +1,7 @@
 // OpenRouter for a visitor without the wallet: the site sends the visitor to OpenRouter's sign in with a
 // PKCE challenge, OpenRouter sends them back with a code, and the page trades it for a key bound to the
-// visitor's own credits. Every answer is billed to them. OpenRouter's sign in takes no state, so the
-// client carries it in the callback address.
+// visitor's own credits. Every answer is billed to them. OpenRouter returns the sign in's state with the
+// code, and leaves it out of a refusal.
 // https://openrouter.ai/docs/use-cases/oauth-pkce
 
 import type { WebAccount, WebAccountContext } from './webAccount.ts';
@@ -27,10 +27,10 @@ export function openRouterAccount(model: string, context: WebAccountContext = {}
     id: 'openrouter',
     name: NAME,
     model,
-    authorizeUrl({ redirectUri, challenge }) {
+    authorizeUrl({ redirectUri, state, challenge }) {
       const url = new URL(AUTHORIZE_URL);
       url.search = new URLSearchParams({
-        callback_url: redirectUri, code_challenge: challenge, code_challenge_method: 'S256',
+        callback_url: redirectUri, code_challenge: challenge, code_challenge_method: 'S256', state,
       }).toString();
       return url.toString();
     },

@@ -25,7 +25,7 @@ function played(answer: (call: Call) => Response): { fetch: HttpFetch; calls: Ca
 
 const form = (call: Call) => Object.fromEntries(new URLSearchParams(call.body));
 const chatStream = () => new Response('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\ndata: [DONE]\n\n');
-const AUTHORIZE = { redirectUri: 'https://shop.example/?aiconnect_state=s1', state: 's1', challenge: 'c'.repeat(43) };
+const AUTHORIZE = { redirectUri: 'https://shop.example/books', state: 's1', challenge: 'c'.repeat(43) };
 
 test('OpenRouter\'s sign in carries the callback and the challenge, and its code becomes a key', async () => {
   const { fetch, calls } = played(() => Response.json({ key: 'sk-or-v1-abc' }));

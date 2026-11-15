@@ -10,8 +10,8 @@ import { challengeFor, randomToken } from './pkce.ts';
 import type { HttpFetch } from './openAiCompatibleSession.ts';
 import { openRouterAccount, OPENROUTER_DEFAULT_MODEL } from './openRouterAccount.ts';
 import {
-  callbackAddress, callbackResult, cleanAddress, isMarkedWindow, keepForRedirect, listenForResult, markWindow,
-  openSignInWindow, returnToOpener, takeRedirected,
+  answerIn, callbackAddress, cleanAddress, forgetRedirected, keepForRedirect, listenForResult, markWindow,
+  openSignInWindow, redirectedSignIn, returnToOpener, windowMark,
 } from './signInWindow.ts';
 import type { PendingSignIn, SignInResult } from './signInWindow.ts';
 import { PLAN_GATEWAY, tensorPassAccount } from './tensorPassAccount.ts';
@@ -104,19 +104,19 @@ export class WebAccountSource {
   // A page loaded as a sign in's callback: a popup hands the answer to its opener and closes, and a page
   // that went to the sign in itself finishes it. Answers what the page was, or null for any other page.
   takeCallback(): 'window' | 'redirect' | null {
-    const result = callbackResult(location.href);
-    if (!result) {
-      return null;
-    }
-    if (isMarkedWindow(result.state)) {
-      returnToOpener(result);
+    const mark = windowMark();
+    const answer = mark ? answerIn(location.href, mark) : null;
+    if (answer) {
+      returnToOpener(answer);
       return 'window';
     }
-    cleanAddress();
-    const pending = takeRedirected();
-    if (pending?.state !== result.state) {
+    const pending = redirectedSignIn();
+    const result = pending ? answerIn(location.href, pending.state) : null;
+    if (!pending || !result) {
       return null;
     }
+    forgetRedirected();
+    cleanAddress();
     this.signingIn = pending.account;
     void this.finish(pending, result);
     return 'redirect';
@@ -131,7 +131,7 @@ export class WebAccountSource {
     this.cancel();
     const popup = openSignInWindow();
     const state = randomToken(16);
-    const pending: PendingSignIn = { account: id, state, verifier: randomToken(), redirectUri: callbackAddress(state) };
+    const pending: PendingSignIn = { account: id, state, verifier: randomToken(), redirectUri: callbackAddress() };
     this.failure = undefined;
     this.signingIn = id;
     this.onChange();
@@ -168,27 +168,47 @@ export class WebAccountSource {
     }
   }
 
+  // Waits for the popup's answer. When the page regains focus with the popup gone, the connect window
+  // leaves its waiting step, and the answer is still taken if it comes: a provider page that isolates the
+  // popup from its opener also makes `popup.closed` read true while the visitor is still signing in.
   private watch(pending: PendingSignIn, popup: Window): void {
-    const stopListening = listenForResult((result) => {
+    const stopListening = listenForResult(pending.state, (result) => {
       if (result.state === this.pending?.state) {
         this.pending.stop();
         this.pending = null;
+        this.signingIn = pending.account;
         void this.finish(pending, result);
       }
     });
-    const timer = setTimeout(() => this.fail({
-      account: pending.account, reason: 'expired', message: 'The sign in took too long',
-    }), SIGN_IN_WAIT_MS);
+    const onFocus = () => {
+      if (popup.closed && this.signingIn === pending.account && this.pending?.state === pending.state) {
+        this.signingIn = null;
+        this.onChange();
+      }
+    };
+    window.addEventListener('focus', onFocus);
+    const timer = setTimeout(() => this.expire(pending), SIGN_IN_WAIT_MS);
     markWindow(pending.state);
     this.pending = {
       ...pending,
       popup,
       stop: () => {
         stopListening();
+        window.removeEventListener('focus', onFocus);
         clearTimeout(timer);
         markWindow(null);
       },
     };
+  }
+
+  // A sign in that got no answer in its time ends; one the connect window already left ends quietly.
+  private expire(pending: PendingSignIn): void {
+    if (this.signingIn) {
+      this.fail({ account: pending.account, reason: 'expired', message: 'The sign in took too long' });
+      return;
+    }
+    this.pending?.stop();
+    this.pending = null;
   }
 
   private async finish(pending: PendingSignIn, result: SignInResult): Promise<void> {
