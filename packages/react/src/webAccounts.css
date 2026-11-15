@@ -21,7 +21,18 @@
 .aic-web[data-placement='note'] {
   width: 100%;
   max-width: 360px;
-  margin: 12px auto 0;
+  margin: 10px auto 0;
+  gap: 6px;
+}
+
+/* Under a module's note the offer keeps to its title and buttons, so it fits a chat's height. */
+.aic-web[data-placement='note'] > .aic-web-text {
+  display: none;
+}
+
+.aic-web[data-placement='note'] .aic-web-button {
+  min-height: 40px;
+  font-size: 14px;
 }
 
 .aic-web-step {
