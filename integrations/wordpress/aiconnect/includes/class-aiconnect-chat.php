@@ -2,7 +2,7 @@
 /**
  * The chat, written as an <aiconnect-chat> element by the [aiconnect_chat] shortcode and the AI Connect Chat
  * block. Both take the same settings and point the chat at the site's own MCP server, so the visitor's model
- * answers from the site's posts and pages.
+ * answers from the site's posts and pages. Every chat carries the site key of the plugin's settings, if any.
  *
  * @package AIConnect
  */
@@ -75,6 +75,7 @@ final class AIConnect_Chat {
 			'launcher-label' => $settings['launcher_label'],
 			'placeholder'    => $settings['placeholder'],
 			'locale'         => self::locale(),
+			'site-key'       => AIConnect_Settings::site_key(),
 		);
 		$html    = '<aiconnect-chat';
 		foreach ( array_filter( $element, 'strlen' ) as $name => $value ) {

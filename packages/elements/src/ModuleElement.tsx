@@ -65,7 +65,7 @@ export abstract class ModuleElement extends HTMLElement {
 
   protected render(): void {
     this.#root?.render(
-      <AiConnectProvider client={pageClient()} locale={localeOf(this)}>
+      <AiConnectProvider client={pageClient(this)} locale={localeOf(this)}>
         {this.module(this.#tools)}
       </AiConnectProvider>,
     );
