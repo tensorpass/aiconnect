@@ -8,7 +8,6 @@ import type { Locale } from './pickerMessages.ts';
 
 export interface WebAccountMessages {
   offerTitle: string;
-  offerText: string;
   signInWith: string;
   signingInTitle: string;
   signingInText: string;
@@ -21,8 +20,7 @@ export interface WebAccountMessages {
 }
 
 const en: WebAccountMessages = {
-  offerTitle: 'No extension? Sign in here',
-  offerText: 'This site can answer with an account you sign in to on this page.',
+  offerTitle: 'No extension? Use an account here',
   signInWith: 'Sign in with {account}',
   signingInTitle: 'Continue in the {account} window',
   signingInText: 'Sign in there. This page continues on its own.',
@@ -39,8 +37,7 @@ const en: WebAccountMessages = {
 };
 
 const fr: WebAccountMessages = {
-  offerTitle: 'Sans extension ? Connectez-vous ici',
-  offerText: 'Ce site peut répondre avec un compte auquel vous vous connectez sur cette page.',
+  offerTitle: 'Sans extension ? Utilisez un compte ici',
   signInWith: 'Se connecter avec {account}',
   signingInTitle: 'Continuez dans la fenêtre de {account}',
   signingInText: 'Connectez-vous dans cette fenêtre. Cette page continue toute seule.',
@@ -57,8 +54,7 @@ const fr: WebAccountMessages = {
 };
 
 const he: WebAccountMessages = {
-  offerTitle: 'אין תוסף? התחברו כאן',
-  offerText: 'האתר יכול לענות עם חשבון שאתם מתחברים אליו בדף הזה.',
+  offerTitle: 'אין תוסף? השתמשו כאן בחשבון',
   signInWith: 'התחברות עם {account}',
   signingInTitle: 'המשיכו בחלון של {account}',
   signingInText: 'התחברו בחלון הזה. הדף ימשיך מעצמו.',
@@ -75,8 +71,7 @@ const he: WebAccountMessages = {
 };
 
 const ar: WebAccountMessages = {
-  offerTitle: 'لا توجد إضافة؟ سجّل الدخول هنا',
-  offerText: 'يمكن لهذا الموقع أن يجيب بحساب تسجّل الدخول إليه في هذه الصفحة.',
+  offerTitle: 'لا توجد إضافة؟ استخدم حسابًا هنا',
   signInWith: 'تسجيل الدخول باستخدام {account}',
   signingInTitle: 'تابع في نافذة {account}',
   signingInText: 'سجّل الدخول في تلك النافذة. ستتابع هذه الصفحة من تلقاء نفسها.',
@@ -93,8 +88,7 @@ const ar: WebAccountMessages = {
 };
 
 const zh: WebAccountMessages = {
-  offerTitle: '没有扩展？在这里登录',
-  offerText: '这个网站可以用你在此页面登录的账户来回答。',
+  offerTitle: '没有扩展？在这里使用一个账户',
   signInWith: '使用 {account} 登录',
   signingInTitle: '在 {account} 窗口中继续',
   signingInText: '请在那个窗口中登录。此页面会自动继续。',

@@ -1,7 +1,7 @@
 // The web accounts in the connect window and in the modules' connection step: the sign ins offered to a
-// visitor without the wallet, under the install step, with why the last one did not go through; the step
-// while the sign in window is open, with Cancel; and, once signed in, the account that answers, where its
-// sign in lives, and Sign out.
+// visitor without the wallet, under the install step and a separator line, with why the last one did not go
+// through; the step while the sign in window is open, with Cancel; and, once signed in, the account that
+// answers, where its sign in lives, and Sign out.
 
 import { WEB_ACCOUNT_NAMES } from '@tensorpass/aiconnect';
 import type { WebAccountId } from '@tensorpass/aiconnect';
@@ -29,8 +29,7 @@ export function WebSignIns({ placement }: { placement: Placement }) {
   const failure = state.status === 'noWallet' ? state.signInFailure : undefined;
   return (
     <div className="aic-web" data-placement={placement}>
-      <p className="aic-web-title">{webMessages.offerTitle}</p>
-      <p className="aic-web-text">{webMessages.offerText}</p>
+      <p className="aic-web-separator">{webMessages.offerTitle}</p>
       {client.webAccounts.map((account) => (
         <button key={account} type="button" className="aic-web-button" onClick={() => void client.signIn(account)}>
           <AccountMark account={account} />

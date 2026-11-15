@@ -86,7 +86,8 @@ async function playGateway(context: BrowserContext, played: Played, outcome: 'ap
 async function signIn(page: Page, account: string, offered: string[]) {
   await page.getByRole('button', { name: 'Connect your AI' }).click();
   const dialog = page.getByRole('dialog', { name: 'Connect your AI' });
-  await expect(dialog.getByText('Add AI Wallet to your browser')).toBeVisible();
+  await expect(dialog.getByText('Use your ChatGPT, Claude or Gemini plan here')).toBeVisible();
+  await expect(dialog.getByText('No extension? Use an account here')).toBeVisible();
   await expect(dialog.getByRole('button', { name: /^Sign in with/ })).toHaveText(offered.map((name) => `Sign in with ${name}`));
   const popup = page.waitForEvent('popup');
   await dialog.getByRole('button', { name: `Sign in with ${account}` }).click();
@@ -149,6 +150,6 @@ test('a TensorPass sign in the visitor declines says so in the connect window', 
 test('a module offers the same sign ins under its install step, in the page\'s language', async ({ page }) => {
   await page.goto(`/?module=inline&lang=fr&siteKey=${SITE_KEY}`);
   const offer = page.locator('.aic-web');
-  await expect(offer.getByText('Sans extension ? Connectez-vous ici')).toBeVisible();
+  await expect(offer.getByText('Sans extension ? Utilisez un compte ici')).toBeVisible();
   await expect(offer.getByRole('button')).toHaveText(['Se connecter avec TensorPass', 'Se connecter avec OpenRouter']);
 });

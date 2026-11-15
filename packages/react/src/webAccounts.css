@@ -1,4 +1,4 @@
-/* The web accounts: the sign ins under the install step, in the connect window's card and under a module's
+/* The web accounts: the separator and the sign ins under the install step, in the connect window's card and under a module's
    connection note, the step while the sign in window is open, the account that answers, and the Sign out
    beside the account a module names. */
 
@@ -13,21 +13,48 @@
 }
 
 .aic-web[data-placement='window'] {
-  margin-top: 14px;
-  padding-top: 16px;
+  margin-top: 12px;
+}
+
+/* The line between the extension's offer and the sign ins, drawn as a rule on each side of its words. */
+.aic-web-separator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 2px;
+  color: var(--aic-muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.aic-web-separator::before,
+.aic-web-separator::after {
+  content: '';
+  flex: 1;
+  min-width: 16px;
   border-top: 1px solid var(--aic-border);
+}
+
+/* In a module, the install step and the sign ins share one card: the note's ground holds both. */
+.aic-connect-card {
+  width: 100%;
+  padding-bottom: 16px;
+  border-radius: 20px;
+  background: var(--aic-ground);
+}
+
+.aic-connect-card > .aic-note {
+  padding-bottom: 12px;
+  background: transparent;
 }
 
 .aic-web[data-placement='note'] {
   width: 100%;
   max-width: 360px;
-  margin: 10px auto 0;
+  margin: 0 auto;
+  padding: 0 18px;
   gap: 6px;
-}
-
-/* Under a module's note the offer keeps to its title and buttons, so it fits a chat's height. */
-.aic-web[data-placement='note'] > .aic-web-text {
-  display: none;
 }
 
 .aic-web[data-placement='note'] .aic-web-button {

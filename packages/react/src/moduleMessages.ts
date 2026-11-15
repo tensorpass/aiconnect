@@ -59,7 +59,8 @@ const enModules: ModuleMessages = {
   toolDone: 'done',
   toolFailed: 'Failed',
   connect: 'Connect your AI',
-  installText: 'Add the AI Wallet extension and this site answers with the AI plan you already pay for.',
+  installText: 'Add AI Wallet to your browser and this site answers with the AI plan you already pay for: ChatGPT, '
+    + 'Claude, Gemini, Grok and more.',
   pendingText: 'Your question is ready. Connect your AI to see the answer.',
   retry: 'Try again',
   guardQuestion: 'This chat answers questions about the site. Ask about what you are looking for here.',
@@ -89,7 +90,8 @@ const frModules: ModuleMessages = {
   toolDone: 'terminé',
   toolFailed: 'Échec',
   connect: 'Connecter votre IA',
-  installText: 'Ajoutez l\'extension AI Wallet et ce site répond avec l\'abonnement d\'IA que vous payez déjà.',
+  installText: 'Ajoutez AI Wallet à votre navigateur et ce site répond avec l\'abonnement d\'IA que vous payez déjà '
+    + ': ChatGPT, Claude, Gemini, Grok et d\'autres.',
   pendingText: 'Votre question est prête. Connectez votre IA pour voir la réponse.',
   retry: 'Réessayer',
   guardQuestion: 'Cette conversation répond aux questions sur le site. Demandez ce que vous cherchez ici.',
@@ -119,7 +121,8 @@ const heModules: ModuleMessages = {
   toolDone: 'הסתיים',
   toolFailed: 'נכשל',
   connect: 'חיבור הבינה המלאכותית',
-  installText: 'הוסיפו את התוסף AI Wallet והאתר יענה עם המנוי שאתם כבר משלמים עליו.',
+  installText: 'הוסיפו את AI Wallet לדפדפן והאתר יענה עם מנוי הבינה המלאכותית שאתם כבר משלמים עליו: ChatGPT, Claude, '
+    + 'Gemini, Grok ועוד.',
   pendingText: 'השאלה שלכם מוכנה. חברו את הבינה המלאכותית שלכם כדי לראות את התשובה.',
   retry: 'ניסיון נוסף',
   guardQuestion: 'הצ׳אט הזה עונה על שאלות על האתר. שאלו על מה שאתם מחפשים כאן.',
@@ -149,7 +152,8 @@ const arModules: ModuleMessages = {
   toolDone: 'تم',
   toolFailed: 'فشل',
   connect: 'اربط الذكاء الاصطناعي الخاص بك',
-  installText: 'أضف إضافة AI Wallet وسيجيب هذا الموقع باشتراك الذكاء الاصطناعي الذي تدفع ثمنه بالفعل.',
+  installText: 'أضف AI Wallet إلى متصفحك وسيجيب هذا الموقع باشتراك الذكاء الاصطناعي الذي تدفع ثمنه بالفعل: ChatGPT '
+    + 'وClaude وGemini وGrok وغيرها.',
   pendingText: 'سؤالك جاهز. اربط الذكاء الاصطناعي الخاص بك لرؤية الإجابة.',
   retry: 'إعادة المحاولة',
   guardQuestion: 'تجيب هذه المحادثة عن أسئلة حول الموقع. اسأل عمّا تبحث عنه هنا.',
@@ -179,7 +183,7 @@ const zhModules: ModuleMessages = {
   toolDone: '完成',
   toolFailed: '失败',
   connect: '连接你的 AI',
-  installText: '添加 AI Wallet 扩展后，这个网站就会用你已经付费的 AI 订阅来回答。',
+  installText: '把 AI Wallet 添加到浏览器后，这个网站就会用你已经付费的 AI 订阅来回答：ChatGPT、Claude、Gemini、Grok 等。',
   pendingText: '你的问题已准备好。连接你的 AI 即可查看回答。',
   retry: '重试',
   guardQuestion: '这个对话回答有关本网站的问题。请询问你在这里要找的内容。',
