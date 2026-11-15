@@ -30,7 +30,7 @@ test('in Safari the install step tells a visitor who added the wallet how to all
   }
   assert.equal(
     alreadyAddedLine(builtInMessages.en, 'safari'),
-    'Already added? Click AI Wallet in Safari\'s toolbar, then Allow on every website.',
+    'Already added? Click AI Wallet in Safari\'s toolbar and choose Always Allow on Every Website.',
   );
 });
 

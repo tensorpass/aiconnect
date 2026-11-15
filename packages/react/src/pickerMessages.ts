@@ -62,7 +62,8 @@ const en: PickerMessages = {
     + 'Reload this page once it is installed.',
   addToBrowser: (browser) => `Add to ${browser}`,
   installButton: 'Install AI Wallet',
-  safariAlreadyAdded: 'Already added? Click AI Wallet in Safari\'s toolbar, then Allow on every website.',
+  safariAlreadyAdded: 'Already added? Click AI Wallet in Safari\'s toolbar and choose Always Allow on Every '
+    + 'Website.',
   refusals: {
     declined: {
       title: 'You declined this site',
@@ -106,8 +107,8 @@ const fr: PickerMessages = {
     + 'Rechargez cette page une fois l\'extension installée.',
   addToBrowser: (browser) => `Ajouter à ${browser}`,
   installButton: 'Installer AI Wallet',
-  safariAlreadyAdded: 'Déjà ajouté ? Cliquez sur AI Wallet dans la barre d\'outils de Safari, puis sur Autoriser '
-    + 'sur tous les sites web.',
+  safariAlreadyAdded: 'Déjà ajouté ? Cliquez sur AI Wallet dans la barre d\'outils de Safari et choisissez Toujours '
+    + 'autoriser sur tous les sites web.',
   refusals: {
     declined: {
       title: 'Vous avez refusé ce site',
@@ -151,7 +152,7 @@ const he: PickerMessages = {
     + 'טענו מחדש את הדף אחרי ההתקנה.',
   addToBrowser: (browser) => `הוספה לדפדפן ${browser}`,
   installButton: 'התקנת AI Wallet',
-  safariAlreadyAdded: 'כבר הוספתם? לחצו על AI Wallet בסרגל הכלים של Safari ואז על „אישור בכל האתרים”.',
+  safariAlreadyAdded: 'כבר הוספתם? לחצו על AI Wallet בסרגל הכלים של Safari ובחרו „תמיד לאשר בכל האתרים”.',
   refusals: {
     declined: {
       title: 'דחיתם את האתר הזה',
@@ -195,7 +196,8 @@ const ar: PickerMessages = {
     + 'أعد تحميل هذه الصفحة بعد تثبيتها.',
   addToBrowser: (browser) => `إضافة إلى ${browser}`,
   installButton: 'تثبيت AI Wallet',
-  safariAlreadyAdded: 'هل أضفته من قبل؟ انقر على AI Wallet في شريط أدوات Safari، ثم على «السماح على كل مواقع الويب».',
+  safariAlreadyAdded: 'هل أضفته من قبل؟ انقر على AI Wallet في شريط أدوات Safari واختر «السماح دائمًا على كل '
+    + 'مواقع الويب».',
   refusals: {
     declined: {
       title: 'لقد رفضت هذا الموقع',
@@ -238,7 +240,7 @@ const zh: PickerMessages = {
   installText: 'AI Wallet 扩展保管你的 AI 账户，并把它们连接到你批准的网站。安装完成后请重新加载此页面。',
   addToBrowser: (browser) => `添加至 ${browser}`,
   installButton: '安装 AI Wallet',
-  safariAlreadyAdded: '已经添加过？点按 Safari 工具栏中的 AI Wallet，然后点按“在所有网站上允许”。',
+  safariAlreadyAdded: '已经添加过？点按 Safari 工具栏中的 AI Wallet，然后选择“在所有网站上始终允许”。',
   refusals: {
     declined: {
       title: '你拒绝了这个网站',
