@@ -9,7 +9,7 @@ import { useCallback, useRef, useState } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 import { createChatGuard, GuardStop, runConversation } from '@tensorpass/aiconnect';
 import type {
-  ChatGuard, ChatMessage, ConversationHooks, GuardPolicy, ProviderSession, ToolCall, ToolSource,
+  ChatGuard, ChatMessage, ConnectionState, ConversationHooks, GuardPolicy, ProviderSession, ToolCall, ToolSource,
 } from '@tensorpass/aiconnect';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { failedAnswerText } from './messages.ts';
@@ -104,6 +104,18 @@ function showStop(stop: GuardStop, run: QuestionRun, copy: ModuleMessages) {
   }
 }
 
+// The words of an answer that failed. A web account's 429 keeps the provider's own message, such as the
+// gateway's limit of requests from one site, since the module's words for a 429 send the visitor to another
+// account in the wallet.
+function answerFailure(reason: unknown, connection: Extract<ConnectionState, { status: 'connected' }>,
+  copy: ModuleMessages): string {
+  const status = (reason as { status?: unknown } | null)?.status;
+  if (connection.account && status === 429 && reason instanceof Error) {
+    return reason.message;
+  }
+  return failedAnswerText(reason, connection.providerName, copy);
+}
+
 export function useAiChat({ system, tools, guards }: UseAiChatOptions) {
   const { client, state, moduleMessages } = useAiConnect();
   const transcript = useRef<ChatMessage[]>([{ role: 'system', content: system }]);
@@ -141,7 +153,7 @@ export function useAiChat({ system, tools, guards }: UseAiChatOptions) {
         showStop(reason, run, moduleMessages);
       } else if (!controller.signal.aborted) {
         // An answer the site stopped itself ends without an error.
-        setError(failedAnswerText(reason, connection.providerName, moduleMessages));
+        setError(answerFailure(reason, connection, moduleMessages));
       }
     } finally {
       // A question sent after a stop has taken over; its own end clears `busy`.
