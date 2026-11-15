@@ -1,0 +1,111 @@
+/* The web accounts: the sign ins under the install step, in the connect window's card and under a module's
+   connection note, the step while the sign in window is open, the account that answers, and the Sign out
+   beside the account a module names. */
+
+.aic-web,
+.aic-web-step {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  font-family: var(--aic-font);
+  text-align: center;
+}
+
+.aic-web[data-placement='window'] {
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--aic-border);
+}
+
+.aic-web[data-placement='note'] {
+  width: 100%;
+  max-width: 360px;
+  margin: 12px auto 0;
+}
+
+.aic-web-step {
+  align-items: center;
+  padding: 4px 0 8px;
+}
+
+.aic-web-step[data-placement='note'] {
+  width: 100%;
+  padding: 2px 18px 20px;
+  border-radius: 20px;
+  background: var(--aic-ground);
+}
+
+.aic-web-title {
+  margin: 0;
+  color: var(--aic-ink);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.aic-web-text {
+  margin: 0;
+  color: var(--aic-muted);
+  font-size: 14px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.aic-web-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  gap: 10px;
+  min-height: 46px;
+  margin: 0;
+  padding: 0 18px;
+  border: 1px solid var(--aic-field-edge);
+  border-radius: 12px;
+  background: var(--aic-surface);
+  color: var(--aic-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.aic-web-button:hover {
+  border-color: var(--aic-ink);
+}
+
+.aic-web-button:focus-visible {
+  outline: 2px solid var(--aic-focus);
+  outline-offset: 3px;
+}
+
+.aic-web-mark {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  background: currentColor;
+}
+
+svg.aic-web-mark {
+  background: none;
+}
+
+.aic-web-failure {
+  margin: 2px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--aic-danger) 9%, var(--aic-surface));
+  color: var(--aic-ink);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.aic-account-sign-out {
+  flex: none;
+  margin-inline-start: auto;
+  font-size: 13px;
+}

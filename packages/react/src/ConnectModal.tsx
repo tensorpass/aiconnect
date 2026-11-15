@@ -1,8 +1,9 @@
 // The connect window a site shows: one card over the page that connects the visitor's AI through
 // the AI Wallet. It says what happens, waits while the wallet asks the visitor, explains how to
 // install the wallet when it is missing (and, in Safari, how to allow a wallet already added on every
-// website), and lets the visitor try again after a refusal. The accounts themselves live in the
-// wallet; the site never handles them.
+// website), and lets the visitor try again after a refusal. The wallet's accounts stay in the extension.
+// A visitor without the wallet can sign in to a web account on the page instead (WebAccountStep.tsx), whose
+// credential the site keeps.
 
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -10,6 +11,7 @@ import { AboutView } from './AboutView.tsx';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { ConnectRing } from './ConnectRing.tsx';
 import { alreadyAddedLine, installLabel, refusalStep } from './messages.ts';
+import { WebAccountConnected, WebSignIns, WebSigningIn } from './WebAccountStep.tsx';
 
 function useEscapeToClose(onClose: () => void) {
   useEffect(() => {
@@ -70,6 +72,24 @@ function WalletStep() {
   }
 }
 
+// The card's body: the wallet's step, with the sign ins under it when the wallet is missing, the step of a
+// sign in in progress, or the web account that answers.
+function WindowBody() {
+  const { state } = useAiConnect();
+  if (state.status === 'signingIn') {
+    return <WebSigningIn account={state.account} placement="window" />;
+  }
+  if (state.status === 'connected' && state.account) {
+    return <WebAccountConnected account={state.account} />;
+  }
+  return (
+    <>
+      <WalletStep />
+      {state.status === 'noWallet' ? <WebSignIns placement="window" /> : null}
+    </>
+  );
+}
+
 export function ConnectModal() {
   const { messages, closePicker } = useAiConnect();
   const [about, setAbout] = useState(false);
@@ -84,7 +104,7 @@ export function ConnectModal() {
           <h2 id="aic-title" className="aic-title">{about ? messages.help : messages.title}</h2>
           <button type="button" className="aic-icon-button" aria-label={messages.close} onClick={closePicker}>×</button>
         </header>
-        {about ? <AboutView /> : <WalletStep />}
+        {about ? <AboutView /> : <WindowBody />}
         <button type="button" className="aic-link" onClick={() => setAbout(!about)}>
           {about ? messages.back : messages.help}
         </button>

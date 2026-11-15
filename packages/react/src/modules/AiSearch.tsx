@@ -8,7 +8,7 @@ import type { FormEvent, KeyboardEvent } from 'react';
 import { useAiConnect } from '../AiConnectProvider.tsx';
 import { AccountBadge } from './parts/AccountBadge.tsx';
 import { StopButton } from './parts/Composer.tsx';
-import { ConnectNote } from './parts/ConnectNote.tsx';
+import { ConnectStep } from './parts/ConnectStep.tsx';
 import { Suggestions, TurnBody } from './parts/Conversation.tsx';
 import type { TurnView } from './parts/Conversation.tsx';
 import { ArrowIcon, CloseIcon, SearchIcon } from './parts/icons.tsx';
@@ -35,7 +35,7 @@ function SearchResult(view: TurnView & { chat: ModuleChat }) {
       {turn ? (
         <TurnBody turn={turn} view={view} live={chat.busy} stopped={chat.stopped.includes(chat.turns.length - 1)}
           linkAllowed={chat.linkAllowed} />
-      ) : <ConnectNote pending compact />}
+      ) : <ConnectStep pending compact />}
       {chat.error ? (
         <div className="aic-error" role="alert">
           <p>{chat.error}</p>

@@ -6,6 +6,9 @@ import type { ProviderSession } from '../types.ts';
 import type { HttpFetch } from './openAiCompatibleSession.ts';
 import type { WebAccountId, WebAccountStore, WebCredential } from './webAccountStore.ts';
 
+// The name of each account as the connect window and the chat show it.
+export const WEB_ACCOUNT_NAMES: Record<WebAccountId, string> = { tensorpass: 'TensorPass', openrouter: 'OpenRouter' };
+
 export interface AuthorizeRequest {
   redirectUri: string;
   state: string;

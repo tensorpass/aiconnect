@@ -8,6 +8,8 @@ export { builtInLauncherMessages } from './launcher.ts';
 export type { LauncherLocale, LauncherMessages } from './launcher.ts';
 export { builtInMessages, builtInModuleMessages } from './messages.ts';
 export type { Locale, ModuleMessages, PickerMessages, RefusalStep } from './messages.ts';
+export { builtInWebMessages } from './webAccountMessages.ts';
+export type { WebAccountMessages } from './webAccountMessages.ts';
 export { AiChatInline } from './modules/AiChatInline.tsx';
 export type { AiChatInlineProps } from './modules/AiChatInline.tsx';
 export { AiChatPage } from './modules/AiChatPage.tsx';

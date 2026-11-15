@@ -11,7 +11,7 @@ import { ConnectRing } from '../../ConnectRing.tsx';
 import type { ChatTurn } from '../../useAiChat.ts';
 import type { AiModuleProps } from '../types.ts';
 import { AnswerText } from './AnswerText.tsx';
-import { ConnectNote } from './ConnectNote.tsx';
+import { ConnectStep } from './ConnectStep.tsx';
 import { useActionAttribute } from './moduleAnalytics.ts';
 import { ArrowIcon, WaveIcon } from './icons.tsx';
 import { ToolActivityList } from './ToolActivity.tsx';
@@ -117,7 +117,7 @@ export function Conversation({ chat, intro, suggestions, ...view }: Conversation
         <div className="aic-empty">
           <div className="aic-empty-ring"><ConnectRing live={false} /></div>
           <h3 className="aic-intro">{intro}</h3>
-          <ConnectNote pending={false} />
+          <ConnectStep pending={false} />
           <Suggestions items={suggestions} onPick={chat.ask} />
         </div>
       ) : null}
@@ -130,7 +130,7 @@ export function Conversation({ chat, intro, suggestions, ...view }: Conversation
           </li>
         ))}
         {chat.pendingQuestion ? (
-          <li className="aic-turn"><Question text={chat.pendingQuestion} /><ConnectNote pending /></li>
+          <li className="aic-turn"><Question text={chat.pendingQuestion} /><ConnectStep pending /></li>
         ) : null}
       </ol>
       {chat.error ? (

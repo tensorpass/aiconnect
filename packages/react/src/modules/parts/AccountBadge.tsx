@@ -1,11 +1,12 @@
 // Names the account that answers, as the wallet reports it: a key card with its ink stripe, the
-// contactless arcs that light up while the answer streams, the account and its model.
+// contactless arcs that light up while the answer streams, the account and its model. A web account the
+// visitor signed in to on the page also gets its Sign out.
 
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { WaveIcon } from './icons.tsx';
 
 export function AccountBadge({ live }: { live: boolean }) {
-  const { state, moduleMessages } = useAiConnect();
+  const { client, state, moduleMessages, webMessages } = useAiConnect();
   if (state.status !== 'connected') {
     return null;
   }
@@ -17,6 +18,11 @@ export function AccountBadge({ live }: { live: boolean }) {
         {moduleMessages.answersWith} <b>{state.providerName}</b>
       </span>
       {state.model ? <span className="aic-account-model">{state.model}</span> : null}
+      {state.account ? (
+        <button type="button" className="aic-text-button aic-account-sign-out" onClick={() => void client.signOut()}>
+          {webMessages.signOut}
+        </button>
+      ) : null}
     </div>
   );
 }

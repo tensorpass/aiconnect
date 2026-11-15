@@ -9,14 +9,14 @@
 
 import { WalletRequestError } from '../walletProvider.ts';
 import type { WebAccount, WebAccountContext } from './webAccount.ts';
-import { jsonOf, replyMessage } from './webAccount.ts';
+import { jsonOf, replyMessage, WEB_ACCOUNT_NAMES } from './webAccount.ts';
 import { webSession } from './openAiCompatibleSession.ts';
 import type { HttpFetch } from './openAiCompatibleSession.ts';
 import type { TensorPassCredential, WebAccountStore } from './webAccountStore.ts';
 
 export const PLAN_GATEWAY = 'https://plan.tensorpass.app';
 export type PlanLevel = 'quick' | 'smart' | 'expert';
-const NAME = 'TensorPass';
+const NAME = WEB_ACCOUNT_NAMES.tensorpass;
 // A token this close to its end is renewed before the call.
 const RENEW_BEFORE_MS = 60_000;
 const RENEW_LOCK = 'aiconnect:tensorpass-renewal';

@@ -111,12 +111,12 @@ test('the conversation loop runs a tool the account asks for, then streams its f
 
 test('a refused call carries the provider\'s status and its own message', async () => {
   const refusal = Response.json(
-    { error: { type: 'plan_error', code: 'plan_site_cap_reached', message: 'This site reached its monthly limit.' } },
-    { status: 429 },
+    { error: { type: 'plan_error', code: 'plan_site_rate_limited', message: 'Too many requests from this site.' } },
+    { status: 429, headers: { 'retry-after': '20' } },
   );
   const { fetch } = played([refusal]);
   await assert.rejects(webSession(config(fetch, { providerName: 'TensorPass' })).chat({ messages: [] }), {
-    name: 'WalletRequestError', status: 429, message: 'TensorPass: This site reached its monthly limit.',
+    name: 'WalletRequestError', status: 429, message: 'TensorPass: Too many requests from this site.',
   });
 });
 

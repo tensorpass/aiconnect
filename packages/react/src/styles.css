@@ -10,6 +10,7 @@
 @import './modules/styles/prompt.css';
 @import './modules/styles/forms.css';
 @import './modules/styles/search.css';
+@import './webAccounts.css';
 
 @keyframes aic-fade-in {
   from { opacity: 0; }

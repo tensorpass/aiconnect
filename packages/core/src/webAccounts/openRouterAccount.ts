@@ -5,7 +5,7 @@
 // https://openrouter.ai/docs/use-cases/oauth-pkce
 
 import type { WebAccount, WebAccountContext } from './webAccount.ts';
-import { jsonOf, replyMessage } from './webAccount.ts';
+import { jsonOf, replyMessage, WEB_ACCOUNT_NAMES } from './webAccount.ts';
 import { webSession } from './openAiCompatibleSession.ts';
 
 const AUTHORIZE_URL = 'https://openrouter.ai/auth';
@@ -13,7 +13,7 @@ const KEY_EXCHANGE_URL = 'https://openrouter.ai/api/v1/auth/keys';
 const CHAT_URL = 'https://openrouter.ai/api/v1/chat/completions';
 // OpenRouter's Auto Router, which picks the model for each prompt.
 export const OPENROUTER_DEFAULT_MODEL = 'openrouter/auto';
-const NAME = 'OpenRouter';
+const NAME = WEB_ACCOUNT_NAMES.openrouter;
 
 // OpenRouter credits the site that sent the call by these two headers.
 function siteHeaders(): Record<string, string> {

@@ -19,4 +19,5 @@ export type { ChatEvent, WalletChatParams, WalletProvider, WalletRefusal } from 
 export type { WalletFetch } from './wireProtocols/walletFetch.ts';
 export { PLAN_GATEWAY } from './webAccounts/tensorPassAccount.ts';
 export type { PlanLevel } from './webAccounts/tensorPassAccount.ts';
+export { WEB_ACCOUNT_NAMES } from './webAccounts/webAccount.ts';
 export type { WebAccountId } from './webAccounts/webAccountStore.ts';

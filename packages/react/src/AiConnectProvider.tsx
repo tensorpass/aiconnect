@@ -7,12 +7,15 @@ import type { AiConnect, ConnectionState } from '@tensorpass/aiconnect';
 import { ConnectModal } from './ConnectModal.tsx';
 import { builtInMessages, builtInModuleMessages } from './messages.ts';
 import type { Locale, ModuleMessages, PickerMessages } from './messages.ts';
+import { builtInWebMessages } from './webAccountMessages.ts';
+import type { WebAccountMessages } from './webAccountMessages.ts';
 
 interface AiConnectContextValue {
   client: AiConnect;
   state: ConnectionState;
   messages: PickerMessages;
   moduleMessages: ModuleMessages;
+  webMessages: WebAccountMessages;
   isPickerOpen: boolean;
   openPicker: () => void;
   closePicker: () => void;
@@ -29,11 +32,12 @@ export interface AiConnectProviderProps {
   locale?: Locale;
   messages?: PickerMessages;
   moduleMessages?: ModuleMessages;
+  webMessages?: WebAccountMessages;
   children: ReactNode;
 }
 
 export function AiConnectProvider(props: AiConnectProviderProps) {
-  const { client, locale = 'en', messages, moduleMessages, children } = props;
+  const { client, locale = 'en', messages, moduleMessages, webMessages, children } = props;
   const state = useSyncExternalStore(
     (listener) => client.subscribe(listener),
     () => client.state,
@@ -55,10 +59,11 @@ export function AiConnectProvider(props: AiConnectProviderProps) {
     state,
     messages: messages ?? builtInMessages[locale],
     moduleMessages: moduleMessages ?? builtInModuleMessages[locale],
+    webMessages: webMessages ?? builtInWebMessages[locale],
     isPickerOpen,
     openPicker,
     closePicker,
-  }), [client, state, messages, moduleMessages, locale, isPickerOpen, openPicker, closePicker]);
+  }), [client, state, messages, moduleMessages, webMessages, locale, isPickerOpen, openPicker, closePicker]);
 
   return (
     <AiConnectContext.Provider value={value}>
