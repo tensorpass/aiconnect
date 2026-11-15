@@ -289,7 +289,7 @@ AI Wallet holds the accounts and translates one chat format to each provider's A
 
 The [providers page](https://tensorpass.app/docs/providers) gives each account's default model, its model list and how its sign in finishes. A missing provider can be proposed with the [connector form](https://tensorpass.app/connectors/propose).
 
-AI Wallet runs in desktop Chrome, Edge, Brave and Opera. Firefox and Safari versions are planned. In Safari, on a Mac, an iPhone or an iPad, the install button reads "Add to Safari", and a line under it tells a visitor who already added the wallet to click AI Wallet in Safari's toolbar and choose Always Allow on Every Website, since Safari runs an extension only on the sites the visitor allowed. In any other browser of a phone, the install button reads "Install AI Wallet" and leads to the AI Wallet page.
+AI Wallet runs in desktop Chrome, Edge, Brave and Opera. Firefox and Safari versions are planned. In Safari, on a Mac, an iPhone or an iPad, the install button reads "Add to Safari", and a line under it tells a visitor who already added the wallet to click AI Wallet in Safari's toolbar, then Allow on every website, the wallet's own button for it, since Safari runs an extension only on the sites the visitor allowed. In any other browser of a phone, the install button reads "Install AI Wallet" and leads to the AI Wallet page.
 
 ## Security and privacy model
 
