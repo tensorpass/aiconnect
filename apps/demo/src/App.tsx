@@ -19,7 +19,7 @@ function Connection() {
     return (
       <p className="status">
         Connected with {state.providerName}{state.model ? ` (${state.model})` : ''}{' '}
-        <button type="button" onClick={() => client.disconnect()}>Disconnect</button>
+        <button type="button" onClick={() => client.disconnect()}>{state.account ? 'Sign out' : 'Disconnect'}</button>
       </p>
     );
   }

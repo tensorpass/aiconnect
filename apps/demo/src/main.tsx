@@ -11,8 +11,12 @@ import { App } from './App.tsx';
 import { ModulesPlayground } from './modules/ModulesPlayground.tsx';
 import { isPlayground } from './modules/playgroundSettings.ts';
 
-// The visitor's AI, through the AI Wallet extension.
-const client = new AiConnect();
+// The site's TensorPass site key: `siteKey` in the address, for trying another key, or VITE_TENSORPASS_SITE_KEY.
+const siteKey = new URLSearchParams(window.location.search).get('siteKey')
+  ?? (import.meta.env.VITE_TENSORPASS_SITE_KEY as string | undefined);
+
+// The visitor's AI, through the AI Wallet extension, or an account signed in to on the page without it.
+const client = new AiConnect({ siteKey: siteKey || undefined });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

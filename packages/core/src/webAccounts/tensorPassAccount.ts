@@ -85,7 +85,9 @@ function renewer(endpoint: TokenEndpoint, store: WebAccountStore, onSignedOut: (
 const bearer = (credential: TensorPassCredential) => ({ Authorization: `Bearer ${credential.accessToken}` });
 
 export function tensorPassAccount(options: TensorPassOptions): WebAccount {
-  const endpoint = { url: options.gateway, siteKey: options.siteKey, send: options.fetch ?? fetch };
+  // The browser's fetch called as a method of another object throws, so it is wrapped.
+  const send: HttpFetch = options.fetch ?? ((input, init) => fetch(input, init));
+  const endpoint = { url: options.gateway, siteKey: options.siteKey, send };
   return {
     id: 'tensorpass',
     name: NAME,
