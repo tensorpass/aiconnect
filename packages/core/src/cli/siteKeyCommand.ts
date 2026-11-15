@@ -1,20 +1,14 @@
-// `aiconnect site-key <domain>`: signs in to TensorPass with a device authorization, creates the site key of
+// `aiconnect site-key <domain>`: signs in to TensorPass in the developer's browser, creates the site key of
 // the domain, and prints the key with where it goes in this project. The key is public: it names the site in
 // the TensorPass sign in a visitor without AI Wallet opens, and works on https://<domain> and on localhost.
 
-import { requestDeviceCode, waitForApproval } from './deviceAuthorization.ts';
-import type { CliFetch } from './deviceAuthorization.ts';
+import { signIn } from './loopbackSignIn.ts';
+import type { SignInDeps } from './loopbackSignIn.ts';
 import { detectStack, placementOf } from './siteKeyPlacement.ts';
 
-export interface SiteKeyRun {
+export interface SiteKeyRun extends SignInDeps {
   domain: string;
-  gateway: string;
   directory: string;
-  fetch: CliFetch;
-  print: (line: string) => void;
-  // Opens the approval page in the developer's browser, where the computer has one.
-  openBrowser: (url: string) => void;
-  sleep: (seconds: number) => Promise<void>;
 }
 
 export interface SiteKey {
@@ -38,11 +32,7 @@ async function createSiteKey(run: SiteKeyRun, token: string): Promise<SiteKey> {
 }
 
 export async function runSiteKey(run: SiteKeyRun): Promise<SiteKey> {
-  const code = await requestDeviceCode(run);
-  run.print(`Approve this command in your browser: ${code.verificationUriComplete}`);
-  run.print(`Check that the page shows the code ${code.userCode}, then sign in to TensorPass and approve.`);
-  run.openBrowser(code.verificationUriComplete);
-  const token = await waitForApproval(run, code);
+  const token = await signIn(run);
   const siteKey = await createSiteKey(run, token);
   run.print('');
   run.print(`Site key of ${siteKey.domain}: ${siteKey.key}`);

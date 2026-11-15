@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // The AI Connect command line. `npx @tensorpass/aiconnect site-key <domain>` creates the TensorPass site key of
-// a domain after the developer approves it in their browser. `--gateway <url>` names another TensorPass
-// gateway, and `--no-browser` only prints the approval page's address.
+// a domain after the developer signs in to TensorPass in their browser, which comes back to the command on
+// this computer. `--gateway <url>` names another TensorPass gateway, and `--no-browser` only prints the sign
+// in's address, for a developer who opens it themselves.
 
 import { spawn } from 'node:child_process';
 import { PLAN_GATEWAY } from '@tensorpass/aiconnect';
@@ -36,7 +37,6 @@ async function main(args: string[]): Promise<void> {
     fetch: (input, init) => fetch(input, init),
     print: (line) => console.log(line),
     openBrowser: args.includes('--no-browser') ? () => undefined : openBrowser,
-    sleep: (seconds) => new Promise((resolve) => setTimeout(resolve, seconds * 1000)),
   });
 }
 

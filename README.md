@@ -171,13 +171,13 @@ In a browser without the extension, on a computer or a phone, the connect window
 const client = new AiConnect({ siteKey: process.env.NEXT_PUBLIC_TENSORPASS_SITE_KEY });
 ```
 
-A site key is public: it names the site on TensorPass's sign in page and works on `https://<domain>` and on `http://localhost` for development, with no proof of the domain. The command line creates one after you approve it in your browser, and prints where it goes for your project:
+A site key is public: it names the site on TensorPass's sign in page and works on `https://<domain>` and on `http://localhost` for development, with no proof of the domain. The command line opens TensorPass's sign in in your browser, which comes back to the command on your computer once you approve, then creates the key and prints where it goes for your project:
 
 ```bash
 npx @tensorpass/aiconnect site-key shop.example
 ```
 
-The Web Components take it as `data-site-key` on their script tag or `site-key` on the element, and the WordPress plugin as its Site key setting. Coding agents get the key from TensorPass's account MCP server at https://plan.tensorpass.app/mcp.
+The Web Components take it as `data-site-key` on their script tag or `site-key` on the element, and the WordPress plugin as its TensorPass site key setting, under Settings, AI Connect. Coding agents get the key from TensorPass's account MCP server at https://plan.tensorpass.app/mcp.
 
 Each sign in opens in a popup from the visitor's click, with PKCE and a checked state, and comes back to the page's own address. Where the browser blocks the popup, the page itself goes to the sign in and returns. The credential, an OpenRouter key or a TensorPass token of 15 minutes with its refresh token, is kept in the site's `localStorage` for its origin, and `client.signOut()` removes it. Every script of the site's pages can read it there, which the wallet's accounts are kept from. A TensorPass token only answers chats, from the site's origin. Plan accounts such as ChatGPT, Claude, Gemini and Grok stay in the extension: on 15 November 2026 each of them refused a web page at its sign in or its chat.
 
