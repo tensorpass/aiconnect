@@ -1,14 +1,15 @@
 // The connect window a site shows: one card over the page that connects the visitor's AI through
 // the AI Wallet. It says what happens, waits while the wallet asks the visitor, explains how to
-// install the wallet when it is missing, and lets the visitor try again after a refusal. The
-// accounts themselves live in the wallet; the site never handles them.
+// install the wallet when it is missing (and, in Safari, how to allow a wallet already added on every
+// website), and lets the visitor try again after a refusal. The accounts themselves live in the
+// wallet; the site never handles them.
 
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { AboutView } from './AboutView.tsx';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { ConnectRing } from './ConnectRing.tsx';
-import { installLabel, refusalStep } from './messages.ts';
+import { alreadyAddedLine, installLabel, refusalStep } from './messages.ts';
 
 function useEscapeToClose(onClose: () => void) {
   useEffect(() => {
@@ -41,14 +42,17 @@ function WalletStep() {
       return <Step live={false} title={messages.checking} text="" />;
     case 'connecting':
       return <Step live title={messages.waitingTitle} text={messages.waitingText} />;
-    case 'noWallet':
+    case 'noWallet': {
+      const alreadyAdded = alreadyAddedLine(messages, client.browser);
       return (
         <Step live={false} title={messages.installTitle} text={messages.installText}>
           <a className="aic-primary" href={client.installUrl} target="_blank" rel="noreferrer">
             {installLabel(messages, client.browser)}
           </a>
+          {alreadyAdded ? <p className="aic-hint">{alreadyAdded}</p> : null}
         </Step>
       );
+    }
     case 'error': {
       const refusal = refusalStep(state, messages);
       return (

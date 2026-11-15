@@ -29,10 +29,26 @@ test('each desktop browser is named by its brands, Brave\'s own flag or its user
   }
 });
 
-test('a phone or a tablet installs no extension, so it gets the wallet\'s page without a browser', () => {
-  const iphone = 'Mozilla/5.0 (iPhone; CPU iPhone OS 27_2 like Mac OS X) AppleWebKit/605.1.15 Version/27.2 '
-    + 'Mobile/15E148 Safari/604.1';
-  assert.equal(browserOf(signals(iphone)), 'other');
+const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 27_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) ';
+
+test('Safari is named on an iPhone and an iPad, where the wallet runs in it', () => {
+  const ipad = IPHONE.replace('iPhone; CPU iPhone OS', 'iPad; CPU OS');
+  assert.equal(browserOf(signals(`${IPHONE}Version/27.2 Mobile/15E148 Safari/604.1`)), 'safari');
+  assert.equal(browserOf(signals(`${ipad}Version/27.2 Mobile/15E148 Safari/604.1`)), 'safari');
+  assert.equal(walletInstallUrl('safari'), 'https://tensorpass.app/wallet?browser=safari');
+});
+
+test('any other browser of a phone or a tablet gets the wallet\'s page without a browser', () => {
+  const others = [
+    `${IPHONE}CriOS/142.0.0.0 Mobile/15E148 Safari/604.1`,
+    `${IPHONE}FxiOS/145.0 Mobile/15E148 Safari/605.1.15`,
+    `${IPHONE}EdgiOS/142.0.0.0 Version/27.0 Mobile/15E148 Safari/604.1`,
+    'Mozilla/5.0 (Linux; U; Android 4.3; en-us) AppleWebKit/534.30 Version/4.0 Mobile Safari/534.30',
+    'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Version/4.0 Chrome/142.0.0.0 Mobile Safari/537.36',
+  ];
+  for (const userAgent of others) {
+    assert.equal(browserOf(signals(userAgent)), 'other', userAgent);
+  }
   assert.equal(browserOf(signals(CHROME, { brands: ['Google Chrome'], mobile: true })), 'other');
   assert.equal(walletInstallUrl('other'), 'https://tensorpass.app/wallet');
   assert.equal(walletInstallUrl('firefox'), 'https://tensorpass.app/wallet?browser=firefox');

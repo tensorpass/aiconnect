@@ -18,6 +18,13 @@ export function installLabel(messages: PickerMessages, browser: VisitorBrowser):
   return browser === 'other' ? messages.installButton : messages.addToBrowser(BROWSER_NAMES[browser]);
 }
 
+// The line under the install button for a visitor who may have the wallet already: in Safari, which runs
+// an extension only on the sites the visitor allowed, the way to allow it on every website. Any other
+// browser runs the wallet everywhere once it is added, and has no such line.
+export function alreadyAddedLine(messages: PickerMessages, browser: VisitorBrowser): string | undefined {
+  return browser === 'safari' ? messages.safariAlreadyAdded : undefined;
+}
+
 // The step a connection in error shows: the words for the reason the wallet gave, or the wallet's
 // own message under the general title.
 export function refusalStep(state: { message: string; reason?: WalletRefusal }, messages: PickerMessages): RefusalStep {

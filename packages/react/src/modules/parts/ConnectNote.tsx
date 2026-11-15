@@ -1,12 +1,13 @@
 // The connection step a module shows until the visitor's AI is connected, in the connect window's
-// words: connect the wallet, add it to the browser, approve the site, or try again after a refusal.
+// words: connect the wallet, add it to the browser (with, in Safari, how to allow a wallet already added
+// on every website), approve the site, or try again after a refusal.
 // Its button runs the step itself, as the connect window's button does: the install link opens the
 // wallet's page, and connect asks the wallet, whose window opens at once.
 
 import type { ConnectionState, VisitorBrowser } from '@tensorpass/aiconnect';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { ConnectRing } from '../../ConnectRing.tsx';
-import { installLabel, refusalStep } from '../../messages.ts';
+import { alreadyAddedLine, installLabel, refusalStep } from '../../messages.ts';
 import { useActionAttribute } from './moduleAnalytics.ts';
 import type { ModuleMessages, PickerMessages } from '../../messages.ts';
 
@@ -15,6 +16,8 @@ type StepAction = { kind: 'install' | 'connect'; label: string };
 interface Step {
   title: string;
   text: string;
+  // A second line under the text, for the visitor the main text does not cover.
+  aside?: string;
   action?: StepAction;
   live?: boolean;
 }
@@ -39,6 +42,7 @@ function connectionStep(state: ConnectionState, copy: StepCopy): Step | null {
       return {
         title: messages.installTitle,
         text: moduleMessages.installText,
+        aside: alreadyAddedLine(messages, browser),
         action: { kind: 'install', label: installLabel(messages, browser) },
       };
     case 'connecting':
@@ -83,6 +87,7 @@ export function ConnectNote({ pending, compact = false }: { pending: boolean; co
       <div className="aic-note-copy">
         <p className="aic-note-title">{step.title}</p>
         {step.text ? <p className="aic-note-text">{step.text}</p> : null}
+        {step.aside ? <p className="aic-note-text">{step.aside}</p> : null}
       </div>
       {step.action ? <StepButton action={step.action} /> : null}
     </div>

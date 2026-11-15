@@ -26,6 +26,11 @@ export interface BrowserSignals {
 
 const WALLET_PAGE = 'https://tensorpass.app/wallet';
 const MOBILE = /Mobi|Android|iPhone|iPad|iPod/;
+// Safari's user agent, on a Mac as on an iPhone or an iPad, and the other browsers that carry Safari's
+// tokens: Chromium's, Android's own, and the other browsers of iOS, which run on Safari's engine and take
+// no extension.
+const SAFARI = /\bVersion\/[\d.]+.*\bSafari\//;
+const NOT_SAFARI = /\b(Chrome|Chromium|CriOS|FxiOS|EdgiOS|OPiOS)\/|\bAndroid\b/;
 
 // The brand that names each Chromium browser in `userAgentData`, then the token of its user agent.
 const CHROMIUM: { browser: VisitorBrowser; brand: string; token: RegExp }[] = [
@@ -34,8 +39,14 @@ const CHROMIUM: { browser: VisitorBrowser; brand: string; token: RegExp }[] = [
   { browser: 'brave', brand: 'Brave', token: /\bBrave\// },
 ];
 
-/** The browser the signals describe. A phone, a tablet or a browser the wallet does not name is `other`. */
+/**
+ * The browser the signals describe. Safari is named on a Mac, an iPhone and an iPad, where the wallet runs
+ * in it; any other browser of a phone or a tablet, or a browser the wallet does not name, is `other`.
+ */
 export function browserOf({ userAgent, brands, brave, mobile }: BrowserSignals): VisitorBrowser {
+  if (!brave && SAFARI.test(userAgent) && !NOT_SAFARI.test(userAgent)) {
+    return 'safari';
+  }
   if (mobile || MOBILE.test(userAgent)) {
     return 'other';
   }
@@ -53,9 +64,6 @@ export function browserOf({ userAgent, brands, brave, mobile }: BrowserSignals):
   }
   if (/\bFirefox\//.test(userAgent)) {
     return 'firefox';
-  }
-  if (/\bVersion\/[\d.]+.*\bSafari\//.test(userAgent) && !/\b(Chrome|Chromium)\//.test(userAgent)) {
-    return 'safari';
   }
   return 'other';
 }

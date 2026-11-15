@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { WalletRequestError } from '@tensorpass/aiconnect';
-import { builtInModuleMessages, failedAnswerText } from './messages.ts';
+import { alreadyAddedLine, builtInMessages, builtInModuleMessages, failedAnswerText } from './messages.ts';
 
 const en = builtInModuleMessages.en;
 
@@ -21,4 +21,21 @@ test('a failure the wallet words itself keeps its message', () => {
   const locked = new WalletRequestError('AI Wallet is locked', 403);
   assert.equal(failedAnswerText(locked, 'ChatGPT', en), 'AI Wallet is locked');
   assert.equal(failedAnswerText(new Error('network down'), 'ChatGPT', en), 'network down');
+});
+
+test('in Safari the install step tells a visitor who added the wallet how to allow it on every website', () => {
+  for (const messages of Object.values(builtInMessages)) {
+    const line = alreadyAddedLine(messages, 'safari');
+    assert.ok(line?.includes('AI Wallet') && line.includes('Safari'), line);
+  }
+  assert.equal(
+    alreadyAddedLine(builtInMessages.en, 'safari'),
+    'Already added? Click AI Wallet in Safari\'s toolbar and choose Always Allow on Every Website.',
+  );
+});
+
+test('a browser that runs the wallet everywhere once it is added shows no such line', () => {
+  for (const browser of ['chrome', 'edge', 'brave', 'opera', 'firefox', 'other'] as const) {
+    assert.equal(alreadyAddedLine(builtInMessages.en, browser), undefined, browser);
+  }
 });
