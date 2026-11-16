@@ -31,17 +31,21 @@ export interface WebSessionConfig {
 // The characters of a refusal's body read for its message.
 const ERROR_DETAIL_LENGTH = 300;
 
-// The message OpenRouter and the plan gateway both put in `error.message`, or the start of the body.
+// The message OpenRouter and the plan gateway both put in `error.message`, or the start of the body, and
+// the gateway's `error.code`, by which the chat tells a plan without a subscription from other refusals.
 async function refusalOf(config: WebSessionConfig, response: Response): Promise<WalletRequestError> {
   const text = (await response.text().catch(() => '')).slice(0, 4096);
   let message = text.slice(0, ERROR_DETAIL_LENGTH);
+  let code: string | undefined;
   try {
-    const detail = (JSON.parse(text) as { error?: { message?: unknown } }).error?.message;
-    message = typeof detail === 'string' ? detail : message;
+    const detail = (JSON.parse(text) as { error?: { message?: unknown; code?: unknown } }).error;
+    message = typeof detail?.message === 'string' ? detail.message : message;
+    code = typeof detail?.code === 'string' ? detail.code : undefined;
   } catch {
     // The body is not JSON; its start stands as the message.
   }
-  return new WalletRequestError(`${config.providerName}: ${message || `HTTP ${response.status}`}`, response.status);
+  const status = response.status;
+  return new WalletRequestError(`${config.providerName}: ${message || `HTTP ${status}`}`, status, undefined, code);
 }
 
 function send(config: WebSessionConfig, headers: Record<string, string>, request: ChatRequest): Promise<Response> {

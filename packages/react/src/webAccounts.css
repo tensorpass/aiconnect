@@ -147,3 +147,79 @@ svg.aic-web-mark {
   margin-inline-start: auto;
   font-size: 13px;
 }
+
+/* The chat's offer to subscribe, for a TensorPass account without a plan: the plans as rows, each with its
+   levels, its monthly price and its button. */
+.aic-plan-offer {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--aic-ground);
+  font-family: inherit;
+}
+
+.aic-plan-title {
+  margin: 0;
+  color: var(--aic-ink);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.aic-plan-text {
+  margin: 0;
+  color: var(--aic-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.aic-plans {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aic-plan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--aic-border);
+  border-radius: 14px;
+  background: var(--aic-surface);
+}
+
+.aic-plan-copy {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.aic-plan-name {
+  margin: 0;
+  color: var(--aic-ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.aic-plan-levels,
+.aic-plan-price {
+  margin: 0;
+  color: var(--aic-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.aic-plan-price {
+  color: var(--aic-ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.aic-plan-choose {
+  flex: none;
+}

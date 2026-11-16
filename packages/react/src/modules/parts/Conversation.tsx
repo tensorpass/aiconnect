@@ -1,8 +1,9 @@
 // The conversation of a chat module. Empty, it shows its heading, the connection step and the
 // suggested questions, under the wallet's ring in the full page mode. Then each turn shows the
 // visitor's question, the site's tools as they run, the answer as it streams and the site's own
-// result cards, and the last answer's error comes with a way to ask again. The view follows the
-// answer down while the visitor stays at the bottom.
+// result cards, and the last answer's error comes with a way to ask again, or, for a TensorPass account
+// without a plan, the offer to subscribe. The view follows the answer down while the visitor stays at the
+// bottom.
 
 import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
@@ -12,6 +13,7 @@ import type { ChatTurn } from '../../useAiChat.ts';
 import type { AiModuleProps } from '../types.ts';
 import { AnswerText } from './AnswerText.tsx';
 import { ConnectStep } from './ConnectStep.tsx';
+import { PlanOffer } from './PlanOffer.tsx';
 import { useActionAttribute } from './moduleAnalytics.ts';
 import { ArrowIcon, WaveIcon } from './icons.tsx';
 import { ToolActivityList } from './ToolActivity.tsx';
@@ -26,6 +28,9 @@ export interface TurnBodyProps {
   view: TurnView;
   linkAllowed: (href: string) => boolean;
 }
+
+// The plan gateway's refusal of a TensorPass account without a subscription.
+const PLAN_INACTIVE = 'plan_inactive';
 
 // How close to the bottom, in pixels, the visitor counts as following the answer.
 const FOLLOW_DISTANCE = 56;
@@ -133,7 +138,8 @@ export function Conversation({ chat, intro, suggestions, ...view }: Conversation
           <li className="aic-turn"><Question text={chat.pendingQuestion} /><ConnectStep pending /></li>
         ) : null}
       </ol>
-      {chat.error ? (
+      {chat.refusal === PLAN_INACTIVE ? <PlanOffer onActive={chat.retry} /> : null}
+      {chat.error && chat.refusal !== PLAN_INACTIVE ? (
         <div className="aic-error" role="alert">
           <p>{chat.error}</p>
           <button type="button" className="aic-text-button" onClick={chat.retry}>{moduleMessages.retry}</button>

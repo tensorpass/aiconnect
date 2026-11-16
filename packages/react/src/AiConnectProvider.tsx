@@ -13,6 +13,8 @@ import type { WebAccountMessages } from './webAccountMessages.ts';
 interface AiConnectContextValue {
   client: AiConnect;
   state: ConnectionState;
+  // The page's language, which also formats prices and numbers.
+  locale: Locale;
   messages: PickerMessages;
   moduleMessages: ModuleMessages;
   webMessages: WebAccountMessages;
@@ -57,6 +59,7 @@ export function AiConnectProvider(props: AiConnectProviderProps) {
   const value = useMemo(() => ({
     client,
     state,
+    locale,
     messages: messages ?? builtInMessages[locale],
     moduleMessages: moduleMessages ?? builtInModuleMessages[locale],
     webMessages: webMessages ?? builtInWebMessages[locale],

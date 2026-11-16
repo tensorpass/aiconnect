@@ -1,8 +1,9 @@
 // TensorPass's plan for a visitor without the wallet. The site names itself with its public site key:
-// the visitor signs in on TensorPass's page, which names the site's origin and lets them set a monthly
-// limit for it, and comes back with a code the page trades, with its PKCE verifier, for a plan token of a
-// few minutes bound to the site's origin and a refresh token that works once. The page calls the plan's
-// gateway with the token and asks for the plan's level as the model.
+// the visitor signs in on TensorPass's page, which names the site's origin, and comes back with a code the
+// page trades, with its PKCE verifier, for a plan token of a few minutes bound to the site's origin and a
+// refresh token that works once. The page calls the plan's gateway with the token and asks for the plan's
+// level as the model. An account without a subscription reads the plans and subscribes on TensorPass's
+// billing page (tensorPassPlan.ts).
 //
 // Every tab of the site shares the stored tokens, and a refresh token used twice ends the sign in, so a
 // renewal runs under a lock the tabs share and reads the store again first: another tab may have renewed.
@@ -12,6 +13,7 @@ import type { WebAccount, WebAccountContext } from './webAccount.ts';
 import { jsonOf, replyMessage, WEB_ACCOUNT_NAMES } from './webAccount.ts';
 import { webSession } from './openAiCompatibleSession.ts';
 import type { HttpFetch } from './openAiCompatibleSession.ts';
+import { planAccess } from './tensorPassPlan.ts';
 import type { TensorPassCredential, WebAccountStore } from './webAccountStore.ts';
 
 export const PLAN_GATEWAY = 'https://plan.tensorpass.app';
@@ -84,6 +86,27 @@ function renewer(endpoint: TokenEndpoint, store: WebAccountStore, onSignedOut: (
 
 const bearer = (credential: TensorPassCredential) => ({ Authorization: `Bearer ${credential.accessToken}` });
 
+// The headers of the stored token, renewed first when it is close to its end, and after a refusal.
+function tokenReader(endpoint: TokenEndpoint, store: WebAccountStore, onSignedOut: () => void) {
+  const renew = renewer(endpoint, store, onSignedOut);
+  const held = () => {
+    const credential = store.read();
+    return credential?.account === 'tensorpass' ? credential : null;
+  };
+  return {
+    current: async (): Promise<Record<string, string>> => {
+      const credential = held();
+      const fresh = credential && credential.expiresAt - RENEW_BEFORE_MS <= Date.now()
+        ? await renew(credential.accessToken) : credential;
+      return fresh ? bearer(fresh) : {};
+    },
+    renewed: async () => {
+      const renewed = await renew(held()?.accessToken ?? null);
+      return renewed ? bearer(renewed) : null;
+    },
+  };
+}
+
 export function tensorPassAccount(options: TensorPassOptions): WebAccount {
   // The browser's fetch called as a method of another object throws, so it is wrapped.
   const send: HttpFetch = options.fetch ?? ((input, init) => fetch(input, init));
@@ -106,28 +129,20 @@ export function tensorPassAccount(options: TensorPassOptions): WebAccount {
       }));
     },
     session(store, onSignedOut) {
-      const renew = renewer(endpoint, store, onSignedOut);
-      const current = () => {
-        const held = store.read();
-        return held?.account === 'tensorpass' ? held : null;
-      };
+      const token = tokenReader(endpoint, store, onSignedOut);
       return webSession({
         providerId: 'tensorpass',
         providerName: NAME,
         model: options.level,
         endpoint: `${options.gateway}/v1/chat/completions`,
         fetch: options.fetch,
-        credential: async () => {
-          const held = current();
-          const fresh = held && held.expiresAt - RENEW_BEFORE_MS <= Date.now() ? await renew(held.accessToken) : held;
-          return fresh ? bearer(fresh) : {};
-        },
-        renew: async () => {
-          const renewed = await renew(current()?.accessToken ?? null);
-          return renewed ? bearer(renewed) : null;
-        },
+        credential: token.current,
+        renew: token.renewed,
         onRefused: onSignedOut,
       });
+    },
+    plan(store, onSignedOut) {
+      return planAccess({ gateway: options.gateway, send, bearer: tokenReader(endpoint, store, onSignedOut).current });
     },
     async revoke(credential) {
       if (credential.account === 'tensorpass') {

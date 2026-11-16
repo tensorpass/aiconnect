@@ -104,3 +104,30 @@ test('a refresh token the gateway refuses signs the visitor out, and sign out re
   assert.equal(calls.at(-1)?.url, 'https://gateway.test/oauth/revoke');
   assert.deepEqual(form(calls.at(-1)!), { client_id: 'tpk_site', token: 'tpr-1' });
 });
+
+test('a TensorPass account without a plan reads the plans and the billing page with its web token', async () => {
+  const plans = [{ id: 'pro', name: 'Pro', levels: ['quick', 'smart'], price: { amount: 2000, currency: 'usd' } }];
+  const gateway = played((call) => {
+    if (call.url.endsWith('/v1/chat/completions')) {
+      const error = { type: 'plan_error', code: 'plan_inactive', message: 'This plan has no active subscription.' };
+      return Response.json({ error }, { status: 402 });
+    }
+    if (call.url.endsWith('/_plan/web/subscription')) {
+      return Response.json({ status: 'none', plan: null, levels: [], plans });
+    }
+    return JSON.parse(call.body).plan === 'pro'
+      ? Response.json({ url: 'https://gateway.test/billing?ticket=t&view=subscribe&plan=pro&from=site' })
+      : Response.json({ error: { code: 'plan_unknown', message: 'No such plan.' } }, { status: 400 });
+  });
+  const store = new WebAccountStore(null);
+  store.save({ account: 'tensorpass', accessToken: 'tpp-1', refreshToken: 'tpr-1', expiresAt: Date.now() + 600_000 });
+  const account = tensorPassAccount({ gateway: 'https://gateway.test', siteKey: 'tpk_site', level: 'quick',
+    fetch: gateway.fetch });
+  await assert.rejects(account.session(store, () => undefined).chat({ messages: [{ role: 'user', content: 'Hey' }] }),
+    { status: 402, code: 'plan_inactive' });
+  const access = account.plan!(store, () => undefined);
+  assert.deepEqual((await access.subscription()).plans, plans);
+  assert.match(await access.billingPage('pro'), /view=subscribe&plan=pro/);
+  await assert.rejects(access.billingPage('gold'), { status: 400, code: 'plan_unknown' });
+  assert.ok(gateway.calls.every((call) => call.headers.get('authorization') === 'Bearer tpp-1'));
+});

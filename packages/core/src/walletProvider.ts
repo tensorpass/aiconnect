@@ -28,12 +28,15 @@ export type WalletRefusal = 'declined' | 'closed' | 'interrupted';
 export class WalletRequestError extends Error {
   readonly status: number;
   readonly reason?: WalletRefusal;
+  // The code a web account's provider gave its refusal, such as the plan gateway's `plan_inactive`.
+  readonly code?: string;
 
-  constructor(message: string, status: number, reason?: WalletRefusal) {
+  constructor(message: string, status: number, reason?: WalletRefusal, code?: string) {
     super(message);
     this.name = 'WalletRequestError';
     this.status = status;
     this.reason = reason;
+    this.code = code;
   }
 }
 

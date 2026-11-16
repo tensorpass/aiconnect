@@ -1,6 +1,8 @@
 // The conversation a module runs: the chat on the visitor's AI with the site's tools, plus the
 // question a visitor asks before their AI is connected. That question opens the connect window and
-// stays on screen; it goes out on its own once the wallet connects the site.
+// stays on screen; it goes out on its own once the wallet connects the site or the visitor signs in on
+// the page, and stays with the connection step while a sign in waits. Signing out of a web account
+// starts the conversation again from the connection step.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { McpToolSource } from '@tensorpass/aiconnect';
@@ -86,13 +88,27 @@ function usePendingQuestion(send: (question: string) => Promise<void>) {
   return { pendingQuestion, ask, forget };
 }
 
+// Starts the conversation again when the web account that answered it signs out, by the visitor or because
+// its credential stopped opening the account: its answers and errors belong to that account.
+function useResetOnSignOut(reset: () => void) {
+  const { client } = useAiConnect();
+  const previous = useRef<ConnectionState>(client.state);
+  useEffect(() => client.subscribe((next) => {
+    const before = previous.current;
+    previous.current = next;
+    if (before.status === 'connected' && before.account && next.status !== 'connected') {
+      reset();
+    }
+  }), [client, reset]);
+}
+
 export function useModuleChat({ system, tools, mcp, guards }: ModuleChatOptions) {
   const toolSource = useMemo(() => tools ?? (mcp ? mcpTools(mcp) : undefined), [tools, mcp]);
   const chat = useAiChat({ system, tools: toolSource, guards });
   const { pendingQuestion, ask, forget } = usePendingQuestion(chat.send);
   // The turns the visitor stopped, by their place in the conversation.
   const [stopped, setStopped] = useState<number[]>([]);
-  const { turns, stop: stopChat, reset: resetChat, busy } = chat;
+  const { turns, stop: stopChat, reset: resetChat, busy, dropFailedTurn } = chat;
 
   const stop = useCallback(() => {
     if (busy) {
@@ -106,13 +122,16 @@ export function useModuleChat({ system, tools, mcp, guards }: ModuleChatOptions)
     forget();
     setStopped([]);
   }, [resetChat, forget]);
+  useResetOnSignOut(reset);
 
+  // Asks the last question again in place of its failed turn.
   const retry = useCallback(() => {
     const last = turns.at(-1);
     if (last) {
+      dropFailedTurn();
       ask(last.question);
     }
-  }, [turns, ask]);
+  }, [turns, ask, dropFailedTurn]);
 
   return { ...chat, ask, stop, reset, retry, pendingQuestion, stopped };
 }

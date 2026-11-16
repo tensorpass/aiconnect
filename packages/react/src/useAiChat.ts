@@ -104,16 +104,62 @@ function showStop(stop: GuardStop, run: QuestionRun, copy: ModuleMessages) {
   }
 }
 
-// The words of an answer that failed. A web account's 429 keeps the provider's own message, such as the
-// gateway's limit of requests from one site, since the module's words for a 429 send the visitor to another
-// account in the wallet.
+// An answer that failed: its words, and the code the provider gave its refusal, such as `plan_inactive`
+// for a TensorPass account without a plan, by which the module offers what fits.
+export interface AnswerFailure {
+  text: string;
+  code: string | null;
+}
+
+// A web account's 429 keeps the provider's own message, such as the gateway's limit of requests from one
+// site, since the module's words for a 429 send the visitor to another account in the wallet.
 function answerFailure(reason: unknown, connection: Extract<ConnectionState, { status: 'connected' }>,
-  copy: ModuleMessages): string {
-  const status = (reason as { status?: unknown } | null)?.status;
-  if (connection.account && status === 429 && reason instanceof Error) {
-    return reason.message;
+  copy: ModuleMessages): AnswerFailure {
+  const { status, code } = (reason ?? {}) as { status?: unknown; code?: unknown };
+  const text = connection.account && status === 429 && reason instanceof Error
+    ? reason.message
+    : failedAnswerText(reason, connection.providerName, copy);
+  return { text, code: typeof code === 'string' ? code : null };
+}
+
+// What a question's run needs from the hook besides the question.
+interface SendContext {
+  connection: Extract<ConnectionState, { status: 'connected' }>;
+  guard: ChatGuard;
+  tools?: ToolSource;
+  transcript: RefObject<ChatMessage[]>;
+  abort: RefObject<AbortController | null>;
+  setTurns: Dispatch<SetStateAction<ChatTurn[]>>;
+  setFailure: Dispatch<SetStateAction<AnswerFailure | null>>;
+  setBusy: Dispatch<SetStateAction<boolean>>;
+  copy: ModuleMessages;
+}
+
+// Sends one question and writes its outcome: the answer, the guard's safe answer, or the failure.
+async function sendQuestion(text: string, context: SendContext): Promise<void> {
+  const { connection, guard, tools, transcript, abort, setTurns, setFailure, setBusy, copy } = context;
+  const controller = new AbortController();
+  abort.current = controller;
+  setBusy(true);
+  setFailure(null);
+  setTurns((current) => [...current, { question: text, answer: '', tools: [] }]);
+  const run = { session: connection.session, tools, guard, transcript, controller, setTurns,
+    asked: { role: 'user', content: text } satisfies ChatMessage };
+  try {
+    await answerQuestion(run);
+  } catch (reason) {
+    if (reason instanceof GuardStop) {
+      showStop(reason, run, copy);
+    } else if (!controller.signal.aborted) {
+      // An answer the site stopped itself ends without an error.
+      setFailure(answerFailure(reason, connection, copy));
+    }
+  } finally {
+    // A question sent after a stop has taken over; its own end clears `busy`.
+    if (abort.current === controller) {
+      setBusy(false);
+    }
   }
-  return failedAnswerText(reason, connection.providerName, copy);
 }
 
 export function useAiChat({ system, tools, guards }: UseAiChatOptions) {
@@ -126,7 +172,7 @@ export function useAiChat({ system, tools, guards }: UseAiChatOptions) {
   const [guard, setGuard] = useState<ChatGuard | null>(null);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<AnswerFailure | null>(null);
 
   // The session is read from the client when the question is sent, so a question kept while the
   // wallet connected the site goes out as soon as the client is connected.
@@ -137,30 +183,9 @@ export function useAiChat({ system, tools, guards }: UseAiChatOptions) {
       return;
     }
     activeGuard.current ??= createChatGuard(guards);
-    const conversationGuard = activeGuard.current;
-    setGuard(conversationGuard);
-    const controller = new AbortController();
-    abort.current = controller;
-    setBusy(true);
-    setError(null);
-    setTurns((current) => [...current, { question: text, answer: '', tools: [] }]);
-    const run = { session: connection.session, tools, guard: conversationGuard, transcript, controller, setTurns,
-      asked: { role: 'user', content: text } satisfies ChatMessage };
-    try {
-      await answerQuestion(run);
-    } catch (reason) {
-      if (reason instanceof GuardStop) {
-        showStop(reason, run, moduleMessages);
-      } else if (!controller.signal.aborted) {
-        // An answer the site stopped itself ends without an error.
-        setError(answerFailure(reason, connection, moduleMessages));
-      }
-    } finally {
-      // A question sent after a stop has taken over; its own end clears `busy`.
-      if (abort.current === controller) {
-        setBusy(false);
-      }
-    }
+    setGuard(activeGuard.current);
+    await sendQuestion(text, { connection, guard: activeGuard.current, tools, transcript, abort, setTurns,
+      setFailure, setBusy, copy: moduleMessages });
   }, [client, tools, guards, moduleMessages]);
 
   const stop = useCallback(() => abort.current?.abort(), []);
@@ -171,11 +196,21 @@ export function useAiChat({ system, tools, guards }: UseAiChatOptions) {
     activeGuard.current = null;
     setGuard(null);
     setTurns([]);
-    setError(null);
+    setFailure(null);
   }, [system]);
 
+  // Takes back the last turn when it failed with nothing to show, so asking it again does not repeat it.
+  const dropFailedTurn = useCallback(() => {
+    setTurns((current) => {
+      const last = current.at(-1);
+      return last && !last.answer && last.tools.length === 0 ? current.slice(0, -1) : current;
+    });
+    setFailure(null);
+  }, []);
+
   return {
-    turns, send, stop, reset, busy, error, connected: state.status === 'connected',
+    turns, send, stop, reset, dropFailedTurn, busy, error: failure?.text ?? null, refusal: failure?.code ?? null,
+    connected: state.status === 'connected',
     linkAllowed: guard?.linkAllowed ?? NO_LINKS,
   };
 }

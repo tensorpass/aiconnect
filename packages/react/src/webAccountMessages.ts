@@ -17,6 +17,18 @@ export interface WebAccountMessages {
   storedText: string;
   signOut: string;
   failures: Record<WebSignInFailure['reason'], string>;
+  // The chat's offer to subscribe when the TensorPass account has no plan. `{plan}` stands for the plan's
+  // name and `{price}` for its monthly price.
+  plan: PlanOfferMessages;
+}
+
+export interface PlanOfferMessages {
+  title: string;
+  text: string;
+  choose: string;
+  perMonth: string;
+  waiting: string;
+  failed: string;
 }
 
 const en: WebAccountMessages = {
@@ -33,6 +45,14 @@ const en: WebAccountMessages = {
     declined: 'You cancelled the sign in to {account}.',
     failed: '{account} did not finish the sign in. Try again.',
     expired: 'The sign in to {account} took too long. Try again.',
+  },
+  plan: {
+    title: 'Your TensorPass account has no plan yet',
+    text: 'Choose a plan to get the answer here. Your question is kept and answered once the plan is active.',
+    choose: 'Choose {plan}',
+    perMonth: '{price} a month',
+    waiting: 'Finish in the TensorPass tab. This chat answers once the plan is active.',
+    failed: 'TensorPass did not send its plans. Try again.',
   },
 };
 
@@ -51,6 +71,15 @@ const fr: WebAccountMessages = {
     failed: '{account} n\'a pas terminé la connexion. Réessayez.',
     expired: 'La connexion à {account} a pris trop de temps. Réessayez.',
   },
+  plan: {
+    title: 'Votre compte TensorPass n\'a pas encore d\'abonnement',
+    text: 'Choisissez un abonnement pour obtenir la réponse ici. Votre question est gardée et reçoit sa réponse '
+      + 'dès que l\'abonnement est actif.',
+    choose: 'Choisir {plan}',
+    perMonth: '{price} par mois',
+    waiting: 'Terminez dans l\'onglet TensorPass. Ce chat répond dès que l\'abonnement est actif.',
+    failed: 'TensorPass n\'a pas envoyé ses abonnements. Réessayez.',
+  },
 };
 
 const he: WebAccountMessages = {
@@ -67,6 +96,14 @@ const he: WebAccountMessages = {
     declined: 'ביטלתם את ההתחברות ל {account}.',
     failed: '{account} לא השלים את ההתחברות. נסו שוב.',
     expired: 'ההתחברות ל {account} ארכה זמן רב מדי. נסו שוב.',
+  },
+  plan: {
+    title: 'לחשבון TensorPass שלכם עדיין אין מנוי',
+    text: 'בחרו מנוי כדי לקבל את התשובה כאן. השאלה שלכם נשמרת ותיענה ברגע שהמנוי פעיל.',
+    choose: 'בחירת {plan}',
+    perMonth: '{price} לחודש',
+    waiting: 'סיימו בלשונית של TensorPass. הצ׳אט יענה ברגע שהמנוי פעיל.',
+    failed: 'TensorPass לא שלח את המנויים. נסו שוב.',
   },
 };
 
@@ -85,6 +122,14 @@ const ar: WebAccountMessages = {
     failed: 'لم يُكمل {account} تسجيل الدخول. أعد المحاولة.',
     expired: 'استغرق تسجيل الدخول إلى {account} وقتًا طويلًا. أعد المحاولة.',
   },
+  plan: {
+    title: 'لا يملك حسابك في TensorPass اشتراكًا بعد',
+    text: 'اختر اشتراكًا لتحصل على الإجابة هنا. سؤالك محفوظ وستتم الإجابة عنه فور تفعيل الاشتراك.',
+    choose: 'اختيار {plan}',
+    perMonth: '{price} شهريًا',
+    waiting: 'أكمل في علامة تبويب TensorPass. ستجيب هذه المحادثة فور تفعيل الاشتراك.',
+    failed: 'لم يرسل TensorPass اشتراكاته. أعد المحاولة.',
+  },
 };
 
 const zh: WebAccountMessages = {
@@ -100,6 +145,14 @@ const zh: WebAccountMessages = {
     declined: '你取消了 {account} 登录。',
     failed: '{account} 未能完成登录。请重试。',
     expired: '{account} 登录耗时过长。请重试。',
+  },
+  plan: {
+    title: '你的 TensorPass 账户还没有订阅',
+    text: '选择一个订阅即可在这里获得回答。你的问题会被保留，订阅生效后就会得到回答。',
+    choose: '选择 {plan}',
+    perMonth: '每月 {price}',
+    waiting: '请在 TensorPass 标签页中完成。订阅生效后，这个聊天就会回答。',
+    failed: 'TensorPass 没有发送订阅信息。请重试。',
   },
 };
 

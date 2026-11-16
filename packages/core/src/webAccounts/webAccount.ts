@@ -4,6 +4,7 @@
 
 import type { ProviderSession } from '../types.ts';
 import type { HttpFetch } from './openAiCompatibleSession.ts';
+import type { PlanAccess } from './tensorPassPlan.ts';
 import type { WebAccountId, WebAccountStore, WebCredential } from './webAccountStore.ts';
 
 // The name of each account as the connect window and the chat show it.
@@ -30,6 +31,8 @@ export interface WebAccount {
   exchange(request: CodeExchange): Promise<WebCredential>;
   // `onSignedOut` runs when the credential stops opening the account.
   session(store: WebAccountStore, onSignedOut: () => void): ProviderSession;
+  // The plan of an account that sells one, TensorPass's, for the chat's offer to subscribe.
+  plan?(store: WebAccountStore, onSignedOut: () => void): PlanAccess;
   revoke(credential: WebCredential): Promise<void>;
 }
 
