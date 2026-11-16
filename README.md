@@ -174,7 +174,7 @@ That page runs `finishSignIn()` on load. It hands the answer to the page that op
 <meta charset="utf-8">
 <meta name="robots" content="noindex">
 <title>Signing in</title>
-<script src="/aiconnect-callback.js"></script>
+<script src="/aiconnect-callback.js" defer></script>
 ```
 
 The Web Components take the page as `data-sign-in-callback` on their script tag or `sign-in-callback` on the element. Without a return page, the sign in comes back to the page itself, which finishes it as it loads. Where the browser blocks the popup, the tab itself goes to the sign in and the return page sends it back to the page it left. The credential, an OpenRouter key or a TensorPass token of 15 minutes with its refresh token, is kept in the site's `localStorage` for its origin, and `client.signOut()` removes it. Every script of the site's pages can read it there, which the wallet's accounts are kept from. A TensorPass token only answers chats, from the site's origin. Plan accounts such as ChatGPT, Claude, Gemini and Grok stay in the extension: on 15 November 2026 each of them refused a web page at its sign in or its chat.

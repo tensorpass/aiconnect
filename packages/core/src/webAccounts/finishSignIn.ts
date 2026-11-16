@@ -22,7 +22,13 @@ function closeLine(): string {
   return CLOSE_LINES[language] ?? CLOSE_LINES.en;
 }
 
+// A return page that loads its script in <head> without `defer` runs it before the body exists, so the line
+// waits for the body.
 function showCloseLine(): void {
+  if (!document.body) {
+    document.addEventListener('DOMContentLoaded', showCloseLine, { once: true });
+    return;
+  }
   const line = document.createElement('p');
   line.textContent = closeLine();
   line.style.cssText = 'margin:40px auto;max-width:28em;padding:0 16px;font:16px/1.5 system-ui,sans-serif;'

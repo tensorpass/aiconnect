@@ -1,6 +1,6 @@
 {
   "name": "@tensorpass/aiconnect",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Headless SDK: connect a visitor's own AI account and run the site's tools with it.",
   "type": "module",
   "sideEffects": false,
