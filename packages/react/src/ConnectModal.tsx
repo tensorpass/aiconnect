@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import { AboutView } from './AboutView.tsx';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { ConnectRing } from './ConnectRing.tsx';
-import { alreadyAddedLine, installLabel, refusalStep } from './messages.ts';
+import { alreadyAddedLine, installLabel, installText, refusalStep } from './messages.ts';
 
 function useEscapeToClose(onClose: () => void) {
   useEffect(() => {
@@ -45,7 +45,7 @@ function WalletStep() {
     case 'noWallet': {
       const alreadyAdded = alreadyAddedLine(messages, client.browser);
       return (
-        <Step live={false} title={messages.installTitle} text={messages.installText}>
+        <Step live={false} title={messages.installTitle} text={installText(messages, client.browser)}>
           <a className="aic-primary" href={client.installUrl} target="_blank" rel="noreferrer">
             {installLabel(messages, client.browser)}
           </a>
