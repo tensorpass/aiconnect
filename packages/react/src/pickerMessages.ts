@@ -26,7 +26,9 @@ export interface PickerMessages {
   waitingTitle: string;
   waitingText: string;
   installTitle: string;
-  installText: string;
+  // The install step's text, with the visitor's browser named in Latin script, or `undefined` for a browser
+  // the wallet does not name.
+  installText: (browser: string | undefined) => string;
   // The install button when the visitor's browser is known, with the browser's name in Latin script;
   // `installButton` names it for any other browser.
   addToBrowser: (browser: string) => string;
@@ -58,8 +60,8 @@ const en: PickerMessages = {
   waitingTitle: 'Continue in AI Wallet',
   waitingText: 'Its window is open. This page continues on its own.',
   installTitle: 'Use your ChatGPT, Claude or Gemini plan here',
-  installText: 'Add AI Wallet to your browser and this site answers with the AI plan you already pay for: ChatGPT, '
-    + 'Claude, Gemini, Grok and more.',
+  installText: (browser) => `Add AI Wallet to ${browser ?? 'your browser'} and this site answers with the AI plan `
+    + 'you already pay for: ChatGPT, Claude, Gemini, Grok and more.',
   addToBrowser: (browser) => `Add to ${browser}`,
   installButton: 'Install AI Wallet',
   safariAlreadyAdded: 'Already added? Click AI Wallet in Safari\'s toolbar and choose Always Allow on Every '
@@ -103,8 +105,8 @@ const fr: PickerMessages = {
   waitingTitle: 'Continuez dans AI Wallet',
   waitingText: 'Sa fenêtre est ouverte. Cette page continue toute seule.',
   installTitle: 'Utilisez ici votre abonnement ChatGPT, Claude ou Gemini',
-  installText: 'Ajoutez AI Wallet à votre navigateur et ce site répond avec l\'abonnement d\'IA que vous payez déjà '
-    + ': ChatGPT, Claude, Gemini, Grok et d\'autres.',
+  installText: (browser) => `Ajoutez AI Wallet à ${browser ?? 'votre navigateur'} et ce site répond avec `
+    + 'l\'abonnement d\'IA que vous payez déjà : ChatGPT, Claude, Gemini, Grok et d\'autres.',
   addToBrowser: (browser) => `Ajouter à ${browser}`,
   installButton: 'Installer AI Wallet',
   safariAlreadyAdded: 'Déjà ajouté ? Cliquez sur AI Wallet dans la barre d\'outils de Safari et choisissez Toujours '
@@ -148,8 +150,8 @@ const he: PickerMessages = {
   waitingTitle: 'המשיכו ב AI Wallet',
   waitingText: 'החלון שלו פתוח. הדף ימשיך מעצמו.',
   installTitle: 'השתמשו כאן במנוי ChatGPT, Claude או Gemini שלכם',
-  installText: 'הוסיפו את AI Wallet לדפדפן והאתר יענה עם מנוי הבינה המלאכותית שאתם כבר משלמים עליו: ChatGPT, Claude, '
-    + 'Gemini, Grok ועוד.',
+  installText: (browser) => `הוסיפו את AI Wallet לדפדפן ${browser ?? 'שלכם'} והאתר יענה עם מנוי הבינה המלאכותית `
+    + 'שאתם כבר משלמים עליו: ChatGPT, Claude, Gemini, Grok ועוד.',
   addToBrowser: (browser) => `הוספה לדפדפן ${browser}`,
   installButton: 'התקנת AI Wallet',
   safariAlreadyAdded: 'כבר הוספתם? לחצו על AI Wallet בסרגל הכלים של Safari ובחרו „תמיד לאשר בכל האתרים”.',
@@ -192,8 +194,8 @@ const ar: PickerMessages = {
   waitingTitle: 'تابع في AI Wallet',
   waitingText: 'نافذته مفتوحة. ستتابع هذه الصفحة من تلقاء نفسها.',
   installTitle: 'استخدم هنا اشتراكك في ChatGPT أو Claude أو Gemini',
-  installText: 'أضف AI Wallet إلى متصفحك وسيجيب هذا الموقع باشتراك الذكاء الاصطناعي الذي تدفع ثمنه بالفعل: ChatGPT '
-    + 'وClaude وGemini وGrok وغيرها.',
+  installText: (browser) => `أضف AI Wallet إلى ${browser ?? 'متصفحك'} وسيجيب هذا الموقع باشتراك الذكاء الاصطناعي `
+    + 'الذي تدفع ثمنه بالفعل: ChatGPT وClaude وGemini وGrok وغيرها.',
   addToBrowser: (browser) => `إضافة إلى ${browser}`,
   installButton: 'تثبيت AI Wallet',
   safariAlreadyAdded: 'هل أضفته من قبل؟ انقر على AI Wallet في شريط أدوات Safari واختر «السماح دائمًا على كل '
@@ -237,7 +239,8 @@ const zh: PickerMessages = {
   waitingTitle: '在 AI Wallet 中继续',
   waitingText: '它的窗口已打开。此页面会自动继续。',
   installTitle: '在这里使用你的 ChatGPT、Claude 或 Gemini 订阅',
-  installText: '把 AI Wallet 添加到浏览器后，这个网站就会用你已经付费的 AI 订阅来回答：ChatGPT、Claude、Gemini、Grok 等。',
+  installText: (browser) => `把 AI Wallet 添加到${browser ? ` ${browser} ` : '你的浏览器'}后，`
+    + '这个网站就会用你已经付费的 AI 订阅来回答：ChatGPT、Claude、Gemini、Grok 等。',
   addToBrowser: (browser) => `添加至 ${browser}`,
   installButton: '安装 AI Wallet',
   safariAlreadyAdded: '已经添加过？点按 Safari 工具栏中的 AI Wallet，然后选择“在所有网站上始终允许”。',

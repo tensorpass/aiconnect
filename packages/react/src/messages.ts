@@ -12,10 +12,21 @@ export type { ModuleMessages } from './moduleMessages.ts';
 export { builtInMessages } from './pickerMessages.ts';
 export type { Locale, PickerMessages, RefusalStep } from './pickerMessages.ts';
 
+// The visitor's browser by its name in Latin script, or `undefined` for a browser the wallet does not name.
+function browserName(browser: VisitorBrowser): string | undefined {
+  return browser === 'other' ? undefined : BROWSER_NAMES[browser];
+}
+
 // The words of the install button: "Add to" the visitor's browser, or the general words for a browser the
 // wallet does not name.
 export function installLabel(messages: PickerMessages, browser: VisitorBrowser): string {
-  return browser === 'other' ? messages.installButton : messages.addToBrowser(BROWSER_NAMES[browser]);
+  const name = browserName(browser);
+  return name ? messages.addToBrowser(name) : messages.installButton;
+}
+
+// The text of the install step, which names the visitor's browser where the wallet knows it.
+export function installText(messages: PickerMessages, browser: VisitorBrowser): string {
+  return messages.installText(browserName(browser));
 }
 
 // The line under the install button for a visitor who may have the wallet already: in Safari, which runs

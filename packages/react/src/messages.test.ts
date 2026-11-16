@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { WalletRequestError } from '@tensorpass/aiconnect';
-import { alreadyAddedLine, builtInMessages, builtInModuleMessages, failedAnswerText } from './messages.ts';
+import {
+  alreadyAddedLine, builtInMessages, builtInModuleMessages, failedAnswerText, installLabel, installText,
+} from './messages.ts';
 
 const en = builtInModuleMessages.en;
 
@@ -38,4 +40,25 @@ test('a browser that runs the wallet everywhere once it is added shows no such l
   for (const browser of ['chrome', 'edge', 'brave', 'opera', 'firefox', 'other'] as const) {
     assert.equal(alreadyAddedLine(builtInMessages.en, browser), undefined, browser);
   }
+});
+
+test('the install step names the visitor\'s browser, or says their browser for one the wallet does not name', () => {
+  assert.equal(
+    installText(builtInMessages.en, 'chrome'),
+    'Add AI Wallet to Chrome and this site answers with the AI plan you already pay for: ChatGPT, Claude, Gemini, '
+      + 'Grok and more.',
+  );
+  assert.match(installText(builtInMessages.en, 'other'), /^Add AI Wallet to your browser and this site answers/);
+  assert.match(installText(builtInMessages.fr, 'firefox'), /^Ajoutez AI Wallet à Firefox et ce site répond/);
+  for (const messages of Object.values(builtInMessages)) {
+    const named = installText(messages, 'edge');
+    const unnamed = installText(messages, 'other');
+    assert.ok(named.includes('Edge') && named.includes('ChatGPT') && named.includes('Grok'), named);
+    assert.ok(!/Chrome|Edge|Brave|Opera|Firefox|Safari/.test(unnamed) && unnamed.includes('Gemini'), unnamed);
+  }
+});
+
+test('the install button names the visitor\'s browser, or installs the wallet in a browser it does not name', () => {
+  assert.equal(installLabel(builtInMessages.en, 'brave'), 'Add to Brave');
+  assert.equal(installLabel(builtInMessages.en, 'other'), 'Install AI Wallet');
 });

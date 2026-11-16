@@ -7,7 +7,7 @@
 import type { ConnectionState, VisitorBrowser } from '@tensorpass/aiconnect';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { ConnectRing } from '../../ConnectRing.tsx';
-import { alreadyAddedLine, installLabel, refusalStep } from '../../messages.ts';
+import { alreadyAddedLine, installLabel, installText, refusalStep } from '../../messages.ts';
 import { useActionAttribute } from './moduleAnalytics.ts';
 import type { ModuleMessages, PickerMessages } from '../../messages.ts';
 
@@ -41,7 +41,7 @@ function connectionStep(state: ConnectionState, copy: StepCopy): Step | null {
     case 'noWallet':
       return {
         title: messages.installTitle,
-        text: moduleMessages.installText,
+        text: installText(messages, browser),
         aside: alreadyAddedLine(messages, browser),
         action: { kind: 'install', label: installLabel(messages, browser) },
       };
