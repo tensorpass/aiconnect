@@ -1,0 +1,22 @@
+{
+  "name": "aiconnect",
+  "description": "Add AI Connect to a website so its AI features run on each visitor's own AI. Bundles the skills aiconnect-integrate, aiconnect-mcp-tools, aiconnect-rag-chatbot and aiconnect-hardening, the AI Connect docs MCP server and the TensorPass account MCP server, which creates the site key after an OAuth sign in.",
+  "author": {
+    "name": "TensorPass",
+    "url": "https://tensorpass.app"
+  },
+  "homepage": "https://tensorpass.app/docs",
+  "repository": "https://github.com/tensorpass/aiconnect",
+  "license": "Apache-2.0",
+  "keywords": ["ai-connect", "ai-wallet", "byok", "chat", "mcp", "rag", "nextjs", "react"],
+  "mcpServers": {
+    "aiconnect-docs": {
+      "type": "http",
+      "url": "https://tensorpass.app/mcp"
+    },
+    "tensorpass": {
+      "type": "http",
+      "url": "https://plan.tensorpass.app/mcp"
+    }
+  }
+}

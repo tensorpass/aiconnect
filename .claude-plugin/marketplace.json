@@ -1,0 +1,19 @@
+{
+  "name": "tensorpass",
+  "owner": {
+    "name": "TensorPass",
+    "url": "https://tensorpass.app"
+  },
+  "metadata": {
+    "description": "TensorPass plugins for coding agents: AI Connect runs a website's AI features on each visitor's own AI."
+  },
+  "plugins": [
+    {
+      "name": "aiconnect",
+      "source": "./",
+      "description": "Add AI Connect to a website: the four AI Connect skills, the AI Connect docs MCP server and the TensorPass account MCP server that creates the site key.",
+      "category": "development",
+      "tags": ["ai-connect", "ai-wallet", "chat", "mcp", "rag"]
+    }
+  ]
+}

@@ -253,6 +253,17 @@ npx skills add tensorpass/aiconnect
 npx skills add https://tensorpass.app
 ```
 
+## Claude Code plugin
+
+This repository is also the `tensorpass` plugin marketplace for Claude Code. Its `aiconnect` plugin installs the four skills with two MCP servers: the AI Connect docs at `https://tensorpass.app/mcp`, and the TensorPass account at `https://plan.tensorpass.app/mcp`, which creates the site key once you sign in from `/mcp`. In Claude Code, run:
+
+```
+/plugin marketplace add tensorpass/aiconnect
+/plugin install aiconnect@tensorpass
+```
+
+From a shell, `claude plugin marketplace add tensorpass/aiconnect` and `claude plugin install aiconnect@tensorpass` do the same. Then ask Claude Code to add an AI chat to your site.
+
 ## Interface modules
 
 The interface modules are ready made AI interfaces that connect to the visitor's wallet and to your MCP tools.
