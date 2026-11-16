@@ -4,9 +4,7 @@
 # The wallet's end to end tests run in the wallet's repository, against the demo of this one. The job reads
 # the repository and writes nothing to it. Each action is pinned to the commit of a release, since a tag can
 # be moved to other code after a review.
-# The job runs on the VPS runner of this repository (runs-on: [self-hosted, vps]), in a fresh container with no
-# root: ci/runner of vps-automation. That runner serves the organisation's three repositories, so each branch
-# keeps one running job and one pending: a newer push replaces the pending one.
+# Public contributions run on isolated GitHub-hosted runners.
 name: CI
 
 on:
@@ -23,7 +21,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: [self-hosted, vps]
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -37,3 +35,5 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
+      - run: npm run release:check
+      - run: npm run release:smoke

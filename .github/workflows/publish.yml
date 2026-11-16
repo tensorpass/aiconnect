@@ -1,0 +1,49 @@
+name: Publish npm packages
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 26
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - name: Require a release from main
+        run: git merge-base --is-ancestor HEAD origin/main
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+      - run: npm run release:check
+      - run: npm run release:smoke
+      # A manual run on main validates the release without publishing. Tags publish in dependency order.
+      # Authentication is npm trusted publishing for this workflow; no npm token is stored in GitHub.
+      - name: Publish with provenance
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          npm publish --workspace @tensorpass/aiconnect-design --provenance
+          npm publish --workspace @tensorpass/aiconnect --provenance
+          npm publish --workspace @tensorpass/aiconnect-react --provenance
+          npm publish --workspace @tensorpass/aiconnect-elements --provenance

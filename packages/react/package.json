@@ -1,6 +1,6 @@
 {
   "name": "@tensorpass/aiconnect-react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React provider picker and chat hook for AI Connect.",
   "type": "module",
   "sideEffects": [
@@ -33,8 +33,8 @@
     "build": "rm -rf dist tsconfig.tsbuildinfo && tsc -b && esbuild src/styles.css --bundle --outfile=dist/styles.css --log-level=warning && cp src/modules/styles/launchers.css dist/launchers.css"
   },
   "dependencies": {
-    "@tensorpass/aiconnect": "0.1.0",
-    "@tensorpass/aiconnect-design": "0.1.0"
+    "@tensorpass/aiconnect": "0.1.1",
+    "@tensorpass/aiconnect-design": "0.1.1"
   },
   "peerDependencies": {
     "react": ">=19"
@@ -46,5 +46,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tensorpass/aiwallet-sdk.git",
+    "directory": "packages/react"
   }
 }

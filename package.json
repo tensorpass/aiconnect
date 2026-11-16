@@ -1,6 +1,6 @@
 {
   "name": "aiwallet-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "Apache-2.0",
   "description": "Let visitors connect their own AI account to any website: one click, their plan or credits, no inference bill for the site.",
@@ -18,7 +18,9 @@
     "test": "node --test \"packages/*/src/**/*.test.ts\" \"apps/*/src/**/*.test.ts\"",
     "e2e": "npm run e2e -w @tensorpass/demo",
     "lint": "eslint .",
-    "dev": "npm run dev -w @tensorpass/demo"
+    "dev": "npm run dev -w @tensorpass/demo",
+    "release:check": "node scripts/check-release.mjs",
+    "release:smoke": "node scripts/check-package-install.mjs"
   },
   "engines": {
     "node": ">=26"

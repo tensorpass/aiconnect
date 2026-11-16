@@ -58,25 +58,7 @@ The SDK is four packages under the `@tensorpass` scope, plus a demo and a WordPr
 
 ## Install AI Connect
 
-The packages are not published on npm yet. Until they are, build a checkout of this repository and point your `package.json` at its folders:
-
-```bash
-git clone https://github.com/tensorpass/aiwallet-sdk.git
-cd aiwallet-sdk
-npm install
-npm run build
-```
-
-```json
-{
-  "dependencies": {
-    "@tensorpass/aiconnect": "file:../aiwallet-sdk/packages/core",
-    "@tensorpass/aiconnect-react": "file:../aiwallet-sdk/packages/react"
-  }
-}
-```
-
-Once the packages are on npm, the install becomes one command:
+Install the core SDK and the React components from npm:
 
 ```bash
 npm install @tensorpass/aiconnect @tensorpass/aiconnect-react
@@ -402,7 +384,7 @@ The SDK in this repository is open source under the Apache License, Version 2.0.
 
 ### Are the packages on npm?
 
-The packages are not published on npm yet. Until they are, build this repository and point your `package.json` at its folders. The install section above shows the commands.
+Yes. All four packages are available under the `@tensorpass` scope. The install section above shows the commands.
 
 ## Documentation
 

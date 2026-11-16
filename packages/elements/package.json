@@ -1,6 +1,6 @@
 {
   "name": "@tensorpass/aiconnect-elements",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The AI Connect interface modules as Web Components, defined by one script a page loads with a script tag, and a loader under 10 KB that loads it when a visitor reaches for a chat.",
   "type": "module",
   "sideEffects": true,
@@ -26,9 +26,9 @@
     "build": "rm -rf dist && node build.mjs"
   },
   "devDependencies": {
-    "@tensorpass/aiconnect": "0.1.0",
-    "@tensorpass/aiconnect-design": "0.1.0",
-    "@tensorpass/aiconnect-react": "0.1.0",
+    "@tensorpass/aiconnect": "0.1.1",
+    "@tensorpass/aiconnect-design": "0.1.1",
+    "@tensorpass/aiconnect-react": "0.1.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.2.0",
     "esbuild": "^0.28.2",
@@ -37,5 +37,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tensorpass/aiwallet-sdk.git",
+    "directory": "packages/elements"
   }
 }
