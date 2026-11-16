@@ -24,7 +24,7 @@
     }
   },
   "bin": {
-    "aiconnect": "./dist/cli/main.js"
+    "aiconnect": "dist/cli/main.js"
   },
   "files": [
     "dist",
