@@ -7,7 +7,8 @@
   "license": "Apache-2.0",
   "exports": {
     "./aiconnect-elements.js": "./dist/aiconnect-elements.js",
-    "./aiconnect-loader.js": "./dist/aiconnect-loader.js"
+    "./aiconnect-loader.js": "./dist/aiconnect-loader.js",
+    "./aiconnect-callback.js": "./dist/aiconnect-callback.js"
   },
   "unpkg": "dist/aiconnect-elements.js",
   "jsdelivr": "dist/aiconnect-elements.js",

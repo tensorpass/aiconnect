@@ -13,6 +13,10 @@
     "./guards": {
       "types": "./dist/guards/index.d.ts",
       "default": "./dist/guards/index.js"
+    },
+    "./callback": {
+      "types": "./dist/callback.d.ts",
+      "default": "./dist/callback.js"
     }
   },
   "bin": {

@@ -7,6 +7,7 @@ import { expect, test } from '@playwright/test';
 import type { BrowserContext, Page, Route } from '@playwright/test';
 
 const SITE_KEY = 'tpk_e2eSiteKeyOfTheDemo0000';
+const ISOLATING_PAGE = 'https://accounts.isolating.test/signin';
 const GATEWAY = 'https://plan.tensorpass.app';
 const CORS = {
   'access-control-allow-origin': 'http://localhost:4615',
@@ -49,13 +50,23 @@ async function answerChat(route: Route, played: Played) {
   await route.fulfill({ status: 200, headers: { ...CORS, 'content-type': 'text/event-stream' }, body: stream(events) });
 }
 
-async function playOpenRouter(context: BrowserContext, played: Played) {
+// OpenRouter as it answered live on 16 November 2026: back to the callback address with the code alone,
+// any query of the address dropped. With `isolate`, its page first passes through a page of another origin
+// that sets a Cross-Origin-Opener-Policy, as a sign in with Google does, which cuts the popup from its opener.
+async function playOpenRouter(context: BrowserContext, played: Played, isolate = false) {
   await context.route('https://openrouter.ai/auth**', async (route) => {
     const url = new URL(route.request().url());
     played.signIns.push(url);
-    const back = `${url.searchParams.get('callback_url')}&code=c1`;
-    await route.fulfill({ contentType: 'text/html', body: signInPage(back) });
+    const back = new URL(url.searchParams.get('callback_url')!);
+    back.search = '?code=c1';
+    const next = isolate ? `${ISOLATING_PAGE}?back=${encodeURIComponent(back.toString())}` : back.toString();
+    await route.fulfill({ contentType: 'text/html', body: signInPage(next) });
   });
+  await context.route(`${ISOLATING_PAGE}**`, (route) => route.fulfill({
+    contentType: 'text/html',
+    headers: { 'cross-origin-opener-policy': 'same-origin' },
+    body: signInPage(new URL(route.request().url()).searchParams.get('back')!),
+  }));
   await context.route('https://openrouter.ai/api/v1/auth/keys', (route) => (route.request().method() === 'OPTIONS'
     ? route.fulfill({ status: 204, headers: CORS })
     : route.fulfill({ headers: CORS, json: { key: 'sk-or-v1-played' } })));
@@ -112,7 +123,8 @@ test('OpenRouter signs in through its popup, answers with a tool call, and signs
   const authorize = played.signIns[0];
   expect(authorize.searchParams.get('code_challenge_method')).toBe('S256');
   expect(authorize.searchParams.get('code_challenge')).toMatch(/^[A-Za-z0-9_-]{43}$/);
-  expect(new URL(authorize.searchParams.get('callback_url')!).origin).toBe('http://localhost:4615');
+  expect(authorize.searchParams.get('callback_url')).toBe('http://localhost:4615/callback.html');
+  expect(authorize.searchParams.get('state')).toMatch(/^[A-Za-z0-9_-]{22}$/);
 
   await askForABook(page);
   expect(played.chats[0].authorization).toBe('Bearer sk-or-v1-played');
@@ -152,4 +164,15 @@ test('a module offers the same sign ins under its install step, in the page\'s l
   const offer = page.locator('.aic-web');
   await expect(offer.getByText('Sans extension ? Utilisez un compte ici')).toBeVisible();
   await expect(offer.getByRole('button')).toHaveText(['Se connecter avec TensorPass', 'Se connecter avec OpenRouter']);
+});
+
+test('a popup a provider page cut from its opener still hands the sign in back and closes', async ({
+  page, context,
+}) => {
+  const played: Played = { signIns: [], chats: [] };
+  await playOpenRouter(context, played, true);
+  await page.goto('/');
+  const { popup } = await signIn(page, 'OpenRouter', ['OpenRouter']);
+  await popup.waitForEvent('close');
+  await expect(page.getByText('Connected with OpenRouter (openrouter/auto)')).toBeVisible();
 });

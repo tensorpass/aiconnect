@@ -16,6 +16,7 @@ import { visitorBrowser, walletInstallUrl } from './visitorBrowser.ts';
 import type { VisitorBrowser } from './visitorBrowser.ts';
 import { WebAccountSource } from './webAccounts/webAccountSource.ts';
 import type { WebAccountOptions } from './webAccounts/webAccountSource.ts';
+import type { PlanAccess } from './webAccounts/tensorPassPlan.ts';
 import type { WebAccountId } from './webAccounts/webAccountStore.ts';
 import { createWalletFetch } from './wireProtocols/walletFetch.ts';
 import type { WalletFetch } from './wireProtocols/walletFetch.ts';
@@ -131,6 +132,12 @@ export class AiConnect {
 
   cancelSignIn(): void {
     this.web.cancel();
+  }
+
+  // The TensorPass plan of the web account that answers, for the chat's offer to subscribe when the account
+  // has no plan yet; null for any other account.
+  planAccess(): PlanAccess | null {
+    return this.web.planAccess();
   }
 
   // Removes the web account's credential from the site's storage, and ends a TensorPass sign in.

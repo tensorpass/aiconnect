@@ -1,8 +1,9 @@
 // The window a web sign in runs in, and the way its answer comes back to the page that opened it.
 //
-// The page opens a popup from the visitor's click, and the provider's sign in sends it back to the page's
-// own address with the code (or OAuth's error) and the sign in's state. The page loads there in the popup,
-// finds the state the opener marked in the origin's storage, hands the answer to the opener and closes. A
+// The page opens a popup from the visitor's click, and the provider's sign in sends it back to the site's
+// return address (the `signInCallback` page, or else the page itself) with the code (or OAuth's error) and
+// the sign in's state. The page there finds the state the opener marked in the origin's storage, hands the
+// answer to the opener and closes. A
 // sign in page that isolates itself from its opener with a Cross-Origin-Opener-Policy, as Google's and
 // some providers' pages do, leaves the popup without `window.opener` once it comes back, so the answer
 // also goes by a BroadcastChannel named after the state and by a storage event, which reach every page of
@@ -36,6 +37,8 @@ export interface PendingSignIn {
   state: string;
   verifier: string;
   redirectUri: string;
+  // The page the sign in started from, which a dedicated return page sends the tab back to.
+  returnTo: string;
 }
 
 // Storage access throws where the browser blocks it; the sign in then runs without the mark.
@@ -55,10 +58,31 @@ function withoutCallback(address: string): URL {
   return url;
 }
 
-// The page's own address, which the provider sends the sign in back to with its code and state.
-export function callbackAddress(): string {
+// The page's own address, without the parameters of a sign in's answer.
+export function pageAddress(): string {
   const url = withoutCallback(location.href);
   url.hash = '';
+  return url.toString();
+}
+
+// Where the provider sends the sign in back to: the site's return page, a path or an address on the page's
+// own origin, or else the page itself.
+export function callbackAddress(signInCallback?: string): string {
+  if (!signInCallback) {
+    return pageAddress();
+  }
+  const url = new URL(signInCallback, location.href);
+  if (url.origin !== location.origin) {
+    throw new Error(`signInCallback must be on this page's origin, ${location.origin}`);
+  }
+  return url.toString();
+}
+
+// The page a sign in started from, with the answer for its client to finish.
+export function withAnswer(address: string, answer: SignInResult): string {
+  const url = new URL(address);
+  url.searchParams.set('state', answer.state);
+  url.searchParams.set(answer.code ? 'code' : 'error', answer.code ?? answer.error ?? 'server_error');
   return url.toString();
 }
 
@@ -67,18 +91,19 @@ export function openSignInWindow(): Window | null {
   return window.open('', WINDOW_NAME, WINDOW_FEATURES);
 }
 
-// The answer of the sign in that expects `state`, when the page's address carries it. The provider returns
-// the state with the code or the error; OpenRouter leaves it out of a refusal, which then comes back with
-// its error alone.
+// The answer of the sign in that expects `state`, when the page's address carries it. TensorPass returns
+// the state with the code or the error. OpenRouter may come back with its code or its error alone, as it
+// did on 16 November 2026; such an answer is taken while this origin waits for a sign in, since only the
+// verifier the page holds trades a code.
 export function answerIn(address: string, state: string): SignInResult | null {
   const params = new URL(address).searchParams;
   const code = params.get('code');
   const error = params.get('error');
   const returned = params.get('state');
-  if (returned === state && (code || error)) {
+  if ((returned === state || !returned) && (code || error)) {
     return { state, ...(code ? { code } : {}), ...(error ? { error } : {}) };
   }
-  return !returned && error ? { state, error } : null;
+  return null;
 }
 
 function isResult(data: unknown): data is SignInResult & { type: string } {
@@ -151,7 +176,8 @@ export function redirectedSignIn(): PendingSignIn | null {
     return null;
   }
   const pending = attempt(() => JSON.parse(raw) as PendingSignIn);
-  return pending && typeof pending.state === 'string' && typeof pending.verifier === 'string' ? pending : null;
+  const complete = pending && typeof pending.state === 'string' && typeof pending.verifier === 'string';
+  return complete ? { ...pending, returnTo: pending.returnTo ?? pending.redirectUri } : null;
 }
 
 export function forgetRedirected(): void {

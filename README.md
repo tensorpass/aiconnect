@@ -179,9 +179,25 @@ npx @tensorpass/aiconnect site-key shop.example
 
 The Web Components take it as `data-site-key` on their script tag or `site-key` on the element, and the WordPress plugin as its TensorPass site key setting, under Settings, AI Connect. Coding agents get the key from TensorPass's account MCP server at https://plan.tensorpass.app/mcp.
 
-Each sign in opens in a popup from the visitor's click, with PKCE and a checked state, and comes back to the page's own address. Where the browser blocks the popup, the page itself goes to the sign in and returns. The credential, an OpenRouter key or a TensorPass token of 15 minutes with its refresh token, is kept in the site's `localStorage` for its origin, and `client.signOut()` removes it. Every script of the site's pages can read it there, which the wallet's accounts are kept from. A TensorPass token only answers chats, from the site's origin. Plan accounts such as ChatGPT, Claude, Gemini and Grok stay in the extension: on 15 November 2026 each of them refused a web page at its sign in or its chat.
+Each sign in opens in a popup from the visitor's click, with PKCE and a checked state, and comes back to the site's return page. Give the client a page that does nothing else, so the popup never loads the whole site:
 
-`client.webAccounts` lists the accounts the site offers, `client.signIn(account)` starts a sign in from a click, and the connection state goes through `signingIn` to `connected`, with `account` naming the web account, or back to `noWallet` with `signInFailure`. The [web accounts page](https://tensorpass.app/docs/providers/web-accounts) covers the details.
+```ts
+const client = new AiConnect({ siteKey, signInCallback: '/aiconnect/callback' });
+```
+
+That page runs `finishSignIn()` on load. It hands the answer to the page that opened the popup, by `postMessage` to that page's origin, by a BroadcastChannel named after the sign in's state and by a storage event, so it still arrives when a sign in page with a Cross-Origin-Opener-Policy, such as Google's, has cut the popup from its opener. It then closes the popup, or shows one line saying the visitor can close it. In a framework, the page is a route whose client code calls `finishSignIn()` from `@tensorpass/aiconnect`, or from `@tensorpass/aiconnect/callback`, which brings nothing else. A site without a framework serves `aiconnect-callback.js`, the 2 KB script that `packages/elements` builds beside the Web Components script, from a static page:
+
+```html
+<!doctype html>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Signing in</title>
+<script src="/aiconnect-callback.js"></script>
+```
+
+The Web Components take the page as `data-sign-in-callback` on their script tag or `sign-in-callback` on the element. Without a return page, the sign in comes back to the page itself, which finishes it as it loads. Where the browser blocks the popup, the tab itself goes to the sign in and the return page sends it back to the page it left. The credential, an OpenRouter key or a TensorPass token of 15 minutes with its refresh token, is kept in the site's `localStorage` for its origin, and `client.signOut()` removes it. Every script of the site's pages can read it there, which the wallet's accounts are kept from. A TensorPass token only answers chats, from the site's origin. Plan accounts such as ChatGPT, Claude, Gemini and Grok stay in the extension: on 15 November 2026 each of them refused a web page at its sign in or its chat.
+
+`client.webAccounts` lists the accounts the site offers, `client.signIn(account)` starts a sign in from a click, and the connection state goes through `signingIn` to `connected`, with `account` naming the web account, or back to `noWallet` with `signInFailure`. When the visitor closes the popup, the page leaves its waiting step as it regains focus, and still takes the answer if one comes. A TensorPass account without a plan gets the plans in the chat, read with `client.planAccess()`, and its question is answered once the plan is active. The [web accounts page](https://tensorpass.app/docs/providers/web-accounts) covers the details.
 
 ## Use the AI SDK you already have
 

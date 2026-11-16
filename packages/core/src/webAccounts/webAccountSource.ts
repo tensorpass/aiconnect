@@ -10,12 +10,13 @@ import { challengeFor, randomToken } from './pkce.ts';
 import type { HttpFetch } from './openAiCompatibleSession.ts';
 import { openRouterAccount, OPENROUTER_DEFAULT_MODEL } from './openRouterAccount.ts';
 import {
-  answerIn, callbackAddress, cleanAddress, forgetRedirected, keepForRedirect, listenForResult, markWindow,
+  answerIn, callbackAddress, cleanAddress, pageAddress, forgetRedirected, keepForRedirect, listenForResult, markWindow,
   openSignInWindow, redirectedSignIn, returnToOpener, windowMark,
 } from './signInWindow.ts';
 import type { PendingSignIn, SignInResult } from './signInWindow.ts';
 import { PLAN_GATEWAY, tensorPassAccount } from './tensorPassAccount.ts';
 import type { PlanLevel } from './tensorPassAccount.ts';
+import type { PlanAccess } from './tensorPassPlan.ts';
 import type { WebAccount } from './webAccount.ts';
 import { WEB_ACCOUNT_KEY, WebAccountStore } from './webAccountStore.ts';
 import type { WebAccountId } from './webAccountStore.ts';
@@ -26,6 +27,9 @@ export interface WebAccountOptions {
   planGateway?: string;
   openRouterModel?: string;
   planLevel?: PlanLevel;
+  // The site's return page for the sign ins, a path or an address on the page's origin that runs
+  // `finishSignIn`. Without it, the provider sends the sign in back to the page itself.
+  signInCallback?: string;
 }
 
 // How long a sign in waits for its answer before it ends.
@@ -71,11 +75,13 @@ export class WebAccountSource {
   private failure: WebSignInFailure | undefined;
   private readonly onChange: () => void;
   private readonly store: WebAccountStore;
+  private readonly signInCallback?: string;
 
   constructor({ options, onChange, store = new WebAccountStore(), fetch: fetchImpl }: WebAccountSourceDeps) {
     this.onChange = onChange;
     this.store = store;
     this.accounts = accountsOf(options, fetchImpl);
+    this.signInCallback = options.signInCallback;
     globalThis.addEventListener?.('storage', (event: StorageEvent) => {
       if (event.key === WEB_ACCOUNT_KEY) {
         this.onChange();
@@ -128,10 +134,13 @@ export class WebAccountSource {
     if (!account) {
       throw new Error(`This site offers no ${id} sign in`);
     }
+    const state = randomToken(16);
+    const pending: PendingSignIn = {
+      account: id, state, verifier: randomToken(), redirectUri: callbackAddress(this.signInCallback),
+      returnTo: pageAddress(),
+    };
     this.cancel();
     const popup = openSignInWindow();
-    const state = randomToken(16);
-    const pending: PendingSignIn = { account: id, state, verifier: randomToken(), redirectUri: callbackAddress() };
     this.failure = undefined;
     this.signingIn = id;
     this.onChange();
@@ -156,6 +165,13 @@ export class WebAccountSource {
       this.signingIn = null;
       this.onChange();
     }
+  }
+
+  // The plan of the account that answers, when that account sells one: TensorPass's.
+  planAccess(): PlanAccess | null {
+    const held = this.store.read();
+    const account = held ? this.accounts.get(held.account) : undefined;
+    return account?.plan ? account.plan(this.store, () => this.signedOut()) : null;
   }
 
   async signOut(): Promise<void> {
@@ -227,6 +243,12 @@ export class WebAccountSource {
     }
   }
 
+  // The credential stopped opening its account: the visitor signs in again.
+  private signedOut(): void {
+    this.store.forget();
+    this.onChange();
+  }
+
   private fail(failure: WebSignInFailure): void {
     this.pending?.stop();
     this.pending = null;
@@ -238,10 +260,7 @@ export class WebAccountSource {
   private sessionOf(account: WebAccount): ProviderSession {
     let session = this.sessions.get(account.id);
     if (!session) {
-      session = account.session(this.store, () => {
-        this.store.forget();
-        this.onChange();
-      });
+      session = account.session(this.store, () => this.signedOut());
       this.sessions.set(account.id, session);
     }
     return session;

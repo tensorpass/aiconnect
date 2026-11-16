@@ -15,4 +15,11 @@ const LAZY_SDKS = [
   '@llamaindex/openai',
 ];
 
-export default defineConfig({ plugins: [react(), demoServer()], optimizeDeps: { include: LAZY_SDKS } });
+// The bookshop page, and the return page of the web sign ins.
+const PAGES = { main: 'index.html', callback: 'callback.html' };
+
+export default defineConfig({
+  plugins: [react(), demoServer()],
+  optimizeDeps: { include: LAZY_SDKS },
+  build: { rollupOptions: { input: PAGES } },
+});

@@ -2,9 +2,11 @@
 // tight, such as a Shopify app embed, which allows 10 KB. It draws the button of each chat that opens
 // over the page at once, in the module's own look, and loads the Web Components script only when the
 // visitor reaches for a chat: pointing at its button, focusing it, pressing it, or the site opening
-// the chat. A chat or a search bar in the page's flow loads it as it nears the screen. The page puts
-// the Web Components script's address on its elements, in `data-elements-src`.
+// the chat. A chat or a search bar in the page's flow loads it as it nears the screen, and a page that is
+// the return of a web sign in loads it at once, since the sign in waits for the client to finish. The page
+// puts the Web Components script's address on its elements, in `data-elements-src`.
 
+import { isSignInReturn } from '@tensorpass/aiconnect';
 import { MOUNT_CLASS } from '../mount.ts';
 import { addPageTokens } from '../pageTokens.ts';
 import { loadElements } from './elementsScript.ts';
@@ -100,9 +102,14 @@ function start(): void {
     return;
   }
   const elements = document.querySelectorAll<HTMLElement>(NAMES.join(','));
-  if (elements.length > 0) {
-    addPageTokens();
-    elements.forEach(prepare);
+  if (elements.length === 0) {
+    return;
+  }
+  addPageTokens();
+  elements.forEach(prepare);
+  const src = elements[0].dataset.elementsSrc;
+  if (src && isSignInReturn(location.href)) {
+    loadElements(src).catch(report);
   }
 }
 

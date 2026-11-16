@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { afterEach, test } from 'node:test';
 import type { ConnectionState } from '../connectionState.ts';
 import type { HttpFetch } from './openAiCompatibleSession.ts';
+import { finishSignIn } from './finishSignIn.ts';
 import { WebAccountSource } from './webAccountSource.ts';
 import { WebAccountStore } from './webAccountStore.ts';
 import type { KeyValueStorage } from './webAccountStore.ts';
@@ -20,6 +21,7 @@ function mapStorage(): KeyValueStorage {
 interface Browser {
   popups: { location: { href: string }; closed: boolean; close: () => void }[];
   assigned: string[];
+  replaced: string[];
   closedSelf: number;
   // Delivers a message to the page as `postMessage` does, from the origin given.
   deliver: (data: unknown, origin: string) => void;
@@ -32,7 +34,7 @@ const GLOBALS = ['window', 'location', 'history', 'localStorage', 'sessionStorag
 function installBrowser({ href, popups = true }: { href: string; popups?: boolean }): Browser {
   const target = new EventTarget();
   const browser: Browser = {
-    popups: [], assigned: [], closedSelf: 0,
+    popups: [], assigned: [], replaced: [], closedSelf: 0,
     deliver: (data, origin) => target.dispatchEvent(new MessageEvent('message', { data, origin })),
   };
   const location = {
@@ -41,6 +43,7 @@ function installBrowser({ href, popups = true }: { href: string; popups?: boolea
       return new URL(this.href).origin;
     },
     assign: (url: string) => browser.assigned.push(url),
+    replace: (url: string) => browser.replaced.push(url),
   };
   const window = Object.assign(target, {
     opener: {
@@ -56,6 +59,7 @@ function installBrowser({ href, popups = true }: { href: string; popups?: boolea
     },
     close: () => (browser.closedSelf += 1),
   });
+  Object.defineProperty(window, 'closed', { get: () => browser.closedSelf > 0, configurable: true });
   const history = {
     state: null,
     replaceState: (_state: unknown, _title: string, url: string) => (location.href = url),
@@ -78,10 +82,10 @@ const exchangeFetch: HttpFetch = async (url) => (url.endsWith('/oauth/token')
   ? Response.json({ access_token: 'tpp-1', refresh_token: 'tpr-1', expires_in: 900 })
   : Response.json({ key: 'sk-or-1' }));
 
-function source(store = new WebAccountStore(mapStorage()), fetch = exchangeFetch) {
+function source(store = new WebAccountStore(mapStorage()), fetch = exchangeFetch, signInCallback?: string) {
   const changes: ConnectionState[] = [];
   const web: WebAccountSource = new WebAccountSource({
-    options: { siteKey: 'tpk_site', planGateway: 'https://gateway.test' },
+    options: { siteKey: 'tpk_site', planGateway: 'https://gateway.test', signInCallback },
     onChange: () => changes.push(web.state()),
     store,
     fetch,
@@ -223,4 +227,46 @@ test('focus back with the popup gone leaves the waiting step, and a late answer 
   browser.deliver({ type: 'aiconnect:sign-in', state, code: 'late-but-real' }, ORIGIN);
   await until(opener.changes, 'connected');
   assert.equal(opener.store.read()?.account, 'openrouter');
+});
+
+const CALLBACK = '/aiconnect/callback';
+
+test('a popup that returns to the site\'s callback page hands its answer over and closes there', async () => {
+  const browser = installBrowser({ href: `${ORIGIN}/books?page=2` });
+  const opener = source(undefined, undefined, CALLBACK);
+  await opener.web.signIn('tensorpass');
+  const authorize = new URL(browser.popups[0].location.href);
+  assert.equal(authorize.searchParams.get('redirect_uri'), `${ORIGIN}${CALLBACK}`);
+  Object.assign(window, { opener: null });
+  location.href = `${ORIGIN}${CALLBACK}?code=code-4&state=${authorize.searchParams.get('state')}`;
+  assert.equal(finishSignIn(), 'window');
+  assert.equal(browser.closedSelf, 1);
+  await until(opener.changes, 'connected');
+  assert.equal(opener.store.read()?.account, 'tensorpass');
+});
+
+test('a blocked popup comes back through the callback page to the page it left, which finishes', async () => {
+  const browser = installBrowser({ href: `${ORIGIN}/books?page=2`, popups: false });
+  const store = new WebAccountStore(mapStorage());
+  await source(store, undefined, CALLBACK).web.signIn('openrouter');
+  const authorize = new URL(browser.assigned[0]);
+  assert.equal(authorize.searchParams.get('callback_url'), `${ORIGIN}${CALLBACK}`);
+  // OpenRouter came back with its code alone on 16 November 2026.
+  location.href = `${ORIGIN}${CALLBACK}?code=code-5`;
+  assert.equal(finishSignIn(), 'redirect');
+  const back = new URL(browser.replaced[0]);
+  assert.equal(`${back.origin}${back.pathname}${back.searchParams.get('page')}`, `${ORIGIN}/books2`);
+  location.href = back.toString();
+  const returned = source(store, undefined, CALLBACK);
+  assert.equal(returned.web.takeCallback(), 'redirect');
+  assert.equal(location.href, `${ORIGIN}/books?page=2`);
+  await until(returned.changes, 'connected');
+  assert.deepEqual(store.read(), { account: 'openrouter', key: 'sk-or-1' });
+});
+
+test('a callback page with no sign in waiting leaves the page alone, and a foreign callback is refused', () => {
+  installBrowser({ href: `${ORIGIN}${CALLBACK}?code=stray` });
+  assert.equal(finishSignIn(), 'none');
+  const web = source(undefined, undefined, 'https://evil.example/callback').web;
+  assert.throws(() => web.signIn('openrouter'), /origin/);
 });

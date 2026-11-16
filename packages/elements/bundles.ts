@@ -1,6 +1,6 @@
-// The two scripts of the elements package, as esbuild options: the Web Components script, which bundles
-// the elements, React and the modules' stylesheet, and the loader, which draws the chats' buttons and
-// loads the Web Components script when the visitor reaches for one. Stylesheets come in as minified
+// The three scripts of the elements package, as esbuild options: the Web Components script, which bundles
+// the elements, React and the modules' stylesheet, the loader, which draws the chats' buttons and loads
+// the Web Components script when the visitor reaches for one, and the script of the sign in return page. Stylesheets come in as minified
 // text, for the elements' shadow roots and the page's tokens.
 
 import { readFile } from 'node:fs/promises';
@@ -44,4 +44,10 @@ export const loaderBundle = {
   ...common,
   entryPoints: ['src/loader/index.ts'],
   outfile: 'dist/aiconnect-loader.js',
+} satisfies BuildOptions;
+
+export const callbackBundle = {
+  ...common,
+  entryPoints: ['src/callback.ts'],
+  outfile: 'dist/aiconnect-callback.js',
 } satisfies BuildOptions;
