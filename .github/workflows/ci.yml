@@ -5,7 +5,8 @@
 # the repository and writes nothing to it. Each action is pinned to the commit of a release, since a tag can
 # be moved to other code after a review.
 # The job runs on the VPS runner of this repository (runs-on: [self-hosted, vps]), in a fresh container with no
-# root: ci/runner of vps-automation.
+# root: ci/runner of vps-automation. That runner serves the organisation's three repositories, so each branch
+# keeps one running job and one pending: a newer push replaces the pending one.
 name: CI
 
 on:
@@ -15,6 +16,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   check:
