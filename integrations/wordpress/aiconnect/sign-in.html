@@ -1,0 +1,18 @@
+<!doctype html>
+<!--
+  The return page of the chat's web sign ins. The OpenRouter or TensorPass sign in window comes back here with
+  its code, and aiconnect-callback.js hands the code to the page that opened the window, then closes it. The
+  web server serves this file as it is, without WordPress, its theme or other plugins, at one address that
+  carries no query string in every permalink setting.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Signing in</title>
+  <script src="assets/aiconnect-callback.js" defer></script>
+</head>
+<body></body>
+</html>

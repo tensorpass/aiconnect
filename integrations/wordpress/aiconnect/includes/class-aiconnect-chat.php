@@ -2,7 +2,8 @@
 /**
  * The chat, written as an <aiconnect-chat> element by the [aiconnect_chat] shortcode and the AI Connect Chat
  * block. Both take the same settings and point the chat at the site's own MCP server, so the visitor's model
- * answers from the site's posts and pages. Every chat carries the site key of the plugin's settings, if any.
+ * answers from the site's posts and pages. Every chat carries the site key of the plugin's settings, if any, and
+ * the plugin's sign in return page.
  *
  * @package AIConnect
  */
@@ -68,14 +69,15 @@ final class AIConnect_Chat {
 	private static function render( array $settings ): string {
 		AIConnect_Script::enqueue();
 		$element = array(
-			'variant'        => in_array( $settings['variant'], self::VARIANTS, true ) ? $settings['variant'] : 'popup',
-			'mcp'            => rest_url( AIConnect_Mcp::NAMESPACE . AIConnect_Mcp::ROUTE ),
-			'system'         => '' !== $settings['system'] ? $settings['system'] : self::default_instructions(),
-			'heading'        => $settings['heading'],
-			'launcher-label' => $settings['launcher_label'],
-			'placeholder'    => $settings['placeholder'],
-			'locale'         => self::locale(),
-			'site-key'       => AIConnect_Settings::site_key(),
+			'variant'          => in_array( $settings['variant'], self::VARIANTS, true ) ? $settings['variant'] : 'popup',
+			'mcp'              => rest_url( AIConnect_Mcp::NAMESPACE . AIConnect_Mcp::ROUTE ),
+			'system'           => '' !== $settings['system'] ? $settings['system'] : self::default_instructions(),
+			'heading'          => $settings['heading'],
+			'launcher-label'   => $settings['launcher_label'],
+			'placeholder'      => $settings['placeholder'],
+			'locale'           => self::locale(),
+			'site-key'         => AIConnect_Settings::site_key(),
+			'sign-in-callback' => AIConnect_Script::sign_in_page(),
 		);
 		$html    = '<aiconnect-chat';
 		foreach ( array_filter( $element, 'strlen' ) as $name => $value ) {

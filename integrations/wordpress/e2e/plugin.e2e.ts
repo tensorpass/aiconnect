@@ -95,12 +95,15 @@ test('the MCP server serves the published posts and pages only', async () => {
   await client.close();
 });
 
-test('the block writes the chat with the site\'s MCP server and loads the script', async ({ page }) => {
+test('the block writes the chat with the site\'s MCP server and return page, and loads its script', async ({
+  page,
+}) => {
   await page.goto(`${SITE}/ask-block/`);
   const element = page.locator('aiconnect-chat');
   await expect(element).toHaveAttribute('variant', 'popup');
   await expect(element).toHaveAttribute('mcp', MCP_URL);
   await expect(element).toHaveAttribute('launcher-label', 'Ask the club');
+  await expect(element).toHaveAttribute('sign-in-callback', `${SITE}/wp-content/plugins/aiconnect/sign-in.html`);
   await expect(page.getByRole('button', { name: 'Ask the club', exact: true })).toBeVisible();
   await expect(page.locator('script[src*="aiconnect-elements.js"]')).toHaveAttribute('defer', '');
 });
