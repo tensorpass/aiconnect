@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Report a vulnerability
-    url: https://github.com/tensorpass/aiwallet-sdk/blob/main/SECURITY.md
+    url: https://github.com/tensorpass/aiconnect/blob/main/SECURITY.md
     about: Vulnerabilities are reported in private, by email.
   - name: Propose a connector
     url: https://tensorpass.app/connectors/propose

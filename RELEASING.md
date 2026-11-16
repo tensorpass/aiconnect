@@ -4,15 +4,15 @@ The four public packages share one version. The workspace root and the demo are 
 
 ## npm authentication
 
-Each package trusts the GitHub Actions workflow `publish.yml` in `tensorpass/aiwallet-sdk`, with permission to publish. The workflow runs on GitHub-hosted Ubuntu with OIDC (`id-token: write`), so no npm token is stored in GitHub. The repository must be public for npm provenance.
+Each package trusts the GitHub Actions workflow `publish.yml` in `tensorpass/aiconnect`, with permission to publish. The workflow runs on GitHub-hosted Ubuntu with OIDC (`id-token: write`), so no npm token is stored in GitHub. The repository must be public for npm provenance.
 
 An npm maintainer with two-factor authentication configures each package once:
 
 ```bash
-npm trust github @tensorpass/aiconnect-design --repo tensorpass/aiwallet-sdk --file publish.yml --allow-publish
-npm trust github @tensorpass/aiconnect --repo tensorpass/aiwallet-sdk --file publish.yml --allow-publish
-npm trust github @tensorpass/aiconnect-react --repo tensorpass/aiwallet-sdk --file publish.yml --allow-publish
-npm trust github @tensorpass/aiconnect-elements --repo tensorpass/aiwallet-sdk --file publish.yml --allow-publish
+npm trust github @tensorpass/aiconnect-design --repo tensorpass/aiconnect --file publish.yml --allow-publish
+npm trust github @tensorpass/aiconnect --repo tensorpass/aiconnect --file publish.yml --allow-publish
+npm trust github @tensorpass/aiconnect-react --repo tensorpass/aiconnect --file publish.yml --allow-publish
+npm trust github @tensorpass/aiconnect-elements --repo tensorpass/aiconnect --file publish.yml --allow-publish
 ```
 
 ## Version and validate

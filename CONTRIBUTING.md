@@ -17,8 +17,8 @@ The connectors, the AI providers the wallet holds, are part of the wallet's code
 You need Node.js 26 or later and npm. The repository is one npm workspace.
 
 ```bash
-git clone https://github.com/tensorpass/aiwallet-sdk.git
-cd aiwallet-sdk
+git clone https://github.com/tensorpass/aiconnect.git
+cd aiconnect
 npm ci
 ```
 

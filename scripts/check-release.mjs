@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 
 const PACKAGES = ['design', 'core', 'react', 'elements'];
-const REPOSITORY = 'git+https://github.com/tensorpass/aiwallet-sdk.git';
+const REPOSITORY = 'git+https://github.com/tensorpass/aiconnect.git';
 
 async function readJson(file) {
   return JSON.parse(await readFile(file, 'utf8'));
