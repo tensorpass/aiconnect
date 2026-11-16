@@ -202,7 +202,8 @@
   line-height: 1.4;
   caret-color: var(--aic-cyan);
   resize: none;
-  overflow-y: auto;
+  /* The composer turns scrolling on once the text is taller than the box grows (Composer.tsx). */
+  overflow-y: hidden;
 }
 
 /* The question box and the search bar draw the focus on their own edge, so the field inside draws

@@ -18,12 +18,16 @@ export interface ComposerProps {
 // The tallest the box grows before it scrolls, in pixels.
 const MAX_FIELD_HEIGHT = 168;
 
-function fitHeight(field: HTMLTextAreaElement | null): void {
+// Fits the box to its text, rounded up to a whole pixel so a single line never shows a scrollbar, and
+// lets it scroll once the text is taller than the box may grow.
+export function fitHeight(field: HTMLTextAreaElement | null): void {
   if (!field) {
     return;
   }
   field.style.height = 'auto';
-  field.style.height = `${Math.min(field.scrollHeight, MAX_FIELD_HEIGHT)}px`;
+  const needed = Math.ceil(field.scrollHeight);
+  field.style.height = `${Math.min(needed, MAX_FIELD_HEIGHT)}px`;
+  field.style.overflowY = needed > MAX_FIELD_HEIGHT ? 'auto' : 'hidden';
 }
 
 export function StopButton({ onStop }: { onStop: () => void }) {
@@ -47,6 +51,7 @@ function useQuestionText({ busy, onSend, fieldRef }: Pick<ComposerProps, 'busy' 
     setText('');
     if (fieldRef.current) {
       fieldRef.current.style.height = '';
+      fieldRef.current.style.overflowY = '';
     }
   };
   return {
