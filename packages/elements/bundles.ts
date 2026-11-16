@@ -1,7 +1,7 @@
-// The three scripts of the elements package, as esbuild options: the Web Components script, which bundles
-// the elements, React and the modules' stylesheet, the loader, which draws the chats' buttons and loads
-// the Web Components script when the visitor reaches for one, and the script of the sign in return page. Stylesheets come in as minified
-// text, for the elements' shadow roots and the page's tokens.
+// The three scripts of the elements package, as esbuild options: the Web Components script, which bundles the elements,
+// React and the modules' stylesheet, the loader, which draws the chats' buttons and loads the Web Components script
+// when the visitor reaches for one, and the script of the sign in return page. Stylesheets come in as minified text,
+// for the elements' shadow roots and the page's tokens.
 
 import { readFile } from 'node:fs/promises';
 import { transform } from 'esbuild';
