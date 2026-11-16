@@ -7,6 +7,10 @@
     "*.css"
   ],
   "license": "Apache-2.0",
+  "homepage": "https://tensorpass.app/docs",
+  "bugs": {
+    "email": "hello@tensorpass.app"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -22,7 +26,8 @@
   "files": [
     "dist",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "README.md"
   ],
   "scripts": {
     "build": "rm -rf dist tsconfig.tsbuildinfo && tsc -b && esbuild src/styles.css --bundle --outfile=dist/styles.css --log-level=warning && cp src/modules/styles/launchers.css dist/launchers.css"

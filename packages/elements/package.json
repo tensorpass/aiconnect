@@ -5,6 +5,10 @@
   "type": "module",
   "sideEffects": true,
   "license": "Apache-2.0",
+  "homepage": "https://tensorpass.app/docs",
+  "bugs": {
+    "email": "hello@tensorpass.app"
+  },
   "exports": {
     "./aiconnect-elements.js": "./dist/aiconnect-elements.js",
     "./aiconnect-loader.js": "./dist/aiconnect-loader.js",
@@ -15,21 +19,20 @@
   "files": [
     "dist",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "README.md"
   ],
   "scripts": {
     "build": "rm -rf dist && node build.mjs"
   },
-  "dependencies": {
+  "devDependencies": {
     "@tensorpass/aiconnect": "0.1.0",
     "@tensorpass/aiconnect-design": "0.1.0",
     "@tensorpass/aiconnect-react": "0.1.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1"
-  },
-  "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.2.0",
-    "esbuild": "^0.28.2"
+    "esbuild": "^0.28.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   }
 }

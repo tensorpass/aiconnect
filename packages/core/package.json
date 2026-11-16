@@ -5,6 +5,10 @@
   "type": "module",
   "sideEffects": false,
   "license": "Apache-2.0",
+  "homepage": "https://tensorpass.app/docs",
+  "bugs": {
+    "email": "hello@tensorpass.app"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -25,7 +29,8 @@
   "files": [
     "dist",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "README.md"
   ],
   "scripts": {
     "build": "rm -rf dist tsconfig.tsbuildinfo tsconfig.cli.tsbuildinfo && tsc -b tsconfig.json tsconfig.cli.json"

@@ -7,24 +7,39 @@
     "*.css"
   ],
   "license": "Apache-2.0",
+  "homepage": "https://tensorpass.app/docs",
+  "bugs": {
+    "email": "hello@tensorpass.app"
+  },
   "scripts": {
+    "build": "rm -rf dist tsconfig.tsbuildinfo && tsc -b",
     "brand": "node scripts/exportBrand.ts"
   },
   "exports": {
     "./tokens.css": "./tokens.css",
-    "./card-tints": "./src/cardTints.ts",
-    "./room-color": "./src/roomColor.ts",
-    "./brand-mark": "./src/brandMark.ts",
-    "./provider-marks": "./src/providerMarks.ts"
+    "./card-tints": {
+      "types": "./dist/cardTints.d.ts",
+      "default": "./dist/cardTints.js"
+    },
+    "./room-color": {
+      "types": "./dist/roomColor.d.ts",
+      "default": "./dist/roomColor.js"
+    },
+    "./brand-mark": {
+      "types": "./dist/brandMark.d.ts",
+      "default": "./dist/brandMark.js"
+    },
+    "./provider-marks": {
+      "types": "./dist/providerMarks.d.ts",
+      "default": "./dist/providerMarks.js"
+    }
   },
   "files": [
     "tokens.css",
-    "src/cardTints.ts",
-    "src/roomColor.ts",
-    "src/brandMark.ts",
-    "src/providerMarks.ts",
+    "dist",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "README.md"
   ],
   "devDependencies": {
     "@fontsource/reddit-sans": "^5.3.0",
