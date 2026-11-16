@@ -114,6 +114,18 @@
   text-overflow: ellipsis;
 }
 
+/* A web account's level or short model name stays whole, and the account's name gives way first. */
+.aic-account[data-web] .aic-account-model {
+  flex: none;
+}
+
+.aic-account[data-web] .aic-account-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .aic-log {
   flex: 1;
   min-height: 0;
