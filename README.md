@@ -235,6 +235,24 @@ const tools = new McpToolSource('/api/mcp', 'Bookshop');
 
 The tool loop of `useAiChat` and `runConversation` calls the tools the model asks for, in order, and sends the results back until the model answers in plain text, for 6 steps by default. When a tool throws, the model receives a `Tool error:` result and the conversation goes on. Your MCP server is reachable without the page, so it should validate each argument and check each result before returning it. The [MCP guide](https://tensorpass.app/docs/guides/mcp-tools) shows how to serve and design your tools.
 
+## Skills for coding agents
+
+The `skills` folder holds four [Agent Skills](https://agentskills.io/specification) for Claude Code, Cursor, Codex, Gemini CLI and any agent that reads skills:
+
+| Skill | Use it to |
+| --- | --- |
+| `aiconnect-integrate` | Add AI Connect to a React, Next.js or JavaScript site, from the provider and the site key to the chat |
+| `aiconnect-mcp-tools` | Turn a site's server, API or OpenAPI file into MCP tools a model uses well, and check them with a script |
+| `aiconnect-rag-chatbot` | Build a chatbot that answers from the site's own pages: a search index, the MCP server and the chat |
+| `aiconnect-hardening` | Guard a chat against prompt injection and leaks, and pen test it in English, French and Hebrew |
+
+Install them from this repository or from https://tensorpass.app, which serves the same skills:
+
+```bash
+npx skills add tensorpass/aiconnect
+npx skills add https://tensorpass.app
+```
+
 ## Interface modules
 
 The interface modules are ready made AI interfaces that connect to the visitor's wallet and to your MCP tools.

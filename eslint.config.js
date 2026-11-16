@@ -35,11 +35,12 @@ export default tseslint.config(
     rules: { ...reactHooks.configs.recommended.rules, ...STYLE_RULES },
   },
   {
-    // Build scripts run in Node.
+    // Build scripts and the skills' scripts run in Node, which has the Fetch API's globals.
     files: ['**/*.mjs'],
     languageOptions: {
       globals: {
         process: 'readonly', console: 'readonly', fetch: 'readonly', URL: 'readonly', URLSearchParams: 'readonly',
+        Response: 'readonly',
       },
     },
   },
