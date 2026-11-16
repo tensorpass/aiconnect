@@ -18,6 +18,7 @@
   flex: 1;
   gap: 3px;
   min-width: 0;
+  container: aic-head / inline-size;
 }
 
 .aic-head-title {
@@ -114,7 +115,8 @@
   text-overflow: ellipsis;
 }
 
-/* A web account's level or short model name stays whole, and the account's name gives way first. */
+/* A web account's level or short model name stays whole, and the account's name gives way first: on a
+   narrow header its lead words go, and the provider's name stays. */
 .aic-account[data-web] .aic-account-model {
   flex: none;
 }
@@ -124,6 +126,12 @@
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+@container aic-head (max-width: 300px) {
+  .aic-account[data-web] .aic-account-lead {
+    display: none;
+  }
 }
 
 .aic-log {

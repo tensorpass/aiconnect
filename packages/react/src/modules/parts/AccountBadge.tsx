@@ -16,7 +16,7 @@ export function AccountBadge({ live }: { live: boolean }) {
       <span className="aic-keycard" aria-hidden="true" />
       <WaveIcon size={14} className="aic-account-arcs" />
       <span className="aic-account-name">
-        {moduleMessages.answersWith} <b>{state.providerName}</b>
+        <span className="aic-account-lead">{moduleMessages.answersWith}</span> <b>{state.providerName}</b>
       </span>
       {state.model ? <span className="aic-account-model">{modelLabel(state.model, state.account)}</span> : null}
       {state.account ? (
