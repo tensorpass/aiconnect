@@ -46,6 +46,7 @@ Run `npm run build` before `npm test`. One test of `@tensorpass/aiconnect-elemen
 | `packages/design` | The `--aic-*` design tokens, the TensorPass mark as geometry and the providers' marks. |
 | `apps/demo` | The bookshop playground. |
 | `integrations/wordpress` | The WordPress plugin. |
+| `integrations/claude-code` | The Claude Code plugin. Its `skills` is a link to the `skills` folder, and `.claude-plugin/marketplace.json` at the root lists it. |
 
 ## Rules the code follows
 

@@ -45,7 +45,7 @@ The [introduction](https://tensorpass.app/docs) describes a whole visit step by 
 
 ## Packages
 
-The SDK is four packages under the `@tensorpass` scope, plus a demo and a WordPress plugin.
+The SDK is four packages under the `@tensorpass` scope, plus a demo, a WordPress plugin and a Claude Code plugin.
 
 | Package | What it gives your site |
 | --- | --- |
@@ -55,6 +55,7 @@ The SDK is four packages under the `@tensorpass` scope, plus a demo and a WordPr
 | `@tensorpass/aiconnect-design` | The `--aic-*` CSS tokens in light and dark, the TensorPass mark, the providers' marks and the key card colours shared by the wallet and the website. |
 | `apps/demo` | A bookshop playground on port 4605, with every module at `?module=panel`, `popup`, `inline`, `page` or `search`, and the Web Components at `/elements.html`. |
 | `integrations/wordpress` | The WordPress plugin: the chat as a block and a shortcode, and the site's posts served as an MCP server. |
+| `integrations/claude-code` | The Claude Code plugin: the four skills of `skills` and the two TensorPass MCP servers. |
 
 ## Install AI Connect
 
@@ -255,7 +256,7 @@ npx skills add https://tensorpass.app
 
 ## Claude Code plugin
 
-This repository is also the `tensorpass` plugin marketplace for Claude Code. Its `aiconnect` plugin installs the four skills with two MCP servers: the AI Connect docs at `https://tensorpass.app/mcp`, and the TensorPass account at `https://plan.tensorpass.app/mcp`, which creates the site key once you sign in from `/mcp`. In Claude Code, run:
+This repository is also the `tensorpass` plugin marketplace for Claude Code. Its `aiconnect` plugin, in `integrations/claude-code`, installs the four skills with two MCP servers: the AI Connect docs at `https://tensorpass.app/mcp`, and the TensorPass account at `https://plan.tensorpass.app/mcp`, which creates the site key once you sign in from `/mcp`. In Claude Code, run:
 
 ```
 /plugin marketplace add tensorpass/aiconnect

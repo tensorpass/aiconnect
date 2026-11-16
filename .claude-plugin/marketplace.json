@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "aiconnect",
-      "source": "./",
+      "source": "./integrations/claude-code",
       "description": "Add AI Connect to a website: the four AI Connect skills, the AI Connect docs MCP server and the TensorPass account MCP server that creates the site key.",
       "category": "development",
       "tags": ["ai-connect", "ai-wallet", "chat", "mcp", "rag"]
