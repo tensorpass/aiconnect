@@ -51,5 +51,8 @@
     "@modelcontextprotocol/server": "^2.4.0",
     "ai": "^7.0.165",
     "openai": "^7.53.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
