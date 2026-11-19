@@ -147,7 +147,7 @@ Read the project's `package.json`. If it depends on `openai`, `@anthropic-ai/sdk
 Without React, load the modules as Web Components with one script tag, then write the elements where they go. Each element reads the tools from the site's MCP server.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@tensorpass/aiconnect-elements@0.1.2/dist/aiconnect-elements.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorpass/aiconnect-elements@0.1.3/dist/aiconnect-elements.js" defer></script>
 
 <aiconnect-chat variant="popup" mcp="/api/mcp"
   system="You recommend books from this site's catalog. Always search the catalog before recommending."
