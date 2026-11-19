@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { WALLET_STORES } from './visitorBrowser.ts';
 import { iosBrowserOf, walletRouteOf } from './walletRoute.ts';
 import type { BrowserSignals } from './visitorBrowser.ts';
 
@@ -54,7 +55,7 @@ test('a plain http page opens in Safari through its own scheme, and a page that 
   assert.equal(file.kind === 'iphoneBrowser' && file.safariUrl, null);
 });
 
-test('Android and computers keep the wallet\'s install page for their browser', () => {
+test('Android and computers keep the wallet\'s install address for their browser', () => {
   assert.deepEqual(walletRouteOf(signals(ANDROID_CHROME, { brands: ['Google Chrome'], mobile: true }), PAGE), {
     kind: 'install', browser: 'other', url: 'https://tensorpass.app/wallet',
   });
@@ -63,7 +64,7 @@ test('Android and computers keep the wallet\'s install page for their browser', 
   });
   const chrome = `${MAC.replace('605.1.15', '537.36')} Chrome/142.0.0.0 Safari/537.36`;
   assert.deepEqual(walletRouteOf(signals(chrome, { brands: ['Google Chrome'] }), PAGE), {
-    kind: 'install', browser: 'chrome', url: 'https://tensorpass.app/wallet?browser=chrome',
+    kind: 'install', browser: 'chrome', url: WALLET_STORES.chromeWebStore.url,
   });
 });
 
