@@ -1,7 +1,7 @@
 // The visitor's browser, which names the button that adds AI Wallet and picks where it installs from.
-// This is the one place that knows where each browser gets the wallet: today every browser goes to the
-// wallet's page, which names the browser in its query; a browser's store listing replaces its address
-// here once the listing is public.
+// This is the one place that knows where each browser gets the wallet: Chrome, Edge, Brave and Opera add it
+// from its Chrome Web Store listing and Firefox from its Firefox Add-ons listing, public since 18 November
+// 2026. Safari and the browsers of phones have no listing yet and go to the wallet's page.
 
 export type VisitorBrowser = 'chrome' | 'edge' | 'brave' | 'opera' | 'firefox' | 'safari' | 'other';
 
@@ -25,6 +25,28 @@ export interface BrowserSignals {
 }
 
 const WALLET_PAGE = 'https://tensorpass.app/wallet';
+
+// A store that lists AI Wallet, by the name it gives itself.
+export interface WalletStore {
+  name: string;
+  url: string;
+}
+
+export const WALLET_STORES = {
+  chromeWebStore: {
+    name: 'Chrome Web Store',
+    url: 'https://chromewebstore.google.com/detail/ai-wallet/gkmgamdkmlidbjfmheeghkcjdofdafge',
+  },
+  firefoxAddOns: { name: 'Firefox Add-ons', url: 'https://addons.mozilla.org/en-US/firefox/addon/ai-wallet/' },
+} as const satisfies Record<string, WalletStore>;
+
+const STORE_OF: Partial<Record<VisitorBrowser, WalletStore>> = {
+  chrome: WALLET_STORES.chromeWebStore,
+  edge: WALLET_STORES.chromeWebStore,
+  brave: WALLET_STORES.chromeWebStore,
+  opera: WALLET_STORES.chromeWebStore,
+  firefox: WALLET_STORES.firefoxAddOns,
+};
 const MOBILE = /Mobi|Android|iPhone|iPad|iPod/;
 // Safari's user agent, on a Mac as on an iPhone or an iPad, and the other browsers that carry Safari's
 // tokens: Chromium's, Android's own, and the other browsers of iOS, which run on Safari's engine and take
@@ -88,7 +110,16 @@ export function visitorBrowser(): VisitorBrowser {
   });
 }
 
-/** Where a visitor on this browser adds AI Wallet. */
+/** The store that adds AI Wallet to `browser`, or null where no store lists it. */
+export function walletStore(browser: VisitorBrowser): WalletStore | null {
+  return STORE_OF[browser] ?? null;
+}
+
+/** Where a visitor on this browser adds AI Wallet: its store listing, or the wallet's page without one. */
 export function walletInstallUrl(browser: VisitorBrowser): string {
+  const store = walletStore(browser);
+  if (store) {
+    return store.url;
+  }
   return browser === 'other' ? WALLET_PAGE : `${WALLET_PAGE}?browser=${browser}`;
 }

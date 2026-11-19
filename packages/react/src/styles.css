@@ -228,6 +228,33 @@
   flex: none;
 }
 
+/* The plans' marks on the install button: overlapping chips, each ringed in the button's colour. */
+.aic-provider-marks {
+  display: inline-flex;
+  flex: none;
+  margin-inline-end: 10px;
+}
+
+.aic-provider-mark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--aic-chip);
+  box-shadow: 0 0 0 2px var(--aic-accent);
+}
+
+.aic-provider-mark + .aic-provider-mark {
+  margin-inline-start: -5px;
+}
+
+.aic-provider-mark img {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
 .aic-primary:focus-visible,
 .aic-connect-button:focus-visible,
 .aic-link:focus-visible,

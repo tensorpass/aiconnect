@@ -2,11 +2,13 @@
 // words: connect the wallet, add it to the browser (with, in Safari, how to allow a wallet already added
 // on every website), approve the site, or try again after a refusal.
 // Its button runs the step itself, as the connect window's button does: the install link opens the
-// wallet's page, and connect asks the wallet, whose window opens at once.
+// wallet's store listing, under the marks of the plans it answers with, and connect asks the wallet, whose
+// window opens at once.
 
 import type { ConnectionState, VisitorBrowser } from '@tensorpass/aiconnect';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { ConnectRing } from '../../ConnectRing.tsx';
+import { ProviderMarks } from '../../ProviderMarks.tsx';
 import { alreadyAddedLine, installLabel, installText, refusalStep } from '../../messages.ts';
 import { useActionAttribute } from './moduleAnalytics.ts';
 import type { ModuleMessages, PickerMessages } from '../../messages.ts';
@@ -66,6 +68,7 @@ function StepButton({ action }: { action: StepAction }) {
   if (action.kind === 'install') {
     return (
       <a className="aic-button" href={client.installUrl} target="_blank" rel="noreferrer" {...tracking}>
+        <ProviderMarks />
         {action.label}
       </a>
     );

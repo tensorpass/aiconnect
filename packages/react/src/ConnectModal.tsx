@@ -11,6 +11,7 @@ import { AboutView } from './AboutView.tsx';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { ConnectRing } from './ConnectRing.tsx';
 import { alreadyAddedLine, installLabel, installText, refusalStep } from './messages.ts';
+import { ProviderMarks } from './ProviderMarks.tsx';
 import { WebAccountConnected, WebSignIns, WebSigningIn } from './WebAccountStep.tsx';
 
 function useEscapeToClose(onClose: () => void) {
@@ -49,6 +50,7 @@ function WalletStep() {
       return (
         <Step live={false} title={messages.installTitle} text={installText(messages, client.browser)}>
           <a className="aic-primary" href={client.installUrl} target="_blank" rel="noreferrer">
+            <ProviderMarks />
             {installLabel(messages, client.browser)}
           </a>
           {alreadyAdded ? <p className="aic-hint">{alreadyAdded}</p> : null}

@@ -93,7 +93,8 @@ export class AiConnect {
     return visitorBrowser();
   }
 
-  // Where a visitor without the wallet adds it to this browser, for the connect window's link.
+  // Where a visitor without the wallet adds it to this browser, its store listing or the wallet's page, for
+  // the connect window's link.
   get installUrl(): string {
     return walletInstallUrl(this.browser);
   }

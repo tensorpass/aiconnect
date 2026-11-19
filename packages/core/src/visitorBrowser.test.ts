@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { browserOf, walletInstallUrl } from './visitorBrowser.ts';
+import { browserOf, walletInstallUrl, walletStore } from './visitorBrowser.ts';
 import type { BrowserSignals } from './visitorBrowser.ts';
 
 const MAC = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)';
@@ -51,5 +51,16 @@ test('any other browser of a phone or a tablet gets the wallet\'s page without a
   }
   assert.equal(browserOf(signals(CHROME, { brands: ['Google Chrome'], mobile: true })), 'other');
   assert.equal(walletInstallUrl('other'), 'https://tensorpass.app/wallet');
-  assert.equal(walletInstallUrl('firefox'), 'https://tensorpass.app/wallet?browser=firefox');
+});
+
+test('each desktop browser with a store listing installs from it', () => {
+  const chromeWebStore = 'https://chromewebstore.google.com/detail/ai-wallet/gkmgamdkmlidbjfmheeghkcjdofdafge';
+  for (const browser of ['chrome', 'edge', 'brave', 'opera'] as const) {
+    assert.equal(walletInstallUrl(browser), chromeWebStore, browser);
+    assert.equal(walletStore(browser)?.name, 'Chrome Web Store', browser);
+  }
+  assert.equal(walletInstallUrl('firefox'), 'https://addons.mozilla.org/en-US/firefox/addon/ai-wallet/');
+  assert.equal(walletStore('firefox')?.name, 'Firefox Add-ons');
+  assert.equal(walletStore('safari'), null);
+  assert.equal(walletStore('other'), null);
 });
