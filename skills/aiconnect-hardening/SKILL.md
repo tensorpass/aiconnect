@@ -3,7 +3,7 @@ name: aiconnect-hardening
 description: Harden a website chat that runs on each visitor's own AI through AI Connect against prompt injection, leaks of the site's data and exfiltration of the visitor's conversation, then pen test it in English, French and Hebrew. Use before an AI Connect chat or MCP server goes public, when adding guards or guardrails to a site's chat, reviewing what a site's MCP tools expose, or when the user mentions prompt injection, jailbreaks, data leaks, salted envelopes or a chatbot pen test.
 metadata:
   author: TensorPass
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Harden an AI Connect chat
@@ -40,6 +40,7 @@ Start here, since every other guard sits in a browser the visitor controls.
 - **Give links as fields.** A page URL, a website or a booking link goes in a field of its own (`"url": "https://..."`). The page lets an answer link to an address a result gave as a whole field, and to none written inside free text such as a review.
 - **Mark third party content.** A review or comment in a result carries its origin (`"source": "visitor review"`), so the model weighs it as an opinion.
 - **Keep acting tools for signed in visitors.** A tool that books, orders or writes checks the visitor's own session on the server, validates every argument there, and acts only after the visitor confirms in the page. A public chat starts with read only tools.
+- **Refuse other sites on a cookie session.** The page's requests carry the site's cookies, so another site can post to the MCP route with them too. A route that reads a cookie session checks that the `Origin` header is the site's own, and the session cookie is `SameSite=Lax` or `Strict`. A site whose login is a bearer token sends it through `McpToolSource`'s `fetch` option, and keeps the token out of `localStorage` when it can, since any script on the page reads it there.
 
 ```ts
 // In the MCP route, before the transport.

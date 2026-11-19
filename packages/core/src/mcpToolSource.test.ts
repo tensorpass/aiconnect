@@ -40,6 +40,21 @@ function modernOnlyServer() {
   return createServer(toNodeHandler(handler));
 }
 
+// A server whose account tool only a signed in visitor sees, the login being a bearer token.
+function serverWithAccountTool() {
+  return createServer(async (request, response) => {
+    const signedIn = request.headers.authorization === 'Bearer session-token';
+    const server = new McpServer({ name: 'bookshop', version: '1.0.0' });
+    server.registerTool('search', { description: 'Search the catalog' }, async () => ({ content: [] }));
+    if (signedIn) {
+      server.registerTool('list_my_orders', { description: 'The visitor\'s orders' }, async () => ({ content: [] }));
+    }
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+    await server.connect(transport);
+    await transport.handleRequest(request, response);
+  });
+}
+
 async function listening(http: Server, context: { after: (fn: () => void) => void }): Promise<string> {
   http.listen(0, '127.0.0.1');
   context.after(() => {
@@ -60,4 +75,17 @@ test('the tools of a server that serves only the 2026-07-28 revision are read an
   const source = new McpToolSource(await listening(modernOnlyServer(), context));
   assert.deepEqual((await source.listTools()).map((tool) => tool.name), ['search']);
   assert.equal(await source.callTool('search', {}), '[{"title":"Piranesi"}]');
+});
+
+test('a source given a fetch sends the site\'s login with each request', async (context) => {
+  const url = await listening(serverWithAccountTool(), context);
+  const signedIn = new McpToolSource(url, 'bookshop', {
+    fetch: (input, init) => {
+      const headers = new Headers(init?.headers);
+      headers.set('authorization', 'Bearer session-token');
+      return fetch(input, { ...init, headers });
+    },
+  });
+  assert.deepEqual((await signedIn.listTools()).map((tool) => tool.name), ['search', 'list_my_orders']);
+  assert.deepEqual((await new McpToolSource(url).listTools()).map((tool) => tool.name), ['search']);
 });

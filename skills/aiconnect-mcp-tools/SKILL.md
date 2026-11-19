@@ -3,7 +3,7 @@ name: aiconnect-mcp-tools
 description: Turn a website's server, API or services into an MCP server whose tools a visitor's own AI calls through AI Connect, and design those tools so a model uses them well. Works from the site's routes and services or from an OpenAPI file. Use when building or reviewing the MCP server behind a site's AI mode or chat, exposing a catalogue, search, booking or account features to AI, converting a REST API or OpenAPI description into MCP tools, writing tool names, descriptions and input schemas, or when the user mentions McpToolSource, an AI native website, or making a site's data usable by AI.
 metadata:
   author: TensorPass
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Turn a site's server into MCP tools for AI Connect
@@ -50,7 +50,8 @@ Call the service layer directly when the server lives in the same codebase: the 
 2. Make it stateless: for each POST, build a new `McpServer` and a `WebStandardStreamableHTTPServerTransport` (or `StreamableHTTPServerTransport` in Node frameworks) with `sessionIdGenerator: undefined` and `enableJsonResponse: true`. Answer GET and DELETE with 405.
 3. Tools that read published data need no authentication. Rate limit each visitor address (60 requests a minute is a good start) and cap the request body.
 4. Register each tool with `server.registerTool(name, { title, description, inputSchema, annotations }, handler)`, input schemas in zod, and `annotations: { readOnlyHint: true, openWorldHint: false }` on read only tools.
-5. Check each result with `checkToolResult(text, policy)` from `@tensorpass/aiconnect` before it returns, with the policy of the `aiconnect-hardening` skill, so no internal name leaves the server. Before the server goes public, run that skill's pen test: it checks what the tools return, the bounds of every input, and the rate limit.
+5. Serve the visitor's own data and the back office from the same server, by level. For each request, read the site's session as its other routes do and register only the tools of the caller's level (public, signed in, staff), so `tools/list` shows a visitor what they may call. The page's requests carry the site's cookies; a site whose login is a bearer token gives `McpToolSource` a `fetch` option that adds it. On a cookie session, also check that the `Origin` header is the site's own and that the cookie is `SameSite=Lax` or `Strict`, since another site can post to the route with the cookie. A tool that acts returns a proposal the page shows as a card, and the visitor's click sends it through the site's own route.
+6. Check each result with `checkToolResult(text, policy)` from `@tensorpass/aiconnect` before it returns, with the policy of the `aiconnect-hardening` skill, so no internal name leaves the server. Before the server goes public, run that skill's pen test: it checks what the tools return, the bounds of every input, and the rate limit.
 
 ## 4. Design the tools for a model
 

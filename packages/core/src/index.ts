@@ -9,6 +9,7 @@ export { AiConnect } from './client.ts';
 export type { AiConnectOptions, ConnectionState, SdkOptions, WebSignInFailure } from './client.ts';
 export * from './guards/index.ts';
 export { McpToolSource } from './mcpToolSource.ts';
+export type { McpFetch, McpToolSourceOptions } from './mcpToolSource.ts';
 export {
   BROWSER_NAMES, browserOf, visitorBrowser, walletInstallUrl, walletStore, WALLET_STORES,
 } from './visitorBrowser.ts';
