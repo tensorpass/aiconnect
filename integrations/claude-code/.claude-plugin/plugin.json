@@ -1,6 +1,6 @@
 {
   "name": "aiconnect",
-  "description": "Add AI Connect to a website so its AI features run on each visitor's own AI. Bundles the skills aiconnect-integrate, aiconnect-mcp-tools, aiconnect-rag-chatbot and aiconnect-hardening, the AI Connect docs MCP server and the TensorPass account MCP server, which creates the site key after an OAuth sign in.",
+  "description": "Add AI Connect to a website so its AI features run on each visitor's own AI. Bundles the skills aiconnect-integrate, aiconnect-mcp-tools, aiconnect-rag-chatbot, aiconnect-hardening and aiconnect-auth, the AI Connect docs MCP server and the TensorPass account MCP server, which creates the site key after an OAuth sign in.",
   "author": {
     "name": "TensorPass",
     "url": "https://tensorpass.app"
