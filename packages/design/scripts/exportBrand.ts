@@ -7,7 +7,16 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import opentype from 'opentype.js';
-import { BRAND_INK, BRAND_WHITE, MARK_GRID, appIconSvg, markCellColor, markShapes, markSvg } from '../src/brandMark.ts';
+import {
+  BRAND_INK,
+  BRAND_WHITE,
+  MARK_GRID,
+  appIconSvg,
+  bimiSvg,
+  markCellColor,
+  markShapes,
+  markSvg,
+} from '../src/brandMark.ts';
 import type { MarkTheme } from '../src/brandMark.ts';
 
 const FONT_FILE = '@fontsource/reddit-sans/files/reddit-sans-latin-800-normal.woff';
@@ -56,6 +65,7 @@ const FILES = {
   'wordmark.svg': lockupSvg(wordmark, 'light'),
   'wordmark-dark.svg': lockupSvg(wordmark, 'dark'),
   'app-icon.svg': appIconSvg(),
+  'bimi.svg': bimiSvg(WORDMARK),
 };
 
 await mkdir(logoDir, { recursive: true });

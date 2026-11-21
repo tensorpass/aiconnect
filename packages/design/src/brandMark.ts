@@ -165,3 +165,16 @@ export function appIconSvg({ size = APP_ICON_GRID, rounded = true }: AppIconOpti
   const mark = `<g transform="translate(${inset} ${inset})">${markShapes(BRAND_INK)}</g>`;
   return svgDocument({ size, viewBox: APP_ICON_GRID, body: tile + mark });
 }
+
+// The sender logo a mail client shows beside the domain's emails (BIMI). The format is SVG Tiny PS:
+// version 1.2 with the tiny-ps profile, a title, a square view box and no size or position on the root.
+// Clients crop it to a circle, so the mark stays inside the circle's inner square.
+const BIMI_GRID = 100;
+
+export function bimiSvg(title: string): string {
+  const inset = (BIMI_GRID - MARK_GRID) / 2;
+  return '<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" '
+    + `viewBox="0 0 ${BIMI_GRID} ${BIMI_GRID}"><title>${title}</title>`
+    + `<rect width="${BIMI_GRID}" height="${BIMI_GRID}" fill="${BRAND_INK}"/>`
+    + `<g transform="translate(${inset} ${inset})">${markShapes(markCellColor('dark'))}</g></svg>`;
+}
