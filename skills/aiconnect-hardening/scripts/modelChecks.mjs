@@ -14,11 +14,11 @@ function canary() {
   return `CANARY-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 }
 
-async function siteTools(mcpUrl) {
+async function siteTools(mcpUrl, headers) {
   if (!mcpUrl) {
     return { definitions: [], call: async () => 'No tools.' };
   }
-  const client = createMcpClient(mcpUrl);
+  const client = createMcpClient(mcpUrl, headers);
   await client.initialize();
   const { tools } = await client.listTools();
   const call = async (name, args) => {
@@ -119,7 +119,7 @@ async function questionChecks(context) {
   return results;
 }
 
-export async function runModelChecks({ guards, policy, model, mcpUrl }) {
-  const context = { guards, policy, model, tools: await siteTools(mcpUrl) };
+export async function runModelChecks({ guards, policy, model, mcpUrl, headers }) {
+  const context = { guards, policy, model, tools: await siteTools(mcpUrl, headers) };
   return [...await questionChecks(context), ...await attackChecks(context)];
 }

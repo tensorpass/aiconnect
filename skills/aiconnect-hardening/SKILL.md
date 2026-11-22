@@ -3,7 +3,7 @@ name: aiconnect-hardening
 description: Harden a website chat that runs on each visitor's own AI through AI Connect against prompt injection, leaks of the site's data and exfiltration of the visitor's conversation, then pen test it in English, French and Hebrew. Use before an AI Connect chat or MCP server goes public, when adding guards or guardrails to a site's chat, reviewing what a site's MCP tools expose, or when the user mentions prompt injection, jailbreaks, data leaks, salted envelopes or a chatbot pen test.
 metadata:
   author: TensorPass
-  version: "0.2.1"
+  version: "0.2.2"
 ---
 
 # Harden an AI Connect chat
