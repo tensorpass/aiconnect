@@ -3,7 +3,7 @@ name: aiconnect-auth
 description: Harden a website's login before its MCP server serves signed in or staff tools to the visitor's own AI through AI Connect, and move live users to it without logging them out. Covers access tokens kept in localStorage, refresh tokens stored in clear, never rotated or checked apart from their expiry, sessions with no revocation, roles trusted from the browser, cookies without SameSite and routes open to cross site posts, and how the MCP route reads the session for each level of tools. Use before adding tools on a visitor's own data or a back office to an AI Connect MCP server, when reviewing or fixing a site's login, sessions, JWT, refresh tokens, logout or roles, or when the user mentions session security, token storage, refresh rotation, CSRF or McpToolSource's fetch option.
 metadata:
   author: TensorPass
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # Harden a site's login for signed in tools
@@ -60,6 +60,11 @@ Each finding names its file and line, checked by reading the code path from the 
    tokens.
 8. **Roles from the server.** The middleware reads the role from the database or from a short lived token the server
    signed; the browser's copy of the user only draws the interface.
+9. **No session token in a response body.** The cookie's value never reaches the page in JSON. Better Auth 1.7 returns
+   it in `/get-session` (`session.token`) and in the body of each sign in route (`token`), which gives an injected
+   script the value of the httpOnly cookie. On a Better Auth site, return the session through the `customSession`
+   plugin without `token`, strip `token` from the sign in bodies in a `hooks.after` middleware
+   (`createAuthMiddleware`), keep the `bearer` plugin off, and test that no auth response body carries it.
 
 ## 3. Cookies, CSRF and CORS
 
@@ -139,6 +144,7 @@ use:
 8. `tools/list` returns the public tools to a signed out caller, the account tools to a signed in one and the staff
    tools to staff only.
 9. The database holds no clear token after the migration.
+10. No sign in or session response body carries the session token.
 
 ## Rules
 
