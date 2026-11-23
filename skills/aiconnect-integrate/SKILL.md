@@ -3,7 +3,7 @@ name: aiconnect-integrate
 description: Add AI Connect to a website so its AI features run on each visitor's own AI plan (ChatGPT, Claude, Gemini and others) through the AI Wallet browser extension, or on the visitor's OpenRouter or TensorPass account without it, with no API key on the server and no inference bill. Sets up the site's public TensorPass site key through the account MCP server at plan.tensorpass.app. Use when adding an AI chat, an AI mode or an assistant to a React, Next.js or plain JavaScript site with AI Connect, when moving a site that already uses the OpenAI SDK, the Anthropic SDK, Google Gen AI, the Vercel AI SDK, LangChain, LlamaIndex or Mastra onto the visitor's own AI, or when the user mentions AI Connect, AI Wallet, AiConnectProvider, AiChatPanel, AiChatPopup, AiChatInline, AiChatPage, AiSearch, aiconnect-chat, useAiChat, McpToolSource or aiconnect.fetch.
 metadata:
   author: TensorPass
-  version: "0.4.6"
+  version: "0.4.7"
 ---
 
 # Add AI Connect to a site
@@ -90,7 +90,7 @@ Read the project's `package.json`. If it depends on `openai`, `@anthropic-ai/sdk
    }
    ```
 
-   Every module takes `system`, `mcp` (or `tools`, a tool source built once outside render functions, such as `new McpToolSource('/api/mcp', 'My site', { fetch })` when the site's login is a bearer token the page must add to each request), `title`, `intro`, `placeholder`, `suggestions`, `toolLabels` (a plain name per tool) and `renderToolResults`, which draws a turn's tool results as the site's own cards. The panel, the popup and the full page also take `open`, `onOpenChange` and `hideLauncher`, for a site that opens them from a button of its own. The provider's `locale` (`en`, `fr`, `he`) sets their language. See `/docs/modules`.
+   Every module takes `system`, `mcp` (or `tools`, a tool source built once outside render functions, such as `new McpToolSource('/api/mcp', 'My site', { fetch })` when the site's login is a bearer token the page must add to each request), `title`, `intro`, `placeholder`, `suggestions`, `toolLabels` (a plain name per tool) and `renderToolResults`, which draws a turn's tool results as the site's own cards. The panel, the popup and the full page also take `open`, `onOpenChange` and `hideLauncher`, for a site that opens them from a button of its own. On a phone the panel and the popup take the whole screen and hold the page's scroll and position while they are open, and the full page mode does so on every screen, so the site adds no scroll lock of its own around them. The provider's `locale` (`en`, `fr`, `he`) sets their language. See `/docs/modules`.
 
 5. For an interface the modules do not cover, build it on `useAiChat` and `useAiConnect` instead.
 
@@ -148,7 +148,7 @@ Read the project's `package.json`. If it depends on `openai`, `@anthropic-ai/sdk
 Without React, load the modules as Web Components with one script tag, then write the elements where they go. Each element reads the tools from the site's MCP server.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@tensorpass/aiconnect-elements@0.1.5/dist/aiconnect-elements.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorpass/aiconnect-elements@0.1.6/dist/aiconnect-elements.js" defer></script>
 
 <aiconnect-chat variant="popup" mcp="/api/mcp"
   system="You recommend books from this site's catalog. Always search the catalog before recommending."
