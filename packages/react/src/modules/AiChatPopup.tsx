@@ -1,7 +1,7 @@
 // A floating button at the page's corner that opens a chat popup above it. The button shows the
 // wallet's wave mark and turns into a close mark while the popup is open. The popup sits in the
-// bottom right corner in left to right languages and in the bottom left in right to left ones, and
-// takes the whole screen on a phone.
+// bottom right corner in left to right languages and in the bottom left in right to left ones. On a
+// phone it takes the whole screen, and the page behind it holds its scroll while it is open.
 
 import { useAiConnect } from '../AiConnectProvider.tsx';
 import { ChatFrame } from './parts/ChatFrame.tsx';
@@ -17,7 +17,9 @@ export interface AiChatPopupProps extends AiModuleProps, AiOverlayProps {}
 export function AiChatPopup({ ref, ...props }: AiChatPopupProps) {
   const { moduleMessages } = useAiConnect();
   const chat = useModuleChat(props);
-  const { open, show, close, toggle, layerRef, fieldRef, launcherRef, titleId, layerId } = useOverlay(props);
+  const {
+    open, show, close, toggle, layerRef, fieldRef, launcherRef, titleId, layerId,
+  } = useOverlay(props, 'phone');
   useModuleHandle(ref, chat.ask, show);
   const label = props.launcherLabel ?? (open ? moduleMessages.closeChat : moduleMessages.openChat);
   return (

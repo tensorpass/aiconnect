@@ -2,7 +2,9 @@
    page's edge, in a popup over a floating button, and in a full page AI mode. The buttons that open
    them are in launchers.css. The panel and the popup sit at the end of the reading direction, on the
    right in left to right languages and on the left in right to left ones, and take the whole screen
-   on a phone. */
+   on a phone. A form that covers the screen sits on the visual viewport, the part of the page the
+   keyboard leaves visible, through --aic-viewport-top and --aic-viewport-height (pageLock.ts), and
+   fills the window where the browser has no visual viewport. */
 
 @keyframes aic-slide-in {
   from { opacity: 0; transform: translateX(var(--aic-m-slide)); }
@@ -86,7 +88,8 @@
 /* The full page AI mode: one column on the page's ground, the conversation in the middle. */
 .aic-page {
   position: fixed;
-  inset: 0;
+  inset: var(--aic-viewport-top, 0px) 0 auto;
+  height: var(--aic-viewport-height, 100%);
   z-index: var(--aic-layer);
   display: flex;
   justify-content: center;
@@ -193,12 +196,13 @@
   font-size: 17px;
 }
 
+/* The breakpoint is COVERS_SCREEN of mediaQuery.ts, under which the page behind is held. */
 @media (max-width: 640px) {
   .aic-panel,
   .aic-popup {
-    inset: 0;
+    inset: var(--aic-viewport-top, 0px) 0 auto;
     width: 100%;
-    height: 100%;
+    height: var(--aic-viewport-height, 100%);
     border: 0;
     border-radius: 0;
   }

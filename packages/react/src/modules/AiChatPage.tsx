@@ -9,16 +9,17 @@ import { moduleClass } from './parts/moduleClass.ts';
 import { useModuleChat } from './parts/useModuleChat.ts';
 import { useModuleHandle } from './parts/useModuleHandle.ts';
 import type { AiModuleProps, AiOverlayProps } from './types.ts';
-import { useFocusTrap, useOverlay, useScrollLock } from './useOverlay.ts';
+import { useFocusTrap, useOverlay } from './useOverlay.ts';
 
 export interface AiChatPageProps extends AiModuleProps, AiOverlayProps {}
 
 export function AiChatPage({ ref, ...props }: AiChatPageProps) {
   const { moduleMessages, isPickerOpen } = useAiConnect();
   const chat = useModuleChat(props);
-  const { open, show, close, toggle, layerRef, fieldRef, launcherRef, titleId, layerId } = useOverlay(props);
+  const {
+    open, show, close, toggle, layerRef, fieldRef, launcherRef, titleId, layerId,
+  } = useOverlay(props, 'always');
   useModuleHandle(ref, chat.ask, show);
-  useScrollLock(open);
   // The connect window opens over the page mode and keeps the focus while it is open.
   useFocusTrap(layerRef, open && !isPickerOpen);
   const title = props.title ?? moduleMessages.pageTitle;

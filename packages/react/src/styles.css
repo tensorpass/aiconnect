@@ -44,6 +44,8 @@
   width: min(var(--aic-width), 100%);
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
+  /* Reaching the end of the window's own scroll leaves the page where it is. */
+  overscroll-behavior: contain;
   padding: 8px 20px 18px;
   border: 1px solid var(--aic-border);
   border-radius: var(--aic-radius);

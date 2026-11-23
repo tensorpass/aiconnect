@@ -202,8 +202,10 @@
   line-height: 1.4;
   caret-color: var(--aic-cyan);
   resize: none;
-  /* The composer turns scrolling on once the text is taller than the box grows (Composer.tsx). */
+  /* The composer turns scrolling on once the text is taller than the box grows (Composer.tsx), and
+     reaching the end of that scroll leaves the conversation and the page where they are. */
   overflow-y: hidden;
+  overscroll-behavior: contain;
 }
 
 /* The question box and the search bar draw the focus on their own edge, so the field inside draws
