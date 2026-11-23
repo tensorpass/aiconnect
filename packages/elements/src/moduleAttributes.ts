@@ -1,14 +1,17 @@
 // Reads the attributes every element shares into the props of a module: the instructions, the MCP
-// server, the copy, the language and the guards. Lists, maps and the guards are written as JSON in
-// their attribute; one that does not parse is reported in the console and left out. The module's
+// server, the copy, the language, the guards and the attachments. Lists, maps, the guards and the
+// attachments are written as JSON in their attribute; one that does not parse is reported in the console
+// and left out. `attachments` alone, with no value, takes every kind with the default caps. The module's
 // heading is `heading`, since `title` would show as the browser's tooltip over the whole element.
 
 import type { GuardPolicy } from '@tensorpass/aiconnect';
+import type { AttachmentPolicy } from '@tensorpass/aiconnect/attachments';
 import { builtInModuleMessages } from '@tensorpass/aiconnect-react';
 import type { AiModuleProps, Locale } from '@tensorpass/aiconnect-react';
 
 export const SHARED_ATTRIBUTES = [
   'system', 'mcp', 'heading', 'intro', 'placeholder', 'suggestions', 'tool-labels', 'locale', 'guards',
+  'attachments',
 ];
 
 function jsonAttribute<T>(element: HTMLElement, name: string, valid: (value: unknown) => value is T): T | undefined {
@@ -64,6 +67,31 @@ const isGuardPolicy = (value: unknown): value is GuardPolicy => {
   });
 };
 
+const ATTACHMENT_SWITCHES = ['images', 'files', 'voice'];
+const ATTACHMENT_CAPS = ['maxBytes', 'maxFiles'];
+
+// The attachments in JSON: the fields of `AttachmentPolicy`.
+const isAttachmentPolicy = (value: unknown): value is AttachmentPolicy => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false;
+  }
+  return Object.entries(value).every(([name, field]) => {
+    if (ATTACHMENT_SWITCHES.includes(name)) {
+      return typeof field === 'boolean';
+    }
+    if (ATTACHMENT_CAPS.includes(name)) {
+      return Number.isInteger(field) && (field as number) > 0;
+    }
+    return name === 'accept' && isStringList(field);
+  });
+};
+
+function attachmentsOf(element: HTMLElement): AttachmentPolicy | undefined {
+  return element.getAttribute('attachments')?.trim() === ''
+    ? {}
+    : jsonAttribute(element, 'attachments', isAttachmentPolicy);
+}
+
 export function localeOf(element: HTMLElement): Locale {
   const locale = element.getAttribute('locale');
   if (locale === null) {
@@ -87,5 +115,6 @@ export function moduleProps(element: HTMLElement): Omit<AiModuleProps, 'tools'> 
     suggestions: jsonAttribute(element, 'suggestions', isStringList),
     toolLabels: jsonAttribute(element, 'tool-labels', isStringMap),
     guards: jsonAttribute(element, 'guards', isGuardPolicy),
+    attachments: attachmentsOf(element),
   };
 }

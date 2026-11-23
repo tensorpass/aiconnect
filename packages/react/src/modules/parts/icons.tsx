@@ -46,3 +46,28 @@ export const CheckIcon = () => <Stroke size={12} width={3}><path d="m5 12 5 5 9-
 
 // Points along the reading direction; the stylesheet mirrors it in right to left.
 export const ArrowIcon = () => <Stroke size={16} className="aic-arrow"><path d="M5 12h14M13 6l6 6-6 6" /></Stroke>;
+
+export const PaperclipIcon = () => (
+  <Stroke size={18}>
+    <path d="m20 11.5-7.8 7.8a5 5 0 0 1-7-7l8.4-8.4a3.3 3.3 0 0 1 4.7 4.7l-8.4 8.4a1.7 1.7 0 0 1-2.4-2.4l7.7-7.7" />
+  </Stroke>
+);
+
+export const MicIcon = () => (
+  <Stroke size={18}>
+    <rect x="9" y="3" width="6" height="11" rx="3" />
+    <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" />
+  </Stroke>
+);
+
+export const FileIcon = () => (
+  <Stroke size={18} width={1.8}>
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+    <path d="M14 3v5h5M9 13h6M9 17h4" />
+  </Stroke>
+);
+
+// Points back along the reading direction; the stylesheet mirrors it in right to left.
+export const BackIcon = () => <Stroke size={18} className="aic-arrow"><path d="m15 6-6 6 6 6" /></Stroke>;
+
+export const ForwardIcon = () => <Stroke size={18} className="aic-arrow"><path d="m9 6 6 6-6 6" /></Stroke>;

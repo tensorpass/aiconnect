@@ -8,7 +8,6 @@
 // pieces before that one already reached the page, and the visitor's browser holds the whole answer:
 // what must stay out of a visitor's reach is held back on the site's server (see `checkToolResult`).
 
-import { textOf } from './chatContent.ts';
 import { GuardStop } from './guards/chatGuard.ts';
 import type { ChatGuard } from './guards/chatGuard.ts';
 import type { AnswerStop } from './guards/policy.ts';
@@ -81,7 +80,7 @@ function startRun(options: ConversationOptions): ConversationRun {
   }
   guard.remember(options.messages);
   const question = options.messages.findLast((message) => message.role === 'user');
-  const verdict = question ? guard.checkQuestion(textOf(question.content)) : { ok: true as const };
+  const verdict = question ? guard.checkQuestion(question.content) : { ok: true as const };
   if (!verdict.ok) {
     throw new GuardStop('question', verdict.reason);
   }

@@ -21,7 +21,8 @@
       "default": "./dist/launcher.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./launchers.css": "./dist/launchers.css"
+    "./launchers.css": "./dist/launchers.css",
+    "./pcmWorklet.js": "./dist/modules/parts/dictation/pcmWorklet.js"
   },
   "files": [
     "dist",

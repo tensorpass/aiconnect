@@ -10,6 +10,9 @@
 @import './modules/styles/prompt.css';
 @import './modules/styles/forms.css';
 @import './modules/styles/search.css';
+@import './modules/styles/attachments.css';
+@import './modules/styles/dictation.css';
+@import './modules/styles/lightbox.css';
 @import './webAccounts.css';
 
 @keyframes aic-fade-in {

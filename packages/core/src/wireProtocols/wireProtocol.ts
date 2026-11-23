@@ -2,7 +2,8 @@
 // into the wallet's chat format, and writing the wallet's answer back the way the provider's own
 // servers write it, streamed or whole, with errors in the provider's shape.
 
-import type { ChatRequest, ChatResponse, ContentPart, JsonSchema } from '../types.ts';
+import { inlineData, isTextFile, PDF_TYPE } from '../chatContent.ts';
+import type { ChatRequest, ChatResponse, ContentPart, FilePart, JsonSchema } from '../types.ts';
 import { WalletRequestError } from '../walletProvider.ts';
 import type { EventWriter } from './eventStream.ts';
 import type { WalletAnswer } from './walletAnswer.ts';
@@ -56,7 +57,19 @@ export function unsupported(what: string): WalletRequestError {
   return new WalletRequestError(`AI Wallet does not take ${what}`, 400);
 }
 
-// A single text stays a string; images or several parts stay parts.
+// A file an SDK attached as a `data:` URL: a PDF or a text file, the files the chat format carries.
+export function filePart(url: string | undefined, name: string | undefined): FilePart {
+  const inline = url ? inlineData(url) : null;
+  if (!url || !inline) {
+    throw unsupported('files given by address or by id');
+  }
+  if (inline.mediaType !== PDF_TYPE && !isTextFile(inline.mediaType)) {
+    throw unsupported(`${inline.mediaType} files`);
+  }
+  return { type: 'file', url, name: name || 'attachment' };
+}
+
+// A single text stays a string; images, files or several parts stay parts.
 export function userContent(parts: ContentPart[]): string | ContentPart[] {
   return parts.length === 1 && parts[0].type === 'text' ? parts[0].text : parts;
 }

@@ -36,13 +36,20 @@ export interface Chunk {
   choices?: { delta?: { content?: string | null; tool_calls?: ToolCallDelta[] }; finish_reason?: string | null }[];
 }
 
-function wireContent(content: string | ContentPart[]) {
-  if (typeof content === 'string') {
-    return content;
+// Each part as OpenAI's chat completions write it. OpenRouter and the plan read a file part as OpenAI does.
+function wirePart(part: ContentPart): Record<string, unknown> {
+  switch (part.type) {
+    case 'text':
+      return { type: 'text', text: part.text };
+    case 'image':
+      return { type: 'image_url', image_url: { url: part.url } };
+    case 'file':
+      return { type: 'file', file: { filename: part.name, file_data: part.url } };
   }
-  return content.map((part) => (part.type === 'text'
-    ? { type: 'text', text: part.text }
-    : { type: 'image_url', image_url: { url: part.url } }));
+}
+
+function wireContent(content: string | ContentPart[]) {
+  return typeof content === 'string' ? content : content.map(wirePart);
 }
 
 function wireMessage(message: ChatMessage): Record<string, unknown> {

@@ -9,6 +9,7 @@
 // `fetch` lets the AI SDK a site already uses answer through the same connection.
 
 import type { ConnectionState } from './connectionState.ts';
+import type { Dictation } from './dictation.ts';
 import type { ChatRequest, ChatResponse, ProviderSession, WalletLink } from './types.ts';
 import { findWallet, WalletRequestError } from './walletProvider.ts';
 import type { ChatEvent, WalletChatParams, WalletProvider, WalletRefusal } from './walletProvider.ts';
@@ -85,6 +86,14 @@ function walletSession(wallet: WalletProvider, link: Extract<WalletLink, { conne
       return (await wallet.request('chat', params, chatListener(request), request.signal)) as ChatResponse;
     },
   };
+}
+
+// The wallet's dictation for the account that answers, when the account has a transcription service.
+function walletDictation(wallet: WalletProvider, link: Extract<WalletLink, { connected: true }>): Dictation | null {
+  if (!wallet.dictate || !link.dictation || link.dictation === 'none') {
+    return null;
+  }
+  return { mode: link.dictation, start: wallet.dictate.bind(wallet) };
 }
 
 export class AiConnect {
@@ -246,11 +255,14 @@ export class AiConnect {
       this.setState({ status: 'disconnected' });
       return;
     }
+    const dictation = walletDictation(wallet, link);
     this.setState({
       status: 'connected',
       providerName: link.providerName,
       model: link.model,
       session: walletSession(wallet, link),
+      ...(link.reads ? { reads: link.reads } : {}),
+      ...(dictation ? { dictation } : {}),
     });
   }
 

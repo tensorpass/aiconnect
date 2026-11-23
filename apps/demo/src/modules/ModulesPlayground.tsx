@@ -50,11 +50,17 @@ function Shelf({ copy }: { copy: ShopCopy }) {
   );
 }
 
-function ShopPage({ form, copy }: { form: PlaygroundSettings['form']; copy: ShopCopy }) {
+interface ShopPageProps {
+  form: PlaygroundSettings['form'];
+  copy: ShopCopy;
+  attachments: boolean;
+}
+
+function ShopPage({ form, copy, attachments }: ShopPageProps) {
   const renderToolResults = useMemo(() => bookResults(copy.pages), [copy]);
   const module = {
     system: SYSTEM, tools: demoTools, guards: GUARDS, intro: copy.intro, suggestions: copy.suggestions,
-    toolLabels: copy.toolLabels, renderToolResults,
+    toolLabels: copy.toolLabels, renderToolResults, ...(attachments ? { attachments: {} } : {}),
   };
   return (
     <>
@@ -89,7 +95,8 @@ export function ModulesPlayground({ client }: { client: AiConnect }) {
     <div className="shop">
       <AiConnectProvider client={client} locale={settings.lang}>
         <PlaygroundBar settings={settings} onChange={change} />
-        <ShopPage key={settings.form} form={settings.form} copy={SHOP_COPY[settings.lang]} />
+        <ShopPage key={settings.form} form={settings.form} copy={SHOP_COPY[settings.lang]}
+          attachments={settings.attachments} />
       </AiConnectProvider>
     </div>
   );

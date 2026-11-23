@@ -3,17 +3,22 @@
 // tool results can be shown as the site's own cards. `stop` ends the answer in the wallet too, and
 // the turn keeps the text streamed so far. Every conversation runs under its guards, tuned with
 // `guards`: a question or an answer they stop shows the site's safe answer in its place, and
-// `linkAllowed` tells the interface which links of an answer it may draw.
+// `linkAllowed` tells the interface which links of an answer it may draw. A question may carry the files
+// the visitor attached, which reach the model as the account that answers reads them.
 
 import { useCallback, useRef, useState } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 import { createChatGuard, GuardStop, runConversation } from '@tensorpass/aiconnect';
 import type {
-  ChatGuard, ChatMessage, ConnectionState, ConversationHooks, GuardPolicy, ProviderSession, ToolCall, ToolSource,
+  ChatGuard, ChatMessage, ConnectionState, ContentPart, ConversationHooks, GuardPolicy, ProviderSession, ToolCall,
+  ToolSource,
 } from '@tensorpass/aiconnect';
+import { partsForModel, UNKNOWN_READS } from '@tensorpass/aiconnect/attachments';
+import type { PreparedAttachment } from '@tensorpass/aiconnect/attachments';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { failedAnswerText } from './messages.ts';
 import type { ModuleMessages } from './messages.ts';
+import { withinRequestBudget } from './transcriptBudget.ts';
 
 export interface ToolActivity {
   call: ToolCall;
@@ -23,8 +28,18 @@ export interface ToolActivity {
   visible?: boolean;
 }
 
+// A question as the visitor sends it: the text they typed or dictated and the files they attached.
+export interface AskedQuestion {
+  text: string;
+  attachments: PreparedAttachment[];
+}
+
 export interface ChatTurn {
   question: string;
+  // The files the visitor attached to the question.
+  attachments?: PreparedAttachment[];
+  // The attached images and pages the answering model does not read, such as images for a text only model.
+  unread?: number;
   answer: string;
   tools: ToolActivity[];
   // The guard stopped the question before it left the page, or the answer as it came; `answer` then
@@ -86,7 +101,7 @@ async function answerQuestion({ session, tools, guard, transcript, asked, contro
     session,
     tools,
     guard,
-    messages: [...transcript.current, asked],
+    messages: withinRequestBudget([...transcript.current, asked]),
     signal: controller.signal,
     ...lastTurnHooks(setTurns, controller.signal, guard),
   });
@@ -135,17 +150,33 @@ interface SendContext {
   copy: ModuleMessages;
 }
 
+// The visitor's message: the text, then the attachments as the account that answers reads them.
+async function askedMessage(question: AskedQuestion, context: SendContext): Promise<ChatMessage> {
+  if (question.attachments.length === 0) {
+    return { role: 'user', content: question.text };
+  }
+  const { parts, unread } = await partsForModel(question.attachments, context.connection.reads ?? UNKNOWN_READS);
+  if (unread) {
+    context.setTurns((current) => updateLast(current, (turn) => ({ ...turn, unread })));
+  }
+  const text: ContentPart[] = question.text ? [{ type: 'text', text: question.text }] : [];
+  return { role: 'user', content: [...text, ...parts] };
+}
+
 // Sends one question and writes its outcome: the answer, the guard's safe answer, or the failure.
-async function sendQuestion(text: string, context: SendContext): Promise<void> {
+async function sendQuestion(question: AskedQuestion, context: SendContext): Promise<void> {
   const { connection, guard, tools, transcript, abort, setTurns, setFailure, setBusy, copy } = context;
   const controller = new AbortController();
   abort.current = controller;
   setBusy(true);
   setFailure(null);
-  setTurns((current) => [...current, { question: text, answer: '', tools: [] }]);
-  const run = { session: connection.session, tools, guard, transcript, controller, setTurns,
-    asked: { role: 'user', content: text } satisfies ChatMessage };
+  setTurns((current) => [...current, {
+    question: question.text, attachments: question.attachments, answer: '', tools: [],
+  }]);
+  const run: QuestionRun = { session: connection.session, tools, guard, transcript, controller, setTurns,
+    asked: { role: 'user', content: question.text } };
   try {
+    run.asked = await askedMessage(question, context);
     await answerQuestion(run);
   } catch (reason) {
     if (reason instanceof GuardStop) {
@@ -176,16 +207,17 @@ export function useAiChat({ system, tools, guards }: UseAiChatOptions) {
 
   // The session is read from the client when the question is sent, so a question kept while the
   // wallet connected the site goes out as soon as the client is connected.
-  const send = useCallback(async (question: string) => {
+  const send = useCallback(async (question: string | AskedQuestion) => {
     const connection = client.state;
-    const text = question.trim();
-    if (connection.status !== 'connected' || !text) {
+    const asked = typeof question === 'string' ? { text: question, attachments: [] } : question;
+    const text = asked.text.trim();
+    if (connection.status !== 'connected' || (!text && asked.attachments.length === 0)) {
       return;
     }
     activeGuard.current ??= createChatGuard(guards);
     setGuard(activeGuard.current);
-    await sendQuestion(text, { connection, guard: activeGuard.current, tools, transcript, abort, setTurns,
-      setFailure, setBusy, copy: moduleMessages });
+    await sendQuestion({ ...asked, text }, { connection, guard: activeGuard.current, tools, transcript, abort,
+      setTurns, setFailure, setBusy, copy: moduleMessages });
   }, [client, tools, guards, moduleMessages]);
 
   const stop = useCallback(() => abort.current?.abort(), []);
@@ -211,6 +243,8 @@ export function useAiChat({ system, tools, guards }: UseAiChatOptions) {
   return {
     turns, send, stop, reset, dropFailedTurn, busy, error: failure?.text ?? null, refusal: failure?.code ?? null,
     connected: state.status === 'connected',
+    reads: (state.status === 'connected' ? state.reads : undefined) ?? UNKNOWN_READS,
+    dictation: (state.status === 'connected' ? state.dictation : undefined) ?? null,
     linkAllowed: guard?.linkAllowed ?? NO_LINKS,
   };
 }

@@ -5,7 +5,7 @@ export { checkToolResult, leadsToSitePage, linkAllowed, validateAnswer } from '.
 export type { AnswerContext } from './answerGuard.ts';
 export { createChatGuard, GuardStop } from './chatGuard.ts';
 export type { ChatGuard } from './chatGuard.ts';
-export { newSalt, systemPrompt, toolResultEnvelope } from './envelopes.ts';
-export { DEFAULT_MAX_INPUT_LENGTH } from './policy.ts';
+export { attachmentEnvelope, newSalt, systemPrompt, toolResultEnvelope } from './envelopes.ts';
+export { DEFAULT_MAX_ATTACHMENT_TEXT, DEFAULT_MAX_INPUT_LENGTH } from './policy.ts';
 export type { AnswerStop, AnswerVerdict, GuardPolicy, QuestionStop, QuestionVerdict } from './policy.ts';
-export { INJECTION_PATTERNS, normalizeForMatching, validateQuestion } from './questionGuard.ts';
+export { INJECTION_PATTERNS, normalizeForMatching, validateContent, validateQuestion } from './questionGuard.ts';

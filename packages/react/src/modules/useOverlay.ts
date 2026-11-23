@@ -15,7 +15,8 @@ import type { AiOverlayProps } from './types.ts';
 // forms.css gives them the whole screen. On a wider screen the page beside them stays usable.
 export type OverlayCover = 'always' | 'phone';
 
-const FOCUSABLE = 'a[href], button:not([disabled]), textarea, input, [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE = 'a[href], button:not([disabled]):not([tabindex="-1"]), textarea, input:not([tabindex="-1"]), '
+  + '[tabindex]:not([tabindex="-1"])';
 
 export interface OverlayRefs {
   layerRef: RefObject<HTMLElement | null>;

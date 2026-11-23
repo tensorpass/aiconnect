@@ -1,0 +1,88 @@
+/* The dictation bar, which takes the question field's place while the visitor speaks: the words as the
+   transcription writes them, a live waveform from the microphone's level, the time spoken, Cancel and Done,
+   in the question box and in the search bar. */
+
+@keyframes aic-listen {
+  50% { box-shadow: 0 0 0 1px var(--aic-cyan), 0 0 0 6px var(--aic-cyan-faint); }
+}
+
+.aic-field[data-dictating] {
+  border-color: var(--aic-cyan);
+  animation: aic-listen 2.4s ease-in-out infinite;
+}
+
+.aic-dictation {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.aic-dictation-live {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+  min-height: 38px;
+  padding-block: 4px;
+}
+
+/* The newest words stay in sight; the older ones leave by the top. */
+.aic-dictation-words {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-height: 2.9em;
+  margin: 0;
+  overflow: hidden;
+  color: var(--aic-m-ink-2);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.aic-dictation-meter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aic-wave {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 2px;
+  height: 26px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.aic-wave i {
+  flex: 1;
+  max-width: 4px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--aic-cyan);
+  transform-origin: center;
+  transition: transform 90ms linear;
+}
+
+.aic-dictation-time {
+  flex: none;
+  color: var(--aic-muted);
+  font-family: var(--aic-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.aic-dictation[data-status='transcribing'] .aic-wave i {
+  background: var(--aic-cyan-soft);
+}
+
+.aic-search-bar[data-dictating] {
+  border-color: var(--aic-cyan);
+  animation: aic-listen 2.4s ease-in-out infinite;
+}

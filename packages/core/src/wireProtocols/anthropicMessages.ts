@@ -4,20 +4,21 @@
 // usage. `message_start` names the model of the account that answers, which the wallet tells
 // before the first text, and counts nothing yet, since the wallet reports usage once the answer ends.
 
-import { dataUrl, textOf } from '../chatContent.ts';
+import { dataUrl, encodeBase64Text, textOf } from '../chatContent.ts';
 import type {
   ChatMessage, ChatResponse, ContentPart, FinishReason, JsonSchema, ToolCall, ToolChoice, ToolDefinition, Usage,
 } from '../types.ts';
 import type { WalletRequestError } from '../walletProvider.ts';
 import type { EventWriter } from './eventStream.ts';
 import type { WalletAnswer } from './walletAnswer.ts';
-import { EMPTY_PARAMETERS, errorType, toolNameOf, unsupported, userContent } from './wireProtocol.ts';
+import { EMPTY_PARAMETERS, errorType, filePart, toolNameOf, unsupported, userContent } from './wireProtocol.ts';
 import type { AnswerContext, WireProtocol, WireRequest } from './wireProtocol.ts';
 
 interface WireBlock {
   type: string;
   text?: string;
   source?: { type: string; media_type?: string; data?: string; url?: string };
+  title?: string;
   id?: string;
   name?: string;
   input?: Record<string, unknown>;
@@ -83,12 +84,28 @@ function imageUrl(source: NonNullable<WireBlock['source']>): string {
   throw unsupported(`${source.type} image sources`);
 }
 
+// A document block: a PDF or a text file given as base64, or a text file given as its text.
+function documentPart(block: WireBlock): ContentPart {
+  const source = block.source;
+  if (source?.type === 'base64' && source.media_type && source.data) {
+    return filePart(dataUrl({ mediaType: source.media_type, data: source.data }), block.title);
+  }
+  if (source?.type === 'text' && typeof source.data === 'string') {
+    const mediaType = source.media_type ?? 'text/plain';
+    return filePart(dataUrl({ mediaType, data: encodeBase64Text(source.data) }), block.title);
+  }
+  throw unsupported(`${source?.type ?? 'untyped'} document sources`);
+}
+
 function partOf(block: WireBlock): ContentPart {
   if (block.type === 'text') {
     return { type: 'text', text: block.text ?? '' };
   }
   if (block.type === 'image' && block.source) {
     return { type: 'image', url: imageUrl(block.source) };
+  }
+  if (block.type === 'document') {
+    return documentPart(block);
   }
   throw unsupported(`${block.type} content`);
 }
@@ -97,7 +114,7 @@ function partOf(block: WireBlock): ContentPart {
 function resultText(block: WireBlock): string {
   const parts = blocksOf(block.content).map(partOf);
   if (parts.some((part) => part.type !== 'text')) {
-    throw unsupported('images inside tool results');
+    throw unsupported('images or files inside tool results');
   }
   return textOf(parts);
 }

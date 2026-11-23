@@ -2,6 +2,7 @@
 // The extension's page script runs before the site's code, so the wallet is there on load; the
 // announce event covers a script that runs later.
 
+import type { DictationStart } from './dictation.ts';
 import type { ChatMessage, ChatStart, GenerationOptions, ToolDefinition, WalletLink } from './types.ts';
 
 // What a site sends with a `chat` request.
@@ -49,6 +50,9 @@ export interface WalletProvider {
   ): Promise<unknown>;
   // Called when the visitor changes, in the wallet, the account or model this site answers with.
   onLink(listener: (link: WalletLink) => void): () => void;
+  // Transcribes the visitor's voice with the account that answers, when the link's `dictation` is `live`
+  // or `file`. A wallet older than dictation leaves it out.
+  dictate?: DictationStart;
 }
 
 // How long a page waits for the wallet to announce itself before concluding it is not installed.

@@ -18,6 +18,10 @@
       "types": "./dist/guards/index.d.ts",
       "default": "./dist/guards/index.js"
     },
+    "./attachments": {
+      "types": "./dist/attachments/index.d.ts",
+      "default": "./dist/attachments/index.js"
+    },
     "./callback": {
       "types": "./dist/callback.d.ts",
       "default": "./dist/callback.js"
@@ -36,7 +40,8 @@
     "build": "rm -rf dist tsconfig.tsbuildinfo tsconfig.cli.tsbuildinfo && tsc -b tsconfig.json tsconfig.cli.json"
   },
   "dependencies": {
-    "@modelcontextprotocol/client": "^2.4.0"
+    "@modelcontextprotocol/client": "^2.4.0",
+    "pdfjs-dist": "^6.5.438"
   },
   "devDependencies": {
     "@ai-sdk/anthropic": "^4.0.99",

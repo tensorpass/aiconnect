@@ -1,0 +1,286 @@
+/* The files of a question: the drop zone over a module, the chips of the files above the field and beside a
+   sent question, and the attach and microphone buttons. Everything reads the --aic-* tokens and the logical
+   sides, so a site's palette, the dark theme and right to left carry into each. The dictation bar is in
+   dictation.css and the lightbox in lightbox.css. */
+
+@keyframes aic-drop-in {
+  from { opacity: 0; transform: scale(0.985); }
+}
+
+@keyframes aic-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* The drop zone. The frame's wrapper draws no box of its own; the zone covers the module, which is the
+   positioned ancestor of every form. */
+.aic-drop-area {
+  display: contents;
+}
+
+.aic-inline {
+  position: relative;
+}
+
+.aic-drop {
+  position: absolute;
+  inset: 8px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 2px dashed var(--aic-cyan);
+  border-radius: calc(var(--aic-radius) - 6px);
+  background: color-mix(in srgb, var(--aic-surface) 90%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--aic-ink);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+  animation: aic-drop-in 160ms var(--aic-m-ease);
+}
+
+.aic-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--aic-halo);
+  color: var(--aic-focus);
+}
+
+.aic-drop[data-state='refused'] {
+  border-color: var(--aic-danger);
+}
+
+.aic-drop[data-state='refused'] .aic-drop-icon {
+  background: color-mix(in srgb, var(--aic-danger) 12%, var(--aic-surface));
+  color: var(--aic-danger);
+}
+
+/* The attach and microphone buttons, quiet beside the send button. */
+.aic-tool-button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 0 0 1px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--aic-muted);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.aic-tool-button:hover {
+  background: var(--aic-m-fill);
+  color: var(--aic-ink);
+}
+
+.aic-field {
+  flex-wrap: wrap;
+}
+
+.aic-field > .aic-attach {
+  margin-inline-start: -10px;
+}
+
+.aic-composer-note {
+  margin: 0 4px 8px;
+  color: var(--aic-danger);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* The chips of a question's files. */
+.aic-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aic-field > .aic-chips {
+  order: -1;
+  flex-basis: 100%;
+  padding-block: 6px 4px;
+}
+
+.aic-chips-note {
+  order: -1;
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--aic-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.aic-chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  max-width: 230px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--aic-border);
+  border-radius: 14px;
+  background: var(--aic-surface);
+  color: var(--aic-ink);
+}
+
+.aic-chip[data-kind='image'] {
+  width: 56px;
+}
+
+.aic-chip:not([data-kind='image']) {
+  padding-inline: 8px 14px;
+}
+
+.aic-chip[data-unread] {
+  border-style: dashed;
+  opacity: 0.55;
+}
+
+.aic-chip-open {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background: none;
+  cursor: zoom-in;
+}
+
+.aic-chip-thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 13px;
+  background: var(--aic-m-fill);
+  object-fit: cover;
+}
+
+.aic-chip-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--aic-halo);
+  color: var(--aic-focus);
+}
+
+.aic-chip-text {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.aic-chip-name {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aic-chip-size {
+  color: var(--aic-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.aic-chip-ring {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--aic-surface) 55%, transparent);
+}
+
+.aic-chip-ring::after {
+  content: '';
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--aic-cyan-faint);
+  border-block-start-color: var(--aic-cyan);
+  border-radius: 50%;
+  animation: aic-spin 800ms linear infinite;
+}
+
+.aic-chip-remove {
+  position: absolute;
+  inset-block-start: -7px;
+  inset-inline-end: -7px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid var(--aic-surface);
+  border-radius: 50%;
+  background: var(--aic-accent);
+  color: var(--aic-accent-ink);
+  cursor: pointer;
+}
+
+.aic-chip-remove svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 3;
+}
+
+/* A sent question's files sit above its text, on the visitor's side. */
+.aic-question-chips {
+  justify-self: end;
+  justify-content: flex-end;
+  max-width: 86%;
+}
+
+.aic-question-chips .aic-chip[data-kind='image'] {
+  width: 96px;
+  height: 96px;
+  transition: transform 200ms var(--aic-m-ease), box-shadow 200ms var(--aic-m-ease);
+}
+
+.aic-question-chips .aic-chip[data-kind='image']:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--aic-m-lift);
+}
+
+.aic-unread {
+  justify-self: end;
+  max-width: 86%;
+  margin: 0;
+  color: var(--aic-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+  .aic-chip {
+    max-width: 180px;
+  }
+
+  .aic-question-chips .aic-chip[data-kind='image'] {
+    width: 80px;
+    height: 80px;
+  }
+}

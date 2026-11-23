@@ -1,14 +1,15 @@
 // The conversation a module runs: the chat on the visitor's AI with the site's tools, plus the
-// question a visitor asks before their AI is connected. That question opens the connect window and
-// stays on screen; it goes out on its own once the wallet connects the site or the visitor signs in on
-// the page, and stays with the connection step while a sign in waits. Signing out of a web account
-// starts the conversation again from the connection step.
+// question a visitor asks before their AI is connected, with its attachments. That question opens the
+// connect window and stays on screen; it goes out on its own once the wallet connects the site or the
+// visitor signs in on the page, and stays with the connection step while a sign in waits. Signing out of a
+// web account starts the conversation again from the connection step.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { McpToolSource } from '@tensorpass/aiconnect';
 import type { ConnectionState, GuardPolicy, ToolSource } from '@tensorpass/aiconnect';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { useAiChat } from '../../useAiChat.ts';
+import type { AskedQuestion } from '../../useAiChat.ts';
 
 export interface ModuleChatOptions {
   system: string;
@@ -40,13 +41,13 @@ const READY_TO_CONNECT = new Set<ConnectionState['status']>(['disconnected', 'er
 // Keeps the question asked before the connection and sends it once the site is connected. Asking is
 // the visitor's one action: it asks the wallet to connect at once, or as soon as the first wallet
 // check ends, and without the wallet the module's own install step shows with the question kept.
-function usePendingQuestion(send: (question: string) => Promise<void>) {
+function usePendingQuestion(send: (question: AskedQuestion) => Promise<void>) {
   const { client } = useAiConnect();
-  const pending = useRef<string | null>(null);
+  const pending = useRef<AskedQuestion | null>(null);
   const connectAfterCheck = useRef(false);
-  const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
+  const [pendingQuestion, setPendingQuestion] = useState<AskedQuestion | null>(null);
 
-  const keep = useCallback((question: string | null) => {
+  const keep = useCallback((question: AskedQuestion | null) => {
     pending.current = question;
     setPendingQuestion(question);
   }, []);
@@ -66,17 +67,17 @@ function usePendingQuestion(send: (question: string) => Promise<void>) {
     }
   }), [client, keep, send]);
 
-  const ask = useCallback((question: string) => {
-    const text = question.trim();
-    if (!text) {
+  const ask = useCallback((question: string, attachments: AskedQuestion['attachments'] = []) => {
+    const asked = { text: question.trim(), attachments };
+    if (!asked.text && attachments.length === 0) {
       return;
     }
     const { status } = client.state;
     if (status === 'connected') {
-      void send(text);
+      void send(asked);
       return;
     }
-    keep(text);
+    keep(asked);
     if (READY_TO_CONNECT.has(status)) {
       void client.connect();
     } else if (status === 'checking') {
@@ -129,7 +130,7 @@ export function useModuleChat({ system, tools, mcp, guards }: ModuleChatOptions)
     const last = turns.at(-1);
     if (last) {
       dropFailedTurn();
-      ask(last.question);
+      ask(last.question, last.attachments);
     }
   }, [turns, ask, dropFailedTurn]);
 

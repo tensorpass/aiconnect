@@ -3,10 +3,18 @@
 // under the chat's guards, the site's tools read from its MCP server, and the `fetch` that lets the AI SDK a
 // site already uses answer through the same connection.
 
-export { contentParts, dataUrl, inlineData, textOf } from './chatContent.ts';
+export type { AttachmentPolicy } from './attachments/attachmentPolicy.ts';
+export {
+  attachedText, contentParts, dataUrl, decodeBase64Text, encodeBase64Text, fileText, inlineData, isTextFile, PDF_TYPE,
+  textOf,
+} from './chatContent.ts';
 export type { InlineData } from './chatContent.ts';
 export { AiConnect } from './client.ts';
 export type { AiConnectOptions, ConnectionState, SdkOptions, WebSignInFailure } from './client.ts';
+export { DICTATION_SAMPLE_RATE } from './dictation.ts';
+export type {
+  Dictation, DictationEvent, DictationRequest, DictationSession, DictationStart,
+} from './dictation.ts';
 export * from './guards/index.ts';
 export { McpToolSource } from './mcpToolSource.ts';
 export type { McpFetch, McpToolSourceOptions } from './mcpToolSource.ts';

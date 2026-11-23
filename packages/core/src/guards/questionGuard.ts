@@ -2,9 +2,13 @@
 // on long base64 blobs, and injection patterns in English, French and Hebrew. Up to three words may sit
 // between a verb and its object, so "ignore all of the previous instructions" trips the same pattern as
 // "ignore instructions". The patterns also read the question with invisible characters removed and
-// digits used as letters read as letters, so "1gn0r3 y0ur rul3s" reads "ignore your rules".
+// digits used as letters read as letters, so "1gn0r3 y0ur rul3s" reads "ignore your rules". The text of
+// the files the visitor attached has its own length cap and meets the same patterns; the base64 block
+// reads only what the visitor typed, since a CSV or a JSON file holds long tokens of its own.
 
-import { DEFAULT_MAX_INPUT_LENGTH } from './policy.ts';
+import { attachedText, contentParts, textOf } from '../chatContent.ts';
+import type { ContentPart } from '../types.ts';
+import { DEFAULT_MAX_ATTACHMENT_TEXT, DEFAULT_MAX_INPUT_LENGTH } from './policy.ts';
 import type { GuardPolicy, QuestionVerdict } from './policy.ts';
 
 export interface InjectionPattern {
@@ -26,7 +30,7 @@ export const INJECTION_PATTERNS: InjectionPattern[] = [
   { name: 'ask-instructions', re: /\b(?:what\s+are\s+your(?:\s+\S+){0,2}\s+(?:instructions?|rules?|prompts?)|quelles\s+sont\s+tes\s+(?:instructions|consignes|règles))/i },
   { name: 'jailbreak-dan', re: /\bDAN\b/ },
   { name: 'jailbreak-persona', re: /\b(?:developer\s+mode|jailbreak|no\s+restrictions?|mode\s+développeur|sans\s+(?:aucune\s+)?restrictions?)\b/i },
-  { name: 'tag-spoof', re: /<\/?\s*(?:instructions?|system|tool-result|steering)\b[^>]*>/i },
+  { name: 'tag-spoof', re: /<\/?\s*(?:instructions?|system|tool-result|attachment|steering)\b[^>]*>/i },
   { name: 'he-ignore-instructions', re: /(?:התעלם|התעלמי|התעלמו|תתעלם|שכח|שכחי|תשכח)\S*(?:\s+\S+){0,4}?\s+\S*(?:הוראות|הנחיות|כללים|פרומפט)/u },
   { name: 'he-reveal-prompt', re: /(?:הצג|תציג|הראה|תראה|חשוף|תחשוף|הדפס|תדפיס|כתוב|תכתוב)\S*(?:\s+\S+){0,3}?\s+\S*(?:הוראות|הנחיות|פרומפט)\S*\s+(?:שלך|שלכם|המערכת|מערכת)/u },
   { name: 'he-persona', re: /(?:מעכשיו\s+אתה|אתה\s+מעכשיו|תעמיד\s+פנים|העמד\s+פנים|תתנהג\s+כמו|מצב\s+מפתח|ללא\s+הגבלות|בלי\s+הגבלות)/u },
@@ -57,7 +61,40 @@ export function validateQuestion(raw: string, policy: GuardPolicy = {}): Questio
   if (BASE64_BLOB.test(question)) {
     return { ok: false, reason: 'injection', pattern: 'base64-blob' };
   }
-  const normalized = normalizeForMatching(question);
-  const hit = INJECTION_PATTERNS.find(({ re }) => re.test(question) || re.test(normalized));
+  return matchInjection(question);
+}
+
+function matchInjection(text: string): QuestionVerdict {
+  const normalized = normalizeForMatching(text);
+  const hit = INJECTION_PATTERNS.find(({ re }) => re.test(text) || re.test(normalized));
   return hit ? { ok: false, reason: 'injection', pattern: hit.name } : { ok: true };
+}
+
+function validateAttachedText(texts: string[], policy: GuardPolicy): QuestionVerdict {
+  const length = texts.reduce((total, text) => total + text.length, 0);
+  if (length > (policy.maxAttachmentText ?? DEFAULT_MAX_ATTACHMENT_TEXT)) {
+    return { ok: false, reason: 'too-long' };
+  }
+  for (const text of texts) {
+    const verdict = matchInjection(text);
+    if (!verdict.ok) {
+      return verdict;
+    }
+  }
+  return { ok: true };
+}
+
+// A question with its attachments: the typed text under `validateQuestion`, and the attached text under
+// its own cap and the injection patterns. An image or a file alone makes a question.
+export function validateContent(content: string | ContentPart[], policy: GuardPolicy = {}): QuestionVerdict {
+  const parts = contentParts(content);
+  const typed = textOf(parts);
+  const attached = parts.some((part) => part.type !== 'text');
+  if (typed.trim() || !attached) {
+    const verdict = validateQuestion(typed, policy);
+    if (!verdict.ok) {
+      return verdict;
+    }
+  }
+  return validateAttachedText(attachedText(parts), policy);
 }

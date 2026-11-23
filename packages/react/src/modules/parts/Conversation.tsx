@@ -1,6 +1,6 @@
 // The conversation of a chat module. Empty, it shows its heading, the connection step and the
 // suggested questions, under the wallet's ring in the full page mode. Then each turn shows the
-// visitor's question, the site's tools as they run, the answer as it streams and the site's own
+// visitor's question with its files, the site's tools as they run, the answer as it streams and the site's own
 // result cards, and the last answer's error comes with a way to ask again, or, for a TensorPass account
 // without a plan, the offer to subscribe. The view follows the answer down while the visitor stays at the
 // bottom.
@@ -9,9 +9,11 @@ import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { ConnectRing } from '../../ConnectRing.tsx';
+import type { PreparedAttachment } from '@tensorpass/aiconnect/attachments';
 import type { ChatTurn } from '../../useAiChat.ts';
 import type { AiModuleProps } from '../types.ts';
 import { AnswerText } from './AnswerText.tsx';
+import { QuestionAttachments } from './attachments/AttachmentRows.tsx';
 import { ConnectStep } from './ConnectStep.tsx';
 import { PlanOffer } from './PlanOffer.tsx';
 import { useActionAttribute } from './moduleAnalytics.ts';
@@ -35,12 +37,30 @@ const PLAN_INACTIVE = 'plan_inactive';
 // How close to the bottom, in pixels, the visitor counts as following the answer.
 const FOLLOW_DISTANCE = 56;
 
-function Question({ text }: { text: string }) {
-  const { moduleMessages } = useAiConnect();
+interface QuestionProps {
+  text: string;
+  attachments?: PreparedAttachment[];
+  // The images and pages the answering model did not read.
+  unread?: number;
+}
+
+function Question({ text, attachments, unread }: QuestionProps) {
+  const { moduleMessages, state } = useAiConnect();
+  const account = state.status === 'connected' ? state.providerName : '';
   return (
-    <p className="aic-question">
-      <span className="aic-visually-hidden">{moduleMessages.question}: </span>{text}
-    </p>
+    <>
+      {attachments?.length ? <QuestionAttachments attachments={attachments} /> : null}
+      {text ? (
+        <p className="aic-question" dir="auto">
+          <span className="aic-visually-hidden">{moduleMessages.question}: </span>{text}
+        </p>
+      ) : null}
+      {unread ? (
+        <p className="aic-unread">
+          {moduleMessages.unreadPages.replaceAll('{count}', String(unread)).replaceAll('{account}', account)}
+        </p>
+      ) : null}
+    </>
   );
 }
 
@@ -129,13 +149,16 @@ export function Conversation({ chat, intro, suggestions, ...view }: Conversation
       <ol className="aic-turns">
         {chat.turns.map((turn, index) => (
           <li key={index} className="aic-turn">
-            <Question text={turn.question} />
+            <Question text={turn.question} attachments={turn.attachments} unread={turn.unread} />
             <TurnBody turn={turn} view={view} stopped={chat.stopped.includes(index)} linkAllowed={chat.linkAllowed}
               live={chat.busy && index === chat.turns.length - 1} />
           </li>
         ))}
         {chat.pendingQuestion ? (
-          <li className="aic-turn"><Question text={chat.pendingQuestion} /><ConnectStep pending /></li>
+          <li className="aic-turn">
+            <Question text={chat.pendingQuestion.text} attachments={chat.pendingQuestion.attachments} />
+            <ConnectStep pending />
+          </li>
         ) : null}
       </ol>
       {chat.refusal === PLAN_INACTIVE ? <PlanOffer onActive={chat.retry} /> : null}

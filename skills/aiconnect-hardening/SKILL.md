@@ -3,7 +3,7 @@ name: aiconnect-hardening
 description: Harden a website chat that runs on each visitor's own AI through AI Connect against prompt injection, leaks of the site's data and exfiltration of the visitor's conversation, then pen test it in English, French and Hebrew. Use before an AI Connect chat or MCP server goes public, when adding guards or guardrails to a site's chat, reviewing what a site's MCP tools expose, or when the user mentions prompt injection, jailbreaks, data leaks, salted envelopes or a chatbot pen test.
 metadata:
   author: TensorPass
-  version: "0.2.2"
+  version: "0.2.3"
 ---
 
 # Harden an AI Connect chat
@@ -58,7 +58,7 @@ return checkToolResult(result, chatPolicy).ok ? text(result) : text('This result
 
 `AiChatPanel`, `AiChatPopup`, `AiChatInline`, `AiChatPage`, `AiSearch`, the Web Components and `useAiChat` run every guard on every conversation, with no setup:
 
-- **Salted envelopes.** A random salt drawn for each conversation closes `<instructions-SALT>` around the site's instructions and `<tool-result-SALT>` around every tool result. Text planted in the site's content does not know the salt, so it cannot close the envelope and pose as the site's instructions.
+- **Salted envelopes.** A random salt drawn for each conversation closes `<instructions-SALT>` around the site's instructions, `<tool-result-SALT>` around every tool result and `<attachment-SALT name="...">` around every text file the visitor attaches. Text planted in the site's content or in a file does not know the salt, so it cannot close the envelope and pose as the site's instructions.
 - **The question guard** runs before a question leaves the page. A stopped question never reaches the model, and the site's safe answer shows in its place.
 - **The answer guard** runs at each piece the model streams. From the first piece that trips it, the text stops reaching the page, the model's answer is cut in the wallet, and the safe answer replaces what showed. The transcript keeps the safe answer, so the next question never reads the stopped text.
 - **The drawing.** The modules never draw an image, and draw a link only when the guards allow it.
@@ -82,7 +82,7 @@ A page without React sets the same values as JSON on the element, each pattern w
 
 | Guard | Stops |
 | --- | --- |
-| Question | Questions over `maxInputLength` (2,000 characters by default), long base64 blobs, and 18 injection patterns in English, French and Hebrew: ignore or forget the instructions, `system:`, new instructions, role and persona changes, requests for the prompt, spoofed envelope tags. Up to three words may sit between the verb and its object, and the patterns also read the question with invisible characters removed and digits used as letters read as letters. |
+| Question | Questions over `maxInputLength` (2,000 characters by default), attached text over `maxAttachmentText` (200,000), long base64 blobs in the typed text, and 18 injection patterns, on the typed text and on every attached text file in English, French and Hebrew: ignore or forget the instructions, `system:`, new instructions, role and persona changes, requests for the prompt, spoofed envelope tags. Up to three words may sit between the verb and its object, and the patterns also read the question with invisible characters removed and digits used as letters read as letters. |
 | Answer | An envelope tag or the salt; any image; a link outside the page's origin, `allowedLinkHosts` and the addresses the tools returned as fields; an email address the visitor never typed, the tools never returned as a field and `allowedEmails` does not list; a match of `denyPatterns` or `withholdPatterns`. |
 
 ## 4. The policy

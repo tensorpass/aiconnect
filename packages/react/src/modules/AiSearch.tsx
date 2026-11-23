@@ -1,5 +1,5 @@
-// A search bar that answers. The visitor types a question in the site's search bar, and the answer
-// streams in a card under it, with the tools it ran, the site's own result cards and the account
+// A search bar that answers. The visitor types or dictates a question in the site's search bar, and the
+// answer streams in a card under it, with the tools it ran, the site's own result cards and the account
 // that answers. Each search starts a new conversation; Escape or the bar's clear button empties the
 // bar and the answer.
 
@@ -8,6 +8,9 @@ import type { FormEvent, KeyboardEvent } from 'react';
 import { useAiConnect } from '../AiConnectProvider.tsx';
 import { AccountBadge } from './parts/AccountBadge.tsx';
 import { StopButton } from './parts/Composer.tsx';
+import { DictationBar } from './parts/dictation/DictationBar.tsx';
+import { MicButton, useVoiceAvailable } from './parts/dictation/MicButton.tsx';
+import { useDictation } from './parts/dictation/useDictation.ts';
 import { ConnectStep } from './parts/ConnectStep.tsx';
 import { Suggestions, TurnBody } from './parts/Conversation.tsx';
 import type { TurnView } from './parts/Conversation.tsx';
@@ -81,19 +84,32 @@ type SearchBarProps = Pick<AiSearchProps, 'placeholder' | 'analytics'> & {
   bar: ReturnType<typeof useSearchBar>;
   chat: ModuleChat;
   started: boolean;
+  voice: boolean;
 };
 
 // The field with its buttons: clear once there is something to clear, which hands the field back
 // for the next question, then send, or Stop while the answer streams.
-function SearchBar({ bar, chat, started, placeholder, analytics }: SearchBarProps) {
+function SearchBar({ bar, chat, started, placeholder, analytics, voice }: SearchBarProps) {
   const { moduleMessages } = useAiConnect();
   const inputId = useId();
   const input = useRef<HTMLInputElement>(null);
   const sendTracking = analytics ? { 'data-analytics': `${analytics}-send` } : {};
+  const dictation = useDictation(chat.dictation, (words) => {
+    bar.setText((current) => [current.trimEnd(), words].filter(Boolean).join(' '));
+    input.current?.focus();
+  });
+  const voiceOn = useVoiceAvailable(chat.dictation, voice);
   const clear = () => {
     bar.clear();
     input.current?.focus();
   };
+  if (dictation.status !== 'idle') {
+    return (
+      <form className="aic-search-bar" role="search" data-dictating onSubmit={(event) => event.preventDefault()}>
+        <DictationBar dictation={dictation} />
+      </form>
+    );
+  }
   return (
     <form className="aic-search-bar" role="search" onSubmit={bar.onSubmit}>
       <label htmlFor={inputId} className="aic-visually-hidden">{moduleMessages.searchLabel}</label>
@@ -106,6 +122,7 @@ function SearchBar({ bar, chat, started, placeholder, analytics }: SearchBarProp
           <CloseIcon />
         </button>
       ) : null}
+      {voiceOn && !chat.busy ? <MicButton onClick={() => void dictation.start()} /> : null}
       {chat.busy ? <StopButton onStop={chat.stop} /> : (
         <button type="submit" className="aic-send" disabled={!bar.text.trim()} aria-label={moduleMessages.send}
           {...sendTracking}>
@@ -126,7 +143,7 @@ export function AiSearch({ ref, ...props }: AiSearchProps) {
     <ModuleAnalytics.Provider value={props.analytics}>
       <div className={moduleClass('search', props.className)} dir={moduleMessages.dir}>
         <SearchBar bar={bar} chat={chat} started={started} placeholder={props.placeholder}
-          analytics={props.analytics} />
+          analytics={props.analytics} voice={Boolean(props.attachments) && props.attachments?.voice !== false} />
         {started ? (
           <SearchResult chat={chat} toolLabels={props.toolLabels} renderToolResults={props.renderToolResults} />
         ) : <Suggestions items={props.suggestions} onPick={bar.search} />}

@@ -3,7 +3,7 @@ name: aiconnect-integrate
 description: Add AI Connect to a website so its AI features run on each visitor's own AI plan (ChatGPT, Claude, Gemini and others) through the AI Wallet browser extension, or on the visitor's OpenRouter or TensorPass account without it, with no API key on the server and no inference bill. Sets up the site's public TensorPass site key through the account MCP server at plan.tensorpass.app. Use when adding an AI chat, an AI mode or an assistant to a React, Next.js or plain JavaScript site with AI Connect, when moving a site that already uses the OpenAI SDK, the Anthropic SDK, Google Gen AI, the Vercel AI SDK, LangChain, LlamaIndex or Mastra onto the visitor's own AI, or when the user mentions AI Connect, AI Wallet, AiConnectProvider, AiChatPanel, AiChatPopup, AiChatInline, AiChatPage, AiSearch, aiconnect-chat, useAiChat, McpToolSource or aiconnect.fetch.
 metadata:
   author: TensorPass
-  version: "0.4.7"
+  version: "0.4.8"
 ---
 
 # Add AI Connect to a site
@@ -90,7 +90,7 @@ Read the project's `package.json`. If it depends on `openai`, `@anthropic-ai/sdk
    }
    ```
 
-   Every module takes `system`, `mcp` (or `tools`, a tool source built once outside render functions, such as `new McpToolSource('/api/mcp', 'My site', { fetch })` when the site's login is a bearer token the page must add to each request), `title`, `intro`, `placeholder`, `suggestions`, `toolLabels` (a plain name per tool) and `renderToolResults`, which draws a turn's tool results as the site's own cards. The panel, the popup and the full page also take `open`, `onOpenChange` and `hideLauncher`, for a site that opens them from a button of its own. On a phone the panel and the popup take the whole screen and hold the page's scroll and position while they are open, and the full page mode does so on every screen, so the site adds no scroll lock of its own around them. The provider's `locale` (`en`, `fr`, `he`) sets their language. See `/docs/modules`.
+   Every module takes `system`, `mcp` (or `tools`, a tool source built once outside render functions, such as `new McpToolSource('/api/mcp', 'My site', { fetch })` when the site's login is a bearer token the page must add to each request), `title`, `intro`, `placeholder`, `suggestions`, `toolLabels` (a plain name per tool), `renderToolResults`, which draws a turn's tool results as the site's own cards, and `attachments`, which lets the visitor drop, paste or attach images, PDFs and text files and dictate a question (`attachments={{}}` takes every kind; see `/docs/modules/attachments`). The panel, the popup and the full page also take `open`, `onOpenChange` and `hideLauncher`, for a site that opens them from a button of its own. On a phone the panel and the popup take the whole screen and hold the page's scroll and position while they are open, and the full page mode does so on every screen, so the site adds no scroll lock of its own around them. The provider's `locale` (`en`, `fr`, `he`) sets their language. See `/docs/modules`.
 
 5. For an interface the modules do not cover, build it on `useAiChat` and `useAiConnect` instead.
 
@@ -156,7 +156,7 @@ Without React, load the modules as Web Components with one script tag, then writ
 <aiconnect-search mcp="/api/mcp" system="You answer questions about this site's catalog."></aiconnect-search>
 ```
 
-`<aiconnect-chat>` takes `variant` (`inline`, `panel`, `popup` or `page`), and both elements take `system`, `mcp`, `heading`, `intro`, `placeholder`, `suggestions` and `tool-labels` (JSON), and `locale`. The script is `dist/aiconnect-elements.js` of the npm package `@tensorpass/aiconnect-elements`, served by jsDelivr as above, or hosted with the site's files next to its source map. See `/docs/modules/web-components`.
+`<aiconnect-chat>` takes `variant` (`inline`, `panel`, `popup` or `page`), and both elements take `system`, `mcp`, `heading`, `intro`, `placeholder`, `suggestions` and `tool-labels` (JSON), `locale`, and `attachments` (alone for every kind, or the policy in JSON). A page that takes attachments serves `aiconnect-pdf.js` and `aiconnect-pcm-worklet.js` beside the elements script. The script is `dist/aiconnect-elements.js` of the npm package `@tensorpass/aiconnect-elements`, served by jsDelivr as above, or hosted with the site's files next to its source map. See `/docs/modules/web-components`.
 
 For an interface of its own, use the client directly: `client.subscribe(listener)` for the state, `client.connect()` to ask the wallet, and `runConversation` from `@tensorpass/aiconnect` to run the tool loop. See `/docs/quickstart/javascript`.
 

@@ -4,6 +4,8 @@
 export interface GuardPolicy {
   // The longest question a visitor may send, in characters.
   maxInputLength?: number;
+  // The longest text the files of one question may hold together, in characters.
+  maxAttachmentText?: number;
   // What the chat answers about, such as "the restaurants of this site". The model redirects any other
   // question.
   scope?: string;
@@ -28,6 +30,8 @@ export interface GuardPolicy {
 }
 
 export const DEFAULT_MAX_INPUT_LENGTH = 2000;
+
+export const DEFAULT_MAX_ATTACHMENT_TEXT = 200_000;
 
 // Why a guard stopped a question.
 export type QuestionStop = 'empty' | 'too-long' | 'injection';

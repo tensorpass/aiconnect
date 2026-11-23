@@ -11,13 +11,13 @@ import type {
 import { WalletRequestError } from '../walletProvider.ts';
 import type { EventWriter } from './eventStream.ts';
 import type { WalletAnswer } from './walletAnswer.ts';
-import { EMPTY_PARAMETERS, unsupported, userContent } from './wireProtocol.ts';
+import { EMPTY_PARAMETERS, filePart, unsupported, userContent } from './wireProtocol.ts';
 import type { AnswerContext, WireProtocol, WireRequest } from './wireProtocol.ts';
 
 interface WirePart {
   text?: string;
   thought?: boolean;
-  inlineData?: { mimeType: string; data: string };
+  inlineData?: { mimeType: string; data: string; displayName?: string };
   fileData?: { mimeType?: string; fileUri: string };
   functionCall?: { id?: string; name: string; args?: Record<string, unknown> };
   functionResponse?: { id?: string; name: string; response?: unknown };
@@ -104,11 +104,15 @@ function jsonSchemaOf(schema: JsonSchema): JsonSchema {
   return converted;
 }
 
-function mediaPart(mimeType: string | undefined, url: string): ContentPart {
-  if (!mimeType?.startsWith('image/')) {
-    throw unsupported(`${mimeType ?? 'untyped'} files`);
+// An image, or a PDF or a text file given inline. A file Gemini fetches by its address is an image.
+function mediaPart(mimeType: string | undefined, url: string, name?: string): ContentPart {
+  if (mimeType?.startsWith('image/')) {
+    return { type: 'image', url };
   }
-  return { type: 'image', url };
+  if (url.startsWith('data:')) {
+    return filePart(url, name);
+  }
+  throw unsupported(`${mimeType ?? 'untyped'} files`);
 }
 
 function partOf(part: WirePart): ContentPart {
@@ -116,8 +120,8 @@ function partOf(part: WirePart): ContentPart {
     return { type: 'text', text: part.text };
   }
   if (part.inlineData) {
-    const { mimeType, data } = part.inlineData;
-    return mediaPart(mimeType, `data:${mimeType};base64,${data}`);
+    const { mimeType, data, displayName } = part.inlineData;
+    return mediaPart(mimeType, `data:${mimeType};base64,${data}`, displayName);
   }
   if (part.fileData) {
     return mediaPart(part.fileData.mimeType, part.fileData.fileUri);

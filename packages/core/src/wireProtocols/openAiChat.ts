@@ -11,7 +11,7 @@ import type { WalletRequestError } from '../walletProvider.ts';
 import type { EventWriter } from './eventStream.ts';
 import type { WalletAnswer } from './walletAnswer.ts';
 import {
-  EMPTY_PARAMETERS, errorType, parseToolArguments, toolNameOf, unsupported, userContent,
+  EMPTY_PARAMETERS, errorType, filePart, parseToolArguments, toolNameOf, unsupported, userContent,
 } from './wireProtocol.ts';
 import type { AnswerContext, WireProtocol, WireRequest } from './wireProtocol.ts';
 
@@ -20,6 +20,7 @@ interface WirePart {
   text?: string;
   refusal?: string;
   image_url?: string | { url: string };
+  file?: { file_data?: string; filename?: string; file_id?: string };
 }
 
 interface WireToolCall {
@@ -75,6 +76,9 @@ function partOf(part: WirePart): ContentPart {
   }
   if (part.type === 'image_url' && part.image_url) {
     return { type: 'image', url: typeof part.image_url === 'string' ? part.image_url : part.image_url.url };
+  }
+  if (part.type === 'file' && part.file) {
+    return filePart(part.file.file_data, part.file.filename);
   }
   throw unsupported(`${part.type} content`);
 }

@@ -3,7 +3,7 @@
 
 import { createContext, useContext } from 'react';
 
-export type ModuleAction = 'install' | 'connect' | 'send' | 'suggestion';
+export type ModuleAction = 'install' | 'connect' | 'send' | 'suggestion' | 'attach' | 'voice';
 
 export const ModuleAnalytics = createContext<string | undefined>(undefined);
 

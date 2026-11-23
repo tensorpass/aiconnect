@@ -301,3 +301,70 @@ test('LangChain binds tools to ChatOpenAI', async () => {
   const answered = await model.invoke('Hello');
   assert.equal(answered.content, 'Hello from LangChain');
 });
+
+const PDF_URL = 'data:application/pdf;base64,JVBERi0xLjQK';
+const pdfPart = (name: string) => ({ type: 'file', url: PDF_URL, name });
+
+test('the OpenAI SDK sends a PDF as a file part on chat completions and on Responses', async () => {
+  const wallet = scriptedWallet(textReply('Read'), textReply('Read'));
+  const client = new OpenAI({ apiKey: 'aiwallet', fetch: wallet.fetch, maxRetries: 0 });
+  await client.chat.completions.create({
+    model: 'x',
+    messages: [{ role: 'user', content: [{ type: 'file', file: { filename: 'menu.pdf', file_data: PDF_URL } }] }],
+  });
+  await client.responses.create({
+    model: 'x',
+    input: [{ role: 'user', content: [{ type: 'input_file', filename: 'menu.pdf', file_data: PDF_URL }] }],
+  });
+  assert.deepEqual(wallet.requests[0].messages[0], { role: 'user', content: [pdfPart('menu.pdf')] });
+  assert.deepEqual(wallet.requests[1].messages[0], { role: 'user', content: [pdfPart('menu.pdf')] });
+});
+
+test('the Anthropic SDK sends a PDF and a plain text document', async () => {
+  const wallet = scriptedWallet(textReply('Read'));
+  const client = new Anthropic({ apiKey: 'aiwallet', fetch: wallet.fetch, maxRetries: 0 });
+  await client.messages.create({
+    model: 'x',
+    max_tokens: 100,
+    messages: [{
+      role: 'user',
+      content: [
+        {
+          type: 'document',
+          title: 'menu.pdf',
+          source: { type: 'base64', media_type: 'application/pdf', data: 'JVBERi0xLjQK' },
+        },
+        { type: 'document', title: 'notes.txt', source: { type: 'text', media_type: 'text/plain', data: 'שלום' } },
+      ],
+    }],
+  });
+  assert.deepEqual(wallet.requests[0].messages[0], {
+    role: 'user',
+    content: [pdfPart('menu.pdf'), { type: 'file', name: 'notes.txt', url: 'data:text/plain;base64,16nXnNeV150=' }],
+  });
+});
+
+test('Google Gen AI sends a PDF inline', async () => {
+  const wallet = scriptedWallet(textReply('Read'));
+  const client = new GoogleGenAI({ apiKey: 'aiwallet', httpOptions: { fetch: wallet.fetch } });
+  const result = await client.models.generateContent({
+    model: 'x',
+    contents: [{ role: 'user', parts: [{ inlineData: { mimeType: 'application/pdf', data: 'JVBERi0xLjQK' } }] }],
+  });
+  assert.equal(result.text, 'Read');
+  assert.deepEqual(wallet.requests[0].messages[0], { role: 'user', content: [pdfPart('attachment')] });
+});
+
+test('a file given by id or of another type is refused', async () => {
+  const client = new OpenAI({ apiKey: 'aiwallet', fetch: scriptedWallet().fetch, maxRetries: 0 });
+  await assert.rejects(client.chat.completions.create({
+    model: 'x', messages: [{ role: 'user', content: [{ type: 'file', file: { file_id: 'file-1' } }] }],
+  }), OpenAI.BadRequestError);
+  await assert.rejects(client.chat.completions.create({
+    model: 'x',
+    messages: [{
+      role: 'user',
+      content: [{ type: 'file', file: { filename: 'a.zip', file_data: 'data:application/zip;base64,UEs' } }],
+    }],
+  }), OpenAI.BadRequestError);
+});

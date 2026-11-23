@@ -12,7 +12,9 @@
   "exports": {
     "./aiconnect-elements.js": "./dist/aiconnect-elements.js",
     "./aiconnect-loader.js": "./dist/aiconnect-loader.js",
-    "./aiconnect-callback.js": "./dist/aiconnect-callback.js"
+    "./aiconnect-callback.js": "./dist/aiconnect-callback.js",
+    "./aiconnect-pdf.js": "./dist/aiconnect-pdf.js",
+    "./aiconnect-pcm-worklet.js": "./dist/aiconnect-pcm-worklet.js"
   },
   "unpkg": "dist/aiconnect-elements.js",
   "jsdelivr": "dist/aiconnect-elements.js",
@@ -32,6 +34,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.2.0",
     "esbuild": "^0.28.2",
+    "pdfjs-dist": "^6.5.438",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

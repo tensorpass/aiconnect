@@ -1,5 +1,6 @@
 // What the modules playground shows, kept in the page's address so a link opens the same view:
-// `?module=` picks the form, `lang=` the language and `theme=` light or dark.
+// `?module=` picks the form, `lang=` the language, `theme=` light or dark, and `attachments` turns on the
+// files and the voice of a question.
 
 import type { Locale } from '@tensorpass/aiconnect-react';
 
@@ -31,6 +32,7 @@ export interface PlaygroundSettings {
   form: Form;
   lang: Locale;
   theme: Theme;
+  attachments: boolean;
 }
 
 function pick<T extends string>(value: string | null, choices: readonly { id: T }[]): T {
@@ -47,9 +49,10 @@ export function readSettings(search: string): PlaygroundSettings {
     form: pick(params.get('module'), FORMS),
     lang: pick(params.get('lang'), LANGUAGES),
     theme: pick(params.get('theme'), THEMES),
+    attachments: params.has('attachments'),
   };
 }
 
-export function settingsSearch({ form, lang, theme }: PlaygroundSettings): string {
-  return `?${new URLSearchParams({ module: form, lang, theme })}`;
+export function settingsSearch({ form, lang, theme, attachments }: PlaygroundSettings): string {
+  return `?${new URLSearchParams({ module: form, lang, theme, ...(attachments ? { attachments: '1' } : {}) })}`;
 }

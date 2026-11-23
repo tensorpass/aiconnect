@@ -22,7 +22,16 @@ export interface ImagePart {
   url: string;
 }
 
-export type ContentPart = TextPart | ImagePart;
+// A file the visitor attached, as a base64 `data:` URL with its name: a PDF, which an account that
+// reads PDFs receives whole, or a text file (plain text, Markdown, CSV, JSON), which the model reads
+// as text.
+export interface FilePart {
+  type: 'file';
+  url: string;
+  name: string;
+}
+
+export type ContentPart = TextPart | ImagePart | FilePart;
 
 export interface SystemMessage {
   role: 'system';
@@ -126,11 +135,22 @@ export interface ProviderSession {
   chat(request: ChatRequest): Promise<ChatResponse>;
 }
 
+// What the model of an account reads besides text.
+export interface ReadableParts {
+  image: boolean;
+  pdf: boolean;
+}
+
+// How the account transcribes the visitor's voice: `live` writes the words while they are spoken,
+// `file` transcribes the recording once it ends, and `none` leaves dictation to the browser.
+export type DictationMode = 'live' | 'file' | 'none';
+
 // What a site sees of the wallet: whether it may use the visitor's AI, and then which account
-// answers it and on which model.
+// answers it, on which model, what that model reads and how the account transcribes a voice. A
+// wallet older than attachments leaves `reads` and `dictation` out.
 export type WalletLink =
   | { connected: false }
-  | { connected: true; providerName: string; model?: string };
+  | { connected: true; providerName: string; model?: string; reads?: ReadableParts; dictation?: DictationMode };
 
 export interface ToolSource {
   listTools(): Promise<ToolDefinition[]>;

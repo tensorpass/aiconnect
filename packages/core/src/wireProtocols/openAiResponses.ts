@@ -12,7 +12,7 @@ import type { WalletRequestError } from '../walletProvider.ts';
 import type { EventWriter } from './eventStream.ts';
 import type { WalletAnswer } from './walletAnswer.ts';
 import {
-  EMPTY_PARAMETERS, errorType, parseToolArguments, toolNameOf, unsupported, userContent,
+  EMPTY_PARAMETERS, errorType, filePart, parseToolArguments, toolNameOf, unsupported, userContent,
 } from './wireProtocol.ts';
 import type { AnswerContext, WireProtocol, WireRequest } from './wireProtocol.ts';
 
@@ -21,6 +21,8 @@ interface InputPart {
   text?: string;
   refusal?: string;
   image_url?: string;
+  file_data?: string;
+  filename?: string;
 }
 
 interface InputItem {
@@ -68,6 +70,9 @@ function partOf(part: InputPart): ContentPart {
   }
   if (part.type === 'input_image' && part.image_url) {
     return { type: 'image', url: part.image_url };
+  }
+  if (part.type === 'input_file') {
+    return filePart(part.file_data, part.filename);
   }
   throw unsupported(`${part.type} content`);
 }

@@ -319,6 +319,7 @@ On a screen up to 640 pixels wide, the side panel and the popup take the whole s
 | `toolLabels` | A plain name per tool, shown while it runs. |
 | `guards` | Your values for the guards: internal names, allowed hosts, the safe answer. |
 | `renderToolResults` | Your own cards for a turn's tool results. |
+| `attachments` | Images, PDFs and text files the visitor drops, pastes or attaches, and dictation. `{}` takes every kind. |
 | `analytics` | A name for the module's actions in your click analytics. |
 
 The [modules guide](https://tensorpass.app/docs/modules) documents each form and its opening options.
