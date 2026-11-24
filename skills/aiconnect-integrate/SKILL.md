@@ -3,7 +3,7 @@ name: aiconnect-integrate
 description: Add AI Connect to a website so its AI features run on each visitor's own AI plan (ChatGPT, Claude, Gemini and others) through the AI Wallet browser extension, or on the visitor's OpenRouter or TensorPass account without it, with no API key on the server and no inference bill. Sets up the site's public TensorPass site key through the account MCP server at plan.tensorpass.app. Use when adding an AI chat, an AI mode or an assistant to a React, Next.js or plain JavaScript site with AI Connect, when moving a site that already uses the OpenAI SDK, the Anthropic SDK, Google Gen AI, the Vercel AI SDK, LangChain, LlamaIndex or Mastra onto the visitor's own AI, or when the user mentions AI Connect, AI Wallet, AiConnectProvider, AiChatPanel, AiChatPopup, AiChatInline, AiChatPage, AiSearch, aiconnect-chat, useAiChat, McpToolSource or aiconnect.fetch.
 metadata:
   author: TensorPass
-  version: "0.4.8"
+  version: "0.4.9"
 ---
 
 # Add AI Connect to a site
@@ -148,7 +148,7 @@ Read the project's `package.json`. If it depends on `openai`, `@anthropic-ai/sdk
 Without React, load the modules as Web Components with one script tag, then write the elements where they go. Each element reads the tools from the site's MCP server.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@tensorpass/aiconnect-elements@0.1.7/dist/aiconnect-elements.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorpass/aiconnect-elements@0.1.8/dist/aiconnect-elements.js" defer></script>
 
 <aiconnect-chat variant="popup" mcp="/api/mcp"
   system="You recommend books from this site's catalog. Always search the catalog before recommending."
