@@ -5,7 +5,6 @@
 // web account starts the conversation again from the connection step.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { McpToolSource } from '@tensorpass/aiconnect';
 import type { ConnectionState, GuardPolicy, ToolSource } from '@tensorpass/aiconnect';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { useAiChat } from '../../useAiChat.ts';
@@ -21,17 +20,22 @@ export interface ModuleChatOptions {
 // The states in which the connection is still settling on its own, without the visitor.
 const SETTLING = new Set<ConnectionState['status']>(['checking', 'connecting']);
 
-// The site's MCP tools, connected on the first question. The module also renders on the server,
-// where a relative address has no page to resolve against.
+// The site's MCP tools, loaded and connected on the first question: a page whose visitor asks
+// nothing never downloads the MCP client and its schema library. The module also renders on the
+// server, where a relative address has no page to resolve against. A failed load is forgotten, so the
+// next question loads the client again.
 function mcpTools(url: string): ToolSource {
-  let source: McpToolSource | null = null;
+  let source: Promise<ToolSource> | null = null;
   const connected = () => {
-    source ??= new McpToolSource(url);
+    source ??= import('@tensorpass/aiconnect/mcp').then(({ McpToolSource }) => new McpToolSource(url), (error) => {
+      source = null;
+      throw error;
+    });
     return source;
   };
   return {
-    listTools: () => connected().listTools(),
-    callTool: (name, args) => connected().callTool(name, args),
+    listTools: async () => (await connected()).listTools(),
+    callTool: async (name, args) => (await connected()).callTool(name, args),
   };
 }
 

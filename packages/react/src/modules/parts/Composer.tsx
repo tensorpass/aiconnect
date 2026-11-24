@@ -134,8 +134,8 @@ export function Composer(props: ComposerProps) {
         {dictating ? <DictationBar dictation={voice} /> : (
           <>
             {attachments?.policy ? <AttachButton policy={attachments.policy} onFiles={attachments.add} /> : null}
-            <textarea ref={fieldRef} className="aic-field-input" rows={1} dir="auto" value={question.text}
-              placeholder={placeholder} aria-label={placeholder} onKeyDown={question.onKeyDown}
+            <textarea ref={fieldRef} className="aic-field-input" name="question" rows={1} dir="auto"
+              value={question.text} placeholder={placeholder} aria-label={placeholder} onKeyDown={question.onKeyDown}
               onChange={question.onChange} onPaste={pasteHandler(attachments)} />
             {voiceOn && !busy ? <MicButton onClick={() => void voice.start()} /> : null}
             {busy ? <StopButton onStop={onStop} /> : (

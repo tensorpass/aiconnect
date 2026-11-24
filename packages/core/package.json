@@ -18,6 +18,10 @@
       "types": "./dist/guards/index.d.ts",
       "default": "./dist/guards/index.js"
     },
+    "./mcp": {
+      "types": "./dist/mcpToolSource.d.ts",
+      "default": "./dist/mcpToolSource.js"
+    },
     "./attachments": {
       "types": "./dist/attachments/index.d.ts",
       "default": "./dist/attachments/index.js"
