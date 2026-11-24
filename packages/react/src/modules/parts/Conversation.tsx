@@ -1,9 +1,10 @@
-// The conversation of a chat module. Empty, it shows its heading, the connection step and the
-// suggested questions, under the wallet's ring in the full page mode. Then each turn shows the
-// visitor's question with its files, the site's tools as they run, the answer as it streams and the site's own
-// result cards, and the last answer's error comes with a way to ask again, or, for a TensorPass account
-// without a plan, the offer to subscribe. The view follows the answer down while the visitor stays at the
-// bottom.
+// The conversation of a chat module. Empty, it shows its heading, the suggested questions, then the
+// connection step, under the wallet's ring in the full page mode. The step appears once the first wallet
+// check ends, so it comes last and the heading and the questions the page rendered stay in place. Then
+// each turn shows the visitor's question with its files, the site's tools as they run, the answer as it
+// streams and the site's own result cards, and the last answer's error comes with a way to ask again,
+// or, for a TensorPass account without a plan, the offer to subscribe. The view follows the answer down
+// while the visitor stays at the bottom.
 
 import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
@@ -142,8 +143,8 @@ export function Conversation({ chat, intro, suggestions, ...view }: Conversation
         <div className="aic-empty">
           <div className="aic-empty-ring"><ConnectRing live={false} /></div>
           <h3 className="aic-intro">{intro}</h3>
-          <ConnectStep pending={false} />
           <Suggestions items={suggestions} onPick={chat.ask} />
+          <ConnectStep pending={false} />
         </div>
       ) : null}
       <ol className="aic-turns">
