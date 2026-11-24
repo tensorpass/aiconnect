@@ -1,9 +1,9 @@
 ---
 name: aiconnect-auth
-description: Harden a website's login before its MCP server serves signed in or staff tools to the visitor's own AI through AI Connect, and move live users to it without logging them out. Covers access tokens kept in localStorage, refresh tokens stored in clear, never rotated or checked apart from their expiry, sessions with no revocation, roles trusted from the browser, cookies without SameSite and routes open to cross site posts, and how the MCP route reads the session for each level of tools. Use before adding tools on a visitor's own data or a back office to an AI Connect MCP server, when reviewing or fixing a site's login, sessions, JWT, refresh tokens, logout or roles, or when the user mentions session security, token storage, refresh rotation, CSRF or McpToolSource's fetch option.
+description: Harden a website's login before its MCP server serves signed in or staff tools to the visitor's own AI through AI Connect, and move live users to it without logging them out. Covers access tokens kept in localStorage, refresh tokens stored in clear, never rotated or checked apart from their expiry, sessions with no revocation, roles trusted from the browser, cookies without SameSite and routes open to cross site posts, and how the MCP route reads the session for each level of tools. Use before adding tools on a visitor's own data or a back office to an AI Connect MCP server, when reviewing or fixing a site's login, sessions, JWT, refresh tokens, logout or roles, or when the user mentions session security, token storage, refresh rotation, CSRF, Better Auth or McpToolSource's fetch option.
 metadata:
   author: TensorPass
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # Harden a site's login for signed in tools
@@ -65,6 +65,9 @@ Each finding names its file and line, checked by reading the code path from the 
    script the value of the httpOnly cookie. On a Better Auth site, return the session through the `customSession`
    plugin without `token`, strip `token` from the sign in bodies in a `hooks.after` middleware
    (`createAuthMiddleware`), keep the `bearer` plugin off, and test that no auth response body carries it.
+10. **Better Auth sites.** Section 7 lists what to close and check before and after the move: the routes to disable,
+    the exact path limit of `disabledPaths`, the absolute session lifetime, suspended accounts, second factor enrollment
+    and the migration traps found on seven production sites.
 
 ## 3. Cookies, CSRF and CORS
 
@@ -145,6 +148,65 @@ use:
    tools to staff only.
 9. The database holds no clear token after the migration.
 10. No sign in or session response body carries the session token.
+
+## 7. Better Auth: what to close and check
+
+Lessons from seven production sites moved to Better Auth 1.7 on 21 and 22 November 2026, each found by a pen test or a
+security review after the move. Apply all of them when a site adopts Better Auth, and keep their tests.
+
+### Tokens in response bodies
+
+1. Better Auth 1.7 returns the session token in the JSON body of `/get-session` (`session.token`), of each sign in route
+   (`token`), of `/update-session` and `/change-password`, and of `/list-sessions`, which answers an array of sessions,
+   each with its raw `token`. The token is the value inside the httpOnly session cookie, so a script injected in the
+   page reads it from the response.
+2. There is no option to keep it out. Return the session through the `customSession` plugin without `token`, and strip
+   `token` and `session.token` in a `hooks.after` middleware (`createAuthMiddleware`), arrays included. Keep the
+   `bearer` plugin off: the page and the MCP route read the cookie.
+3. Disable the routes the client never calls rather than cleaning their answers: the session list and revoke routes,
+   `/update-session`, `/change-password` when the product has another flow.
+
+### Routes the product does not offer
+
+1. Every route Better Auth mounts is live unless disabled. A route the product never offers is an unreviewed way in:
+   `/update-user` stored names that skipped the app's own validation and reached emails unescaped; `/sign-in/email`
+   skipped the per account lockout the username sign in had; a Google `id_token` posted to `/sign-in/social` opened a
+   14 day session for whoever held a stolen token.
+2. Disable through `disabledPaths` each route the product does not use: sign up on a closed site, `/update-user`,
+   `/change-email`, `/delete-user`, `/link-social`, `/unlink-account`, the session list and revoke routes, sign in
+   methods the site does not show, `id_token` sign in when the site uses the redirect flow.
+3. `disabledPaths` matches exact paths. A route with a parameter, such as `/reset-password/:token`, cannot be disabled
+   there: review what it does, and close it at the plugin or the handler when it must go.
+4. Keep a unit test that lists the routes left on, read from the auth instance's router, and fails when a plugin or a
+   Better Auth upgrade adds one, until someone reviews it.
+5. Apply the lockout, rate limit and account checks to every sign in route left on, in one hook, not per route.
+
+### Sessions
+
+1. `expiresIn` with `updateAge` renews a session at each use, so an active session never ends. Cap it with a database
+   hook on session update: `expiresAt` never later than the session's `createdAt` plus the site's absolute lifetime
+   (30 days on our sites), with a test.
+2. A suspended, banned or deleted account must get no session: check the account's state in a
+   `databaseHooks.session.create.before` hook, and end its sessions (and its open sockets) at the moment it changes.
+3. Staff with a second factor: an account moved without its factor must not enroll one with the password alone. Open
+   enrollment only through a window an operator starts, and alert the staff channel at each enrollment.
+
+### Migration
+
+1. Keep each user's password: `emailAndPassword.password.hash` and `verify` use the project's existing algorithm, and a
+   script creates one `credential` account per user from the existing hash. Count users and accounts before and after,
+   run it once, back up the hashes first.
+2. Read the existing indexes before Better Auth creates its own: a unique index with other options on `users.email`, or
+   two indexes with one name, logs errors or stops the API at boot.
+3. Remove the old JWT and refresh token code, variables and collections in the same release.
+
+### Tests
+
+1. No body of an auth route, object or array, carries a session token.
+2. The list of enabled routes equals the reviewed list.
+3. A session ends at its absolute lifetime even when used every hour.
+4. A suspended account gets no session, and its open sockets close.
+5. Each sign in route left on applies the lockout.
 
 ## Rules
 
