@@ -1,0 +1,65 @@
+# Publishes the two TensorPass MCP servers to the official MCP Registry (https://registry.modelcontextprotocol.io):
+# io.github.tensorpass/aiconnect-docs (https://tensorpass.app/mcp) and io.github.tensorpass/tensorpass-account
+# (https://plan.tensorpass.app/mcp). The registry accepts the tensorpass namespace only from a credential that proves
+# the organization: this job's GitHub OIDC token does, with no stored secret. Each release tag publishes both records
+# under the tag's version, since a version cannot be published twice. A manual run from main publishes the latest
+# release tag's version, without touching npm.
+name: MCP registry
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mcp-registry
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.16
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+      - name: Require a release from main
+        run: git merge-base --is-ancestor HEAD origin/main
+      - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+      - name: Download and verify mcp-publisher
+        run: |
+          set -euo pipefail
+          archive=mcp-publisher_linux_amd64.tar.gz
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob \
+            --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "$archive"
+          tar xzf "$archive" mcp-publisher
+      - name: Write the tag's version into both records
+        run: |
+          set -euo pipefail
+          tag="$(git describe --tags --abbrev=0 --match 'v*')"
+          version="${tag#v}"
+          for file in mcp-registry/*.server.json; do
+            jq --arg version "$version" '.version = $version' "$file" > "$file.next"
+            mv "$file.next" "$file"
+          done
+      - name: Log in with the job's OIDC token
+        run: ./mcp-publisher login github-oidc
+      - name: Publish both servers
+        run: |
+          ./mcp-publisher publish mcp-registry/aiconnect-docs.server.json
+          ./mcp-publisher publish mcp-registry/tensorpass-account.server.json
