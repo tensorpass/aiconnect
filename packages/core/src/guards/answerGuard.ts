@@ -35,7 +35,7 @@ interface Found {
 const ENVELOPE_TAG = /<\/?\s*(?:instructions?|tool-result|attachment|steering)-/i;
 const IMAGE = /!\[[^\]\n]*\]\(|<img\b/i;
 const EMAIL = /[^\s@<>()[\]"'`:]+@[^\s@<>()[\]"'`]+\.[a-z]{2,}/gi;
-const LINK_TARGET = /\]\(\s*<?([^)\s>]+)|\b(https?:\/\/[^\s)\]>"'`]+)|<a\b[^>]*\bhref\s*=\s*["']?([^"'\s>]+)|\b(www\.[^\s)\]>"'`]+)/gi;
+const LINK_TARGET = /\]\(\s*<?([^)\s>]+)|\b(https?:\/\/[^\s)\]>"'`*]+)|<a\b[^>]*\bhref\s*=\s*["']?([^"'\s>]+)|\b(www\.[^\s)\]>"'`*]+)/gi;
 const TRAILING_PUNCTUATION = /[.,;:!?]+$/;
 // Stands for the page's origin where the guard runs without a page, such as a site's server.
 const NO_PAGE_ORIGIN = 'https://page.invalid';

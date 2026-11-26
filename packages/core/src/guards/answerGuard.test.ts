@@ -58,6 +58,7 @@ test('lets through links to the site, its allowed hosts and the addresses its to
   assert.equal(stopped('The guide is at https://guides.docs.example/a.'), null);
   assert.equal(stopped('Café Noa has [its menu](https://cafe-noa.example/menu) online.'), null);
   assert.equal(stopped('The menu: https://cafe-noa.example/menu.'), null);
+  assert.equal(stopped('The menu: **https://cafe-noa.example/menu**'), null);
 });
 
 // What a third party can plant in a site's content: a review, a comment, a product description. Each

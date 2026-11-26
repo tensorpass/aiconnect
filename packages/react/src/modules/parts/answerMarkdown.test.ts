@@ -8,14 +8,42 @@ import { answerBlocks, inlineRuns, keepAllowedLinks } from './answerMarkdown.ts'
 test('bold, italic, code and links become runs, the rest stays text', () => {
   assert.deepEqual(inlineRuns('Try **Piranesi**, a *calm* read: `search_books` [more](https://example.com/p).'), [
     { kind: 'text', text: 'Try ' },
-    { kind: 'strong', text: 'Piranesi' },
+    { kind: 'strong', runs: [{ kind: 'text', text: 'Piranesi' }] },
     { kind: 'text', text: ', a ' },
-    { kind: 'em', text: 'calm' },
+    { kind: 'em', runs: [{ kind: 'text', text: 'calm' }] },
     { kind: 'text', text: ' read: ' },
     { kind: 'code', text: 'search_books' },
     { kind: 'text', text: ' ' },
     { kind: 'link', text: 'more', href: 'https://example.com/p' },
     { kind: 'text', text: '.' },
+  ]);
+});
+
+test('a bare address becomes a link labelled with its host and path, without the closing punctuation', () => {
+  assert.deepEqual(inlineRuns('Start here: https://www.llb-auction.com/valuation.'), [
+    { kind: 'text', text: 'Start here: ' },
+    { kind: 'link', text: 'llb-auction.com/valuation', href: 'https://www.llb-auction.com/valuation' },
+    { kind: 'text', text: '.' },
+  ]);
+  assert.deepEqual(inlineRuns('(www.example.com/menu/)'), [
+    { kind: 'text', text: '(' },
+    { kind: 'link', text: 'example.com/menu', href: 'https://www.example.com/menu/' },
+    { kind: 'text', text: ')' },
+  ]);
+});
+
+test('a long address is cut in its label and kept whole in its link', () => {
+  const href = 'https://example.com/sales/2026/modern-and-contemporary-art/lot-118?ref=chat';
+  const [run] = inlineRuns(href);
+  assert.equal(run.kind === 'link' && run.href, href);
+  assert.equal(run.kind === 'link' && run.text, 'example.com/sales/2026/modern-and-conte…');
+});
+
+test('a link inside bold or italic text stays a link', () => {
+  assert.deepEqual(inlineRuns('**[Free valuation](https://example.com/valuation)** or *https://example.com/sell*'), [
+    { kind: 'strong', runs: [{ kind: 'link', text: 'Free valuation', href: 'https://example.com/valuation' }] },
+    { kind: 'text', text: ' or ' },
+    { kind: 'em', runs: [{ kind: 'link', text: 'example.com/sell', href: 'https://example.com/sell' }] },
   ]);
 });
 
@@ -72,4 +100,15 @@ test('a link the guards do not allow stays as its words, in paragraphs and in li
     { kind: 'text', text: 'verify' },
   ]);
   assert.deepEqual(list.kind === 'list' && list.items, [[{ kind: 'text', text: 'verify' }]]);
+});
+
+test('a bare address the guards do not allow stays as its words, inside bold text too', () => {
+  const blocks = answerBlocks('Go to **https://attacker.example/x** or https://cafe.example/menu');
+  const [paragraph] = keepAllowedLinks(blocks, (href) => href.startsWith('https://cafe.example/'));
+  assert.deepEqual(paragraph.kind === 'paragraph' && paragraph.runs, [
+    { kind: 'text', text: 'Go to ' },
+    { kind: 'strong', runs: [{ kind: 'text', text: 'attacker.example/x' }] },
+    { kind: 'text', text: ' or ' },
+    { kind: 'link', text: 'cafe.example/menu', href: 'https://cafe.example/menu' },
+  ]);
 });

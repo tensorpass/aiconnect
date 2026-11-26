@@ -214,3 +214,20 @@
     gap: 14px;
   }
 }
+
+/* The shop's credit under the question box. */
+.shop-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.shop-credit:hover {
+  text-decoration: underline;
+}
+
+.shop-credit-mark {
+  width: 14px;
+  height: 14px;
+}

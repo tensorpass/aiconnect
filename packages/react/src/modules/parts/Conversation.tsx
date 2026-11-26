@@ -6,7 +6,7 @@
 // or, for a TensorPass account without a plan, the offer to subscribe. The view follows the answer down
 // while the visitor stays at the bottom.
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
 import { useAiConnect } from '../../AiConnectProvider.tsx';
 import { ConnectRing } from '../../ConnectRing.tsx';
@@ -30,6 +30,8 @@ export interface TurnBodyProps {
   stopped: boolean;
   view: TurnView;
   linkAllowed: (href: string) => boolean;
+  // Every file the visitor added up to this turn.
+  attachments: PreparedAttachment[];
 }
 
 // The plan gateway's refusal of a TensorPass account without a subscription.
@@ -67,10 +69,10 @@ function Question({ text, attachments, unread }: QuestionProps) {
 
 // What a turn shows under its question: the tools as they run, a thinking line until the first
 // words arrive, the answer, whether the visitor stopped it, and the site's own result cards.
-export function TurnBody({ turn, live, stopped, view, linkAllowed }: TurnBodyProps) {
+export function TurnBody({ turn, live, stopped, view, linkAllowed, attachments }: TurnBodyProps) {
   const { moduleMessages } = useAiConnect();
   const toolRunning = turn.tools.some((activity) => activity.result === null);
-  const results = view.renderToolResults?.(turn);
+  const results = view.renderToolResults?.(turn, { attachments });
   return (
     <>
       <ToolActivityList tools={turn.tools} labels={view.toolLabels} />
@@ -126,6 +128,15 @@ function useFollowAnswer(logRef: RefObject<HTMLDivElement | null>, chat: ModuleC
   };
 }
 
+// For each turn, every file the visitor added up to it, oldest first.
+export function attachmentsSoFar(turns: ChatTurn[]): PreparedAttachment[][] {
+  const added: PreparedAttachment[] = [];
+  return turns.map((turn) => {
+    added.push(...(turn.attachments ?? []));
+    return [...added];
+  });
+}
+
 export interface ConversationProps extends TurnView {
   chat: ModuleChat;
   intro: string;
@@ -136,6 +147,7 @@ export function Conversation({ chat, intro, suggestions, ...view }: Conversation
   const { moduleMessages } = useAiConnect();
   const logRef = useRef<HTMLDivElement>(null);
   const onScroll = useFollowAnswer(logRef, chat);
+  const attachments = useMemo(() => attachmentsSoFar(chat.turns), [chat.turns]);
   const empty = chat.turns.length === 0 && !chat.pendingQuestion;
   return (
     <div ref={logRef} className="aic-log" role="log" aria-busy={chat.busy} onScroll={onScroll}>
@@ -152,7 +164,7 @@ export function Conversation({ chat, intro, suggestions, ...view }: Conversation
           <li key={index} className="aic-turn">
             <Question text={turn.question} attachments={turn.attachments} unread={turn.unread} />
             <TurnBody turn={turn} view={view} stopped={chat.stopped.includes(index)} linkAllowed={chat.linkAllowed}
-              live={chat.busy && index === chat.turns.length - 1} />
+              live={chat.busy && index === chat.turns.length - 1} attachments={attachments[index]} />
           </li>
         ))}
         {chat.pendingQuestion ? (

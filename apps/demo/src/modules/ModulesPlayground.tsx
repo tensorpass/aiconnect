@@ -25,6 +25,7 @@ import { demoTools } from '../demoTools.ts';
 import { BookCard, bookResults } from './BookCards.tsx';
 import { PlaygroundBar } from './PlaygroundBar.tsx';
 import { readSettings, settingsSearch } from './playgroundSettings.ts';
+import { ShopCredit } from './ShopCredit.tsx';
 import type { PlaygroundSettings } from './playgroundSettings.ts';
 import { GUARDS, SHOP_COPY, SYSTEM } from './shopCopy.ts';
 import type { ShopCopy } from './shopCopy.ts';
@@ -60,7 +61,8 @@ function ShopPage({ form, copy, attachments }: ShopPageProps) {
   const renderToolResults = useMemo(() => bookResults(copy.pages), [copy]);
   const module = {
     system: SYSTEM, tools: demoTools, guards: GUARDS, intro: copy.intro, suggestions: copy.suggestions,
-    toolLabels: copy.toolLabels, renderToolResults, ...(attachments ? { attachments: {} } : {}),
+    toolLabels: copy.toolLabels, renderToolResults, footer: <ShopCredit label={copy.credit} />,
+    ...(attachments ? { attachments: {} } : {}),
   };
   return (
     <>

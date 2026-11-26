@@ -164,6 +164,30 @@
   padding: 8px 14px 14px;
 }
 
+/* The site's own line under the question box: small, muted, its links in the text's colour. */
+.aic-composer:has(~ .aic-module-foot) {
+  padding-bottom: 6px;
+}
+
+.aic-module-foot {
+  flex: none;
+  margin: 0;
+  padding: 0 14px 10px;
+  color: var(--aic-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.aic-module-foot a {
+  color: inherit;
+}
+
+.aic-search .aic-module-foot {
+  padding: 0;
+  text-align: start;
+}
+
 .aic-field {
   display: flex;
   align-items: flex-end;

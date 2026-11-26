@@ -1,6 +1,7 @@
 // A module's chat with a web account, the gateway played: a TensorPass account without a plan gets the offer
 // to subscribe and is answered once the plan is active, the badge names the plan's level in full on a phone,
-// Sign out brings the connection step back, and the question box grows without a scrollbar for one line.
+// Sign out brings the connection step back, the question box grows without a scrollbar for one line, and an
+// answer's addresses become short links above the site's own line under the question box.
 
 import { expect, test } from '@playwright/test';
 import type { BrowserContext, Page, Route } from '@playwright/test';
@@ -21,17 +22,22 @@ const BILLING_PAGE = `${GATEWAY}/billing?ticket=t1&view=subscribe&plan=pro&from=
 
 interface Plan {
   active: boolean;
+  // What the played model answers, 'Try Piranesi.' unless the test sets it.
+  answer?: string;
 }
 
-const ANSWER = `data: ${JSON.stringify({ choices: [{ delta: { content: 'Try Piranesi.' }, finish_reason: 'stop' }] })}`
-  + '\n\ndata: [DONE]\n\n';
+const streamed = (content: string) => (
+  `data: ${JSON.stringify({ choices: [{ delta: { content }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`
+);
 
 function answerChat(route: Route, plan: Plan) {
   if (!plan.active) {
     const error = { type: 'plan_error', code: 'plan_inactive', message: 'This plan has no active subscription.' };
     return route.fulfill({ status: 402, headers: CORS, json: { error } });
   }
-  return route.fulfill({ headers: { ...CORS, 'content-type': 'text/event-stream' }, body: ANSWER });
+  return route.fulfill({
+    headers: { ...CORS, 'content-type': 'text/event-stream' }, body: streamed(plan.answer ?? 'Try Piranesi.'),
+  });
 }
 
 // TensorPass's gateway for an account whose plan the test turns on, with every route answering its preflight.
@@ -144,4 +150,24 @@ test('the question box shows no scrollbar for one line, grows to six, then scrol
   const send = await page.getByRole('button', { name: 'Send' }).boundingBox();
   const box = await page.locator('.aic-field').boundingBox();
   expect(send!.x + send!.width).toBeLessThanOrEqual(box!.x + box!.width);
+});
+
+test('an answer\'s bare address and bold link become links, above the site\'s line under the question box', async ({
+  page, context,
+}) => {
+  const answer = 'Read it at http://localhost:4615/books/piranesi. Or open **[Gilead](/books/gilead)**.';
+  await playGateway(context, { active: true, answer });
+  await signedIn(page);
+  await page.goto(`/?module=inline&siteKey=${SITE_KEY}`);
+  await ask(page, 'A calm book');
+  const links = page.locator('.aic-answer a');
+  await expect(links).toHaveText(['localhost:4615/books/piranesi', 'Gilead']);
+  await expect(links.first()).toHaveAttribute('href', 'http://localhost:4615/books/piranesi');
+  await expect(page.locator('.aic-answer strong a')).toHaveAttribute('href', '/books/gilead');
+
+  const credit = page.locator('.aic-module-foot').getByRole('link', { name: 'AI features powered by TensorPass' });
+  await expect(credit).toHaveAttribute('href', /utm_source=demo/);
+  const composer = await page.locator('.aic-composer').boundingBox();
+  const foot = await page.locator('.aic-module-foot').boundingBox();
+  expect(foot!.y).toBeGreaterThanOrEqual(composer!.y + composer!.height);
 });

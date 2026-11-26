@@ -2,15 +2,16 @@
 // lists, each made of inline runs (plain, bold, italic, code, link). Models write light Markdown
 // even when asked for plain text, so the module shows it as formatting. A mark the stream has not
 // closed yet stays plain text until its closing half arrives. An image is never drawn, since it would
-// load by itself: its description stays as text. A link the conversation's guards do not allow stays
-// as its words.
+// load by itself: its description stays as text. A bare web address becomes a link labelled with its
+// host and path, and a link inside bold or italic text stays a link. A link the conversation's guards
+// do not allow stays as its words.
 
 import { leadsToSitePage } from '@tensorpass/aiconnect';
 
 export type InlineRun =
   | { kind: 'text'; text: string }
-  | { kind: 'strong'; text: string }
-  | { kind: 'em'; text: string }
+  | { kind: 'strong'; runs: InlineRun[] }
+  | { kind: 'em'; runs: InlineRun[] }
   | { kind: 'code'; text: string }
   | { kind: 'link'; text: string; href: string };
 
@@ -19,11 +20,23 @@ export type AnswerBlock =
   | { kind: 'heading'; runs: InlineRun[] }
   | { kind: 'list'; ordered: boolean; items: InlineRun[][] };
 
-const INLINE = /\*\*([^*\n]+)\*\*|`([^`\n]+)`|!\[([^\]\n]*)\]\([^)\s]+\)|\[([^\]\n]+)\]\(([^)\s]+)\)|\*([^*\s][^*\n]*?)\*/g;
+// A bare address ends before a space, a closing bracket, a quote or an asterisk, and never on the
+// punctuation that closes a sentence: the same address the answer guard reads (LINK_TARGET in core).
+const BARE_ADDRESS = String.raw`[^\s)\]>"'\x60*]*[^\s)\]>"'\x60*.,;:!?]`;
+const INLINE = new RegExp([
+  String.raw`\*\*([^*\n]+)\*\*`,
+  String.raw`\x60([^\x60\n]+)\x60`,
+  String.raw`!\[([^\]\n]*)\]\([^)\s]+\)`,
+  String.raw`\[([^\]\n]+)\]\(([^)\s]+)\)`,
+  String.raw`\b((?:https?:\/\/|www\.)${BARE_ADDRESS})`,
+  String.raw`\*([^*\s][^*\n]*?)\*`,
+].join('|'), 'gi');
 const BULLET = /^\s*[-*•]\s+(.*)$/;
 const NUMBERED = /^\s*\d+[.)]\s+(.*)$/;
 const HEADING = /^\s*#{1,6}\s+(.*)$/;
 const WEB_OR_MAIL = /^(https?:\/\/|mailto:)/i;
+const SCHEME = /^https?:\/\//i;
+const LABEL_LENGTH = 40;
 
 // Whether `href` stays on the page's own site, read as the conversation's guards read it.
 export function onSite(href: string): boolean {
@@ -35,10 +48,22 @@ function opensSafely(href: string): boolean {
   return WEB_OR_MAIL.test(href) || onSite(href);
 }
 
+// A bare address as a reader scans it: the host without www and the path, cut at LABEL_LENGTH.
+function addressLabel(href: string): string {
+  const url = new URL(href);
+  const label = `${url.host.replace(/^www\./i, '')}${url.pathname.replace(/\/$/, '')}`;
+  return label.length > LABEL_LENGTH ? `${label.slice(0, LABEL_LENGTH - 1)}…` : label;
+}
+
+function addressRun(address: string): InlineRun {
+  const href = SCHEME.test(address) ? address : `https://${address}`;
+  return URL.canParse(href) ? { kind: 'link', text: addressLabel(href), href } : { kind: 'text', text: address };
+}
+
 function markRun(match: RegExpExecArray): InlineRun {
-  const [whole, strong, code, imageText, linkText, href, em] = match;
+  const [whole, strong, code, imageText, linkText, href, address, em] = match;
   if (strong !== undefined) {
-    return { kind: 'strong', text: strong };
+    return { kind: 'strong', runs: inlineRuns(strong) };
   }
   if (code !== undefined) {
     return { kind: 'code', text: code };
@@ -49,7 +74,10 @@ function markRun(match: RegExpExecArray): InlineRun {
   if (linkText !== undefined) {
     return opensSafely(href) ? { kind: 'link', text: linkText, href } : { kind: 'text', text: whole };
   }
-  return { kind: 'em', text: em };
+  if (address !== undefined) {
+    return addressRun(address);
+  }
+  return { kind: 'em', runs: inlineRuns(em) };
 }
 
 export function inlineRuns(text: string): InlineRun[] {
@@ -107,11 +135,15 @@ function addLine(blocks: AnswerBlock[], line: string, afterBlank: boolean): void
   blocks.push({ kind: 'paragraph', runs: inlineRuns(line) });
 }
 
-// The blocks with every link the guards do not allow turned back into its words.
+// The blocks with every link the guards do not allow turned back into its words, inside bold and
+// italic text too.
 export function keepAllowedLinks(blocks: AnswerBlock[], allowed: (href: string) => boolean): AnswerBlock[] {
-  const runs = (items: InlineRun[]) => items.map((run): InlineRun => (
-    run.kind === 'link' && !allowed(run.href) ? { kind: 'text', text: run.text } : run
-  ));
+  const runs = (items: InlineRun[]): InlineRun[] => items.map((run): InlineRun => {
+    if (run.kind === 'strong' || run.kind === 'em') {
+      return { ...run, runs: runs(run.runs) };
+    }
+    return run.kind === 'link' && !allowed(run.href) ? { kind: 'text', text: run.text } : run;
+  });
   return blocks.map((block) => (block.kind === 'list'
     ? { ...block, items: block.items.map(runs) }
     : { ...block, runs: runs(block.runs) }));

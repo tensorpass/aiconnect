@@ -42,7 +42,7 @@ export class ChatElement extends ModuleElement {
 
   protected module(tools: ToolSource | undefined) {
     const variant = this.getAttribute('variant') ?? 'inline';
-    const props = { ...moduleProps(this), tools };
+    const props = { ...moduleProps(this), tools, footer: this.footer() };
     if (variant === 'inline') {
       return <AiChatInline {...props} />;
     }

@@ -1,7 +1,9 @@
 // The base of the AI Connect elements: an open shadow root holding the modules' stylesheet and a
 // React root, drawn again whenever an observed attribute or the `tools` property changes. The shadow
 // root keeps the page's own element styles out of the module, while the page's --aic-* tokens reach
-// in by inheritance. Every element of the page shares one connection to the visitor's AI.
+// in by inheritance. A child the page gives `slot="footer"` is drawn at the module's foot, under the
+// question box, with the page's own styles. Every element of the page shares one connection to the
+// visitor's AI.
 
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
@@ -19,6 +21,8 @@ export abstract class ModuleElement extends HTMLElement {
   #root: Root | null = null;
   #tools: ToolSource | undefined;
   readonly #mount: HTMLDivElement;
+  // Draws the module again when the page adds or removes its footer child.
+  readonly #children = new MutationObserver(() => this.render());
 
   constructor() {
     super();
@@ -49,10 +53,12 @@ export abstract class ModuleElement extends HTMLElement {
     }
     addPageTokens();
     this.#root ??= createRoot(this.#mount);
+    this.#children.observe(this, { childList: true });
     this.render();
   }
 
   disconnectedCallback(): void {
+    this.#children.disconnect();
     this.#root?.unmount();
     this.#root = null;
   }
@@ -62,6 +68,11 @@ export abstract class ModuleElement extends HTMLElement {
   }
 
   protected abstract module(tools: ToolSource | undefined): ReactNode;
+
+  // The page's own line for the module's foot, when the page gives a child with `slot="footer"`.
+  protected footer(): ReactNode {
+    return this.querySelector(':scope > [slot="footer"]') ? <slot name="footer" /> : undefined;
+  }
 
   protected render(): void {
     this.#root?.render(

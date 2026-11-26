@@ -1,6 +1,6 @@
 // The frame every chat module shares: a header with the module's title, the account that answers
-// and its buttons, then the conversation, then the question box. When the site takes attachments, files
-// dropped anywhere on the frame join the question.
+// and its buttons, then the conversation, then the question box, then the site's own line when it gives
+// one. When the site takes attachments, files dropped anywhere on the frame join the question.
 
 import type { ReactNode, RefObject } from 'react';
 import { attachmentsOn } from '@tensorpass/aiconnect/attachments';
@@ -13,6 +13,7 @@ import { Composer } from './Composer.tsx';
 import { Conversation } from './Conversation.tsx';
 import { CloseIcon, NewChatIcon } from './icons.tsx';
 import { ModuleAnalytics } from './moduleAnalytics.ts';
+import { ModuleFoot } from './ModuleFoot.tsx';
 import type { ModuleChat } from './useModuleChat.ts';
 
 export interface ChatFrameProps {
@@ -60,6 +61,7 @@ export function ChatFrame({ module, chat, fieldRef, ...header }: ChatFrameProps)
         <Composer busy={chat.busy} placeholder={module.placeholder ?? moduleMessages.placeholder} onSend={chat.ask}
           onStop={chat.stop} fieldRef={fieldRef} attachments={attachments.policy ? attachments : undefined}
           reads={chat.reads} dictation={chat.dictation} voice={Boolean(policy) && policy?.voice !== false} />
+        <ModuleFoot>{module.footer}</ModuleFoot>
       </DropZone>
     </ModuleAnalytics.Provider>
   );

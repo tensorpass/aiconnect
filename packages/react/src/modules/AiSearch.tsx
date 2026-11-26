@@ -1,7 +1,7 @@
 // A search bar that answers. The visitor types or dictates a question in the site's search bar, and the
 // answer streams in a card under it, with the tools it ran, the site's own result cards and the account
-// that answers. Each search starts a new conversation; Escape or the bar's clear button empties the
-// bar and the answer.
+// that answers. The site's own line, when it gives one, closes the module. Each search starts a new
+// conversation; Escape or the bar's clear button empties the bar and the answer.
 
 import { useId, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
@@ -17,6 +17,7 @@ import type { TurnView } from './parts/Conversation.tsx';
 import { ArrowIcon, CloseIcon, SearchIcon } from './parts/icons.tsx';
 import { ModuleAnalytics } from './parts/moduleAnalytics.ts';
 import { moduleClass } from './parts/moduleClass.ts';
+import { ModuleFoot } from './parts/ModuleFoot.tsx';
 import { useModuleChat } from './parts/useModuleChat.ts';
 import { useModuleHandle } from './parts/useModuleHandle.ts';
 import type { ModuleChat } from './parts/useModuleChat.ts';
@@ -37,7 +38,7 @@ function SearchResult(view: TurnView & { chat: ModuleChat }) {
     <div className="aic-search-result" role="region" aria-live="polite" aria-busy={chat.busy}>
       {turn ? (
         <TurnBody turn={turn} view={view} live={chat.busy} stopped={chat.stopped.includes(chat.turns.length - 1)}
-          linkAllowed={chat.linkAllowed} />
+          linkAllowed={chat.linkAllowed} attachments={turn.attachments ?? []} />
       ) : <ConnectStep pending compact />}
       {chat.error ? (
         <div className="aic-error" role="alert">
@@ -147,6 +148,7 @@ export function AiSearch({ ref, ...props }: AiSearchProps) {
         {started ? (
           <SearchResult chat={chat} toolLabels={props.toolLabels} renderToolResults={props.renderToolResults} />
         ) : <Suggestions items={props.suggestions} onPick={bar.search} />}
+        <ModuleFoot>{props.footer}</ModuleFoot>
       </div>
     </ModuleAnalytics.Provider>
   );

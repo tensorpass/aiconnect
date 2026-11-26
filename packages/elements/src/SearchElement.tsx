@@ -9,6 +9,6 @@ export class SearchElement extends ModuleElement {
   static observedAttributes = SHARED_ATTRIBUTES;
 
   protected module(tools: ToolSource | undefined) {
-    return <AiSearch {...moduleProps(this)} tools={tools} />;
+    return <AiSearch {...moduleProps(this)} tools={tools} footer={this.footer()} />;
   }
 }

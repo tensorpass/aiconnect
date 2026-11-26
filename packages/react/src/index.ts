@@ -21,4 +21,5 @@ export { AiChatPopup } from './modules/AiChatPopup.tsx';
 export type { AiChatPopupProps } from './modules/AiChatPopup.tsx';
 export { AiSearch } from './modules/AiSearch.tsx';
 export type { AiSearchProps } from './modules/AiSearch.tsx';
-export type { AiModuleHandle, AiModuleProps, AiOverlayProps } from './modules/types.ts';
+export type { AiModuleHandle, AiModuleProps, AiOverlayProps, ToolResultsContext } from './modules/types.ts';
+export { BrandMark } from './BrandMark.tsx';

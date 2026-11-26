@@ -1,6 +1,6 @@
 {
   "name": "@tensorpass/aiconnect-design",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "The design tokens, the TensorPass mark, the providers' marks, key card colours and room colours shared by the AI Connect connect window, the AI Wallet extension and the website.",
   "type": "module",
   "sideEffects": [

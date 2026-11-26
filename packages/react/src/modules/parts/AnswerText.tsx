@@ -11,9 +11,9 @@ import type { AnswerBlock, InlineRun } from './answerMarkdown.ts';
 function Run({ run }: { run: InlineRun }) {
   switch (run.kind) {
     case 'strong':
-      return <strong>{run.text}</strong>;
+      return <strong><Runs runs={run.runs} caret={null} /></strong>;
     case 'em':
-      return <em>{run.text}</em>;
+      return <em><Runs runs={run.runs} caret={null} /></em>;
     case 'code':
       return <code>{run.text}</code>;
     case 'link': {

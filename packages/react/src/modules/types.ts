@@ -1,12 +1,19 @@
 // The props every interface module shares: what the visitor's AI is told, the site's tools, the copy
 // the site sets for its own voice, the guards it tunes, the files and voice it takes, how the site draws
-// its tool results, and the handle its own controls ask through. The modules that float over the page add
-// how they open.
+// its tool results, the site's own line under the question box, and the handle its own controls ask
+// through. The modules that float over the page add how they open.
 
 import type { ReactNode, Ref } from 'react';
 import type { GuardPolicy, ToolSource } from '@tensorpass/aiconnect';
-import type { AttachmentPolicy } from '@tensorpass/aiconnect/attachments';
+import type { AttachmentPolicy, PreparedAttachment } from '@tensorpass/aiconnect/attachments';
 import type { ChatTurn } from '../useAiChat.ts';
+
+// What the conversation holds when a turn's results are drawn.
+export interface ToolResultsContext {
+  // Every file the visitor added up to this turn, oldest first, as prepared for the model: a card that
+  // sends a request with the visitor's photos reads them here, whichever question carried them.
+  attachments: PreparedAttachment[];
+}
 
 // What a site's own controls can do with a module through its `ref`.
 export interface AiModuleHandle {
@@ -41,7 +48,10 @@ export interface AiModuleProps {
   attachments?: AttachmentPolicy;
   // Draws a turn's tool results the site's way, such as its own result cards, under the answer.
   // The turn holds the answer and every tool call with its raw result.
-  renderToolResults?: (turn: ChatTurn) => ReactNode;
+  renderToolResults?: (turn: ChatTurn, context: ToolResultsContext) => ReactNode;
+  // The site's own line under the question box, such as a credit or a privacy note. Nothing is drawn
+  // without it.
+  footer?: ReactNode;
   // A name for the module's actions in the site's click analytics: the install and connect buttons, the
   // send button and the suggestions carry `data-analytics` with it, such as `chat-install` or `chat-send`.
   analytics?: string;

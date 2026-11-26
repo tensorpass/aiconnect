@@ -15,6 +15,8 @@ export interface ShopCopy {
   intro: string;
   suggestions: string[];
   toolLabels: Record<string, string>;
+  // The shop's line under the question box, crediting the AI features to TensorPass.
+  credit: string;
 }
 
 export const SYSTEM = [
@@ -39,6 +41,7 @@ export const SHOP_COPY: Record<Locale, ShopCopy> = {
     intro: 'What do you feel like reading?',
     suggestions: ['A calm book for tonight', 'Something funny and hopeful', 'An adventure under 320 pages'],
     toolLabels: { [SEARCH_BOOKS]: 'Searching the catalog' },
+    credit: 'AI features powered by TensorPass',
   },
   fr: {
     shopName: 'Librairie',
@@ -50,6 +53,7 @@ export const SHOP_COPY: Record<Locale, ShopCopy> = {
     suggestions: ['Un livre calme pour ce soir', 'Quelque chose de drôle et plein d\'espoir',
       'Une aventure de moins de 320 pages'],
     toolLabels: { [SEARCH_BOOKS]: 'Recherche dans le catalogue' },
+    credit: 'Fonctions IA fournies par TensorPass',
   },
   he: {
     shopName: 'חנות ספרים',
@@ -60,6 +64,7 @@ export const SHOP_COPY: Record<Locale, ShopCopy> = {
     intro: 'מה בא לכם לקרוא?',
     suggestions: ['ספר רגוע להערב', 'משהו מצחיק ומלא תקווה', 'הרפתקה של פחות מ 320 עמודים'],
     toolLabels: { [SEARCH_BOOKS]: 'מחפשים בקטלוג' },
+    credit: 'תכונות AI מופעלות על ידי TensorPass',
   },
   ar: {
     shopName: 'مكتبة',
@@ -70,6 +75,7 @@ export const SHOP_COPY: Record<Locale, ShopCopy> = {
     intro: 'ماذا تحب أن تقرأ؟',
     suggestions: ['كتاب هادئ لهذه الليلة', 'شيء مضحك ومليء بالأمل', 'مغامرة في أقل من 320 صفحة'],
     toolLabels: { [SEARCH_BOOKS]: 'جارٍ البحث في الفهرس' },
+    credit: 'ميزات الذكاء الاصطناعي من TensorPass',
   },
   zh: {
     shopName: '书店',
@@ -80,5 +86,6 @@ export const SHOP_COPY: Record<Locale, ShopCopy> = {
     intro: '你想读点什么？',
     suggestions: ['今晚读一本安静的书', '有趣又充满希望的书', '320 页以内的冒险故事'],
     toolLabels: { [SEARCH_BOOKS]: '正在搜索书目' },
+    credit: 'AI 功能由 TensorPass 提供',
   },
 };

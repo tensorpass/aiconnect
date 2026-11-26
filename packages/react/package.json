@@ -1,6 +1,6 @@
 {
   "name": "@tensorpass/aiconnect-react",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "React provider picker and chat hook for AI Connect.",
   "type": "module",
   "sideEffects": [
@@ -34,8 +34,8 @@
     "build": "rm -rf dist tsconfig.tsbuildinfo && tsc -b && esbuild src/styles.css --bundle --outfile=dist/styles.css --log-level=warning && cp src/modules/styles/launchers.css dist/launchers.css"
   },
   "dependencies": {
-    "@tensorpass/aiconnect": "0.1.8",
-    "@tensorpass/aiconnect-design": "0.1.8"
+    "@tensorpass/aiconnect": "0.1.9",
+    "@tensorpass/aiconnect-design": "0.1.9"
   },
   "peerDependencies": {
     "react": ">=19"
