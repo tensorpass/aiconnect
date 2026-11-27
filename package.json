@@ -1,6 +1,6 @@
 {
   "name": "aiconnect",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "license": "Apache-2.0",
   "description": "Let visitors connect their own AI account to any website: one click, their plan or credits, no inference bill for the site.",
