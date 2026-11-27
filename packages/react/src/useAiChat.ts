@@ -18,6 +18,7 @@ import type { PreparedAttachment } from '@tensorpass/aiconnect/attachments';
 import { useAiConnect } from './AiConnectProvider.tsx';
 import { failedAnswerText } from './messages.ts';
 import type { ModuleMessages } from './messages.ts';
+import { appendAnswer } from './answerSteps.ts';
 import { withinRequestBudget } from './transcriptBudget.ts';
 
 export interface ToolActivity {
@@ -62,9 +63,9 @@ function updateLast(turns: ChatTurn[], change: (turn: ChatTurn) => ChatTurn): Ch
   return [...turns.slice(0, -1), change(turns.at(-1)!)];
 }
 
-// Writes the conversation's progress into the last turn, as the answer streams and the tools run.
-// A conversation that was stopped writes nothing more, so a question sent right after it keeps its
-// own turn.
+// Writes the conversation's progress into the last turn, as the answer streams and the tools run. The
+// words the model writes after a tool's result start a paragraph of their own. A conversation that was
+// stopped writes nothing more, so a question sent right after it keeps its own turn.
 function lastTurnHooks(
   setTurns: Dispatch<SetStateAction<ChatTurn[]>>, signal: AbortSignal, guard: ChatGuard,
 ): ConversationHooks {
@@ -73,11 +74,19 @@ function lastTurnHooks(
       setTurns((current) => updateLast(current, change));
     }
   };
+  let newStep = false;
   return {
-    onText: (delta) => updateTurn((turn) => ({ ...turn, answer: turn.answer + delta })),
-    onToolCall: (call) => updateTurn((turn) => ({
-      ...turn, tools: [...turn.tools, { call, result: null, visible: guard.toolVisible(call.name) }],
-    })),
+    onText: (delta) => {
+      const opensStep = newStep;
+      newStep = false;
+      updateTurn((turn) => ({ ...turn, answer: appendAnswer(turn.answer, delta, opensStep) }));
+    },
+    onToolCall: (call) => {
+      newStep = true;
+      updateTurn((turn) => ({
+        ...turn, tools: [...turn.tools, { call, result: null, visible: guard.toolVisible(call.name) }],
+      }));
+    },
     onToolResult: (call, result) => updateTurn((turn) => ({
       ...turn, tools: turn.tools.map((activity) => (activity.call.id === call.id ? { ...activity, result } : activity)),
     })),
